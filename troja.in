@@ -1,0 +1,9 @@
+
+# proton 10 MeV 
+
+# world is unlimited visible
+#/vis/geometry/set/visibility World -1 true
+
+#/gun/particle proton
+#/gun/energy 10 MeV
+/run/beamOn 1000000
