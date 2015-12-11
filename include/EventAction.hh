@@ -30,6 +30,7 @@ class EventAction : public G4UserEventAction
     void Reset();
 
     // get methods
+    G4int GetEventNumber() const { return fEvntNr; }
     G4double GetEnergy1() const { return fEnergy1; }
     G4double GetEnergy2() const { return fEnergy2; }
     G4double GetX1() const { return fX1; }
@@ -41,6 +42,7 @@ class EventAction : public G4UserEventAction
     static EventAction* fgInstance;  
 
     G4int     fPrintModulo;
+    G4int     fEvntNr;
     G4double  fEnergy1;
     G4double  fEnergy2;
     G4double  fX1;

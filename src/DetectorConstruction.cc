@@ -125,7 +125,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   // Sphere shape
 //  G4double shape2_rmin = 10.50*cm, shape2_rmax = 10.6*cm;  //1 mm full-size Si??
-  G4double shape2_rmin = 10.50*cm, shape2_rmax = 11.5*cm;  //10 mm full-size Si??
+  G4double shape2_rmin = 10.50*cm, shape2_rmax = 12.5*cm;  //10 mm full-size Si??
   G4double shape2_thetamin = 0.*deg, shape2_thetamax =  180.*deg;    
   G4double shape2_phimin = 0.*deg, shape2_phimax =  360.*deg;    
   G4Sphere* solidShape2 =    

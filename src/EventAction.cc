@@ -35,6 +35,7 @@ EventAction* EventAction::Instance()
 EventAction::EventAction()
 : G4UserEventAction(),
   fPrintModulo(10000),
+  fEvntNr(0),
   fEnergy1(0.),
   fEnergy2(0.),
   fX1(0.),
@@ -66,7 +67,7 @@ void EventAction::BeginOfEventAction(const G4Event* event)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::EndOfEventAction(const G4Event* /*event*/)
+void EventAction::EndOfEventAction(const G4Event* event)
 {
   // get energy and position information
   fEnergy1  = SteppingAction::Instance()->GetEnergy1();
@@ -81,17 +82,20 @@ void EventAction::EndOfEventAction(const G4Event* /*event*/)
   //at this point the target position needs to be included, 
   //if the particles do not start at origin
   G4ThreeVector v(fX1, fY1, fZ1); 
-  G4double th = v.getTheta(); 
-  G4double ph = v.getPhi(); 
+  G4double fTh = v.getTheta(); 
+  G4double fPh = v.getPhi();
+  fEvntNr = event->GetEventID(); 
  
   G4AnalysisManager* man = G4AnalysisManager::Instance();
-  man->FillNtupleDColumn(0, fEnergy1);
-  man->FillNtupleDColumn(1, fEnergy2);
-  man->FillNtupleDColumn(2, fX1);
-  man->FillNtupleDColumn(3, fY1);
-  man->FillNtupleDColumn(4, fZ1);
-  man->FillNtupleDColumn(5, th/3.1415926535*180.0); //in deg
-  man->FillNtupleDColumn(6, ph);
+  man->FillNtupleDColumn(0, fEvntNr);
+  man->FillNtupleDColumn(1, fEnergy1);
+  man->FillNtupleDColumn(2, fEnergy2);
+  man->FillNtupleDColumn(3, fX1);
+  man->FillNtupleDColumn(4, fY1);
+  man->FillNtupleDColumn(5, fZ1);
+  //man->FillNtupleDColumn(6, fTh); //in deg
+  man->FillNtupleDColumn(6, fTh/3.1415926535*180.0); //in deg
+  man->FillNtupleDColumn(7, fPh);
 
   man->AddNtupleRow();  
   

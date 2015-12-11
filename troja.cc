@@ -28,6 +28,10 @@
 #include "TApplication.h"
 #include "TFile.h"
 
+#include "LibPerso.h"
+#include "InputInfo.hh"
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc,char** argv)
@@ -36,6 +40,13 @@ int main(int argc,char** argv)
   // automatically load all root libraries
   TApplication* theApp=new TApplication("theApp",  0, 0);
 
+  // read input file
+  InputInfo* info = new InputInfo();
+  
+  char inputFileName[100];
+  sprintf(inputFileName, "input.txt"); // !!!!!!!!!!!!!!! hardcoded file name !!!!!!!!!!!!!!!!!!!!
+  
+  info->parse(inputFileName);
 
   // Choose the Random engine
   //
@@ -57,7 +68,8 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(physicsList);
     
   // Primary generator action
-  runManager->SetUserAction(new PrimaryGeneratorAction());
+  // runManager->SetUserAction(new PrimaryGeneratorAction());
+  runManager->SetUserAction(new PrimaryGeneratorAction(info));
 
   // Set user action classes
   //
@@ -68,7 +80,7 @@ int main(int argc,char** argv)
   runManager->SetUserAction(new EventAction());
 
   // Run action
-  runManager->SetUserAction(new RunAction());
+  runManager->SetUserAction(new RunAction(info));
      
   // Initialize G4 kernel
   //
@@ -87,9 +99,21 @@ int main(int argc,char** argv)
 
   if (argc!=1) {
     // batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+//    G4String command = "/control/execute ";
+//    G4String fileName = argv[1];
+//    UImanager->ApplyCommand(command+fileName);
+
+    G4cout << "Creating string " << G4endl;
+    
+    G4String command;
+    //command = "/run/beamOn " + (G4String)info->GetNumberOfEvents();
+    char evnts[100];
+    sprintf(evnts,"%i",info->GetNumberOfEvents());
+    command = evnts;
+    command = "/run/beamOn " + command;
+    G4cout << "EXECUTING " << command << G4endl;
+    
+    UImanager->ApplyCommand(command);
   }
   else {
     // interactive mode : define UI session
@@ -114,6 +138,8 @@ int main(int argc,char** argv)
   delete visManager;
 #endif
   delete runManager;
+  
+  delete theApp;
 
   return 0;
 }

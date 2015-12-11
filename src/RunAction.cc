@@ -19,21 +19,25 @@
 //for root file writing
 #include "g4analysis_defs.hh"
 
+#include "InputInfo.hh"
+
 using namespace G4Root;
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::RunAction()
+RunAction::RunAction(InputInfo* info)
 : G4UserRunAction()
 {
   // Create analysis manager
   G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-  man->OpenFile("troja");
+  //man->OpenFile("troja.root");
+  man->OpenFile(info->GetOutfileNameString().c_str());
   
   // Create ntuple
   man->CreateNtuple("troja", "sim outputs");
+  man->CreateNtupleDColumn("eventNumber");
   man->CreateNtupleDColumn("energyLoss");
   man->CreateNtupleDColumn("energyTotal");
   man->CreateNtupleDColumn("x");
@@ -73,16 +77,10 @@ void RunAction::BeginOfRunAction(const G4Run* aRun)
 void RunAction::EndOfRunAction(const G4Run* aRun)
 {
   G4int nofEvents = aRun->GetNumberOfEvent();
+
+
   if (nofEvents == 0) return;
   
-  // Compute dose
-  //
-//  G4double energySum  = EventAction::Instance()->GetEnergySum();
-//  G4double energy2Sum = EventAction::Instance()->GetEnergy2Sum();
-
-//  G4double mass = SteppingAction::Instance()->GetVolume()->GetMass();
-//  G4double dose = energySum/mass;
-//  G4double rmsDose = rms/mass;
 
   // Run conditions
   //
