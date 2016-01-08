@@ -39,12 +39,18 @@ int main(int argc,char** argv)
 
   // automatically load all root libraries
   TApplication* theApp=new TApplication("theApp",  0, 0);
+  
+  char inputFileName[100];
+  if(argc==2){
+    sprintf(inputFileName, "%s", argv[1]);
+    printf("Using input file '%s'", inputFileName);
+  }else{
+    printf("Dev Info: one input file is needed at the moment ...");
+    return 0;
+  }
 
   // read input file
   InputInfo* info = new InputInfo();
-  
-  char inputFileName[100];
-  sprintf(inputFileName, "input.txt"); // !!!!!!!!!!!!!!! hardcoded file name !!!!!!!!!!!!!!!!!!!!
   
   info->parse(inputFileName);
 
@@ -108,7 +114,7 @@ int main(int argc,char** argv)
     G4String command;
     //command = "/run/beamOn " + (G4String)info->GetNumberOfEvents();
     char evnts[100];
-    sprintf(evnts,"%i",info->GetNumberOfEvents());
+    sprintf(evnts,"%i",info->fNumberEvents);
     command = evnts;
     command = "/run/beamOn " + command;
     G4cout << "EXECUTING " << command << G4endl;

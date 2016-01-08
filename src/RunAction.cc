@@ -33,7 +33,8 @@ RunAction::RunAction(InputInfo* info)
   G4AnalysisManager* man = G4AnalysisManager::Instance();
 
   //man->OpenFile("troja.root");
-  man->OpenFile(info->GetOutfileNameString().c_str());
+  //man->OpenFile(info->GetOutfileNameString().c_str());
+  man->OpenFile(info->fOutFileNameTroja);
   
   // Create ntuple
   man->CreateNtuple("troja", "sim outputs");

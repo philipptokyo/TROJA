@@ -58,7 +58,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(InputInfo* info)
   fgInstance = this;
 
   // fRootInputFileName="132Snout.root";
-  fRootInputFileName = info->GetInfileNameString();
+  //fRootInputFileName = info->GetInfileNameString();
+  fRootInputFileName = info->fOutFileNameMakeEvents;
 
   SetRootTreeInput();
 

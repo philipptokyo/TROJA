@@ -1,22 +1,44 @@
-// input example 
+// input example for makeEvents
 
 
 
+output_rootfile_reaction ../reaction/132Sndp_5.root
+output_rootfile_makeEvents /mnt/raid/OEDO/philipp/events/132Sn_test.root
+output_rootfile_troja /mnt/raid/OEDO/philipp/geant/132Sn_test.root
+output_rootfile_analysis /mnt/raid/OEDO/philipp/analysis/132Sn_test.root
 
-//input_from_reaction 132Sndp_5_evnts_noProfile.root
-//output_rootfile 132Sndp_5_troja_noProfile.root
-
-//input_from_reaction 132Sndp_5_evnts_XYProfile.root
-//output_rootfile 132Sndp_5_troja_XYProfile.root
-
-//input_from_reaction 132Sndp_5_evnts_ABProfile.root
-//output_rootfile 132Sndp_5_troja_ABProfile.root
-
-input_from_reaction 132Sndp_5_evnts_XYABProfile.root
-output_rootfile 132Sndp_5_troja_XYABProfile.root
+// give the root file with oedo beam profile
+//beam_profile_file_oedo /mnt/raid/OEDO/OEDO_Matsushita/132Sn/3rd_order/oedo_132sn_10MeV.root
+beam_profile_file_oedo /mnt/raid/OEDO/OEDO_Matsushita/132Sn/3rd_order/oedo_132sn_10MeV_short.root
 
 
-//number of events to generate
-//default 100, if nothing is set
+// number of events to generate
+// default 100, if nothing is set
 number_events 100000
+
+// beam energy per nucleon in MeV/u
+// default is 10.0 MeV/u
+beam_energy 10.0
+
+
+// choose what should be taken from beam profile file
+//beam_profile_energy
+//beam_profile_position_x
+//beam_profile_position_y
+//beam_profile_angular_a
+//beam_profile_angular_b
+
+
+// for analysis:
+resolution_target_x 0.0
+resolution_target_y 0.0
+resolution_target_z 0.0
+resolution_target_a 0.0
+resolution_target_b 0.0
+resolution_detector1_x 0.0
+resolution_detector1_y 0.0
+resolution_detector1_z 0.0
+resolution_detector1_e 0.0
+resolution_detector2_e 0.0
+resolution_beam_e 0.0
 
