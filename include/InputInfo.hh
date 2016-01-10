@@ -1,5 +1,5 @@
-#ifndef InputInfo_h
-#define InputInfo_h
+#ifndef InputInfo_hh
+#define InputInfo_hh
 
 #include "LibPerso.h"
 
@@ -18,6 +18,11 @@ class InputInfo
         
         // general, for all programs
         Int_t fNumberEvents;
+
+        // for reaction and event generator
+        Int_t fProjA, fProjZ, fTargetA, fTargetZ, fLightA, fLightZ;
+        Int_t fNumberOfStates;
+        Float_t fMaxExEnergy;
 	Float_t fBeamEnergy;
 
         // event generator related
