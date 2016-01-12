@@ -171,7 +171,11 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4int particleId=(G4int)fPdgId;
+  //particleId=1000010020; //deuteron
   G4ParticleDefinition* particle = particleTable->FindParticle(particleId);
+  //printf("particle ID is %d\n", particleId);
+  //printf("PDGMass %f, ParticleType %s, PDGEncoding %d, PDGCharge %f\n", particle->GetPDGMass(), particle->GetParticleType().c_str(), particle->GetPDGEncoding(), particle->GetPDGCharge());
+
   fParticleGun->SetParticleDefinition(particle);
 
 

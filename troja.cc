@@ -44,10 +44,16 @@ int main(int argc,char** argv)
   if(argc==2){
     sprintf(inputFileName, "%s", argv[1]);
     printf("Using input file '%s'", inputFileName);
-  }else{
-    printf("Dev Info: one input file is needed at the moment ...");
+  }else if(argc<2){
+    printf("Help:\n - one input text file is needed, e.g. troja input.txt\n - any second input argument will start interactive mode\n");
     return 0;
+  }else{
+    printf("Info: only the first input file/argument is used to collect information; second argument just starts interactive mode!\n");
+    sprintf(inputFileName, "%s", argv[1]);
+    printf("Using input file '%s'", inputFileName);
+    //return 0;
   }
+
 
   // read input file
   InputInfo* info = new InputInfo();
@@ -103,7 +109,7 @@ int main(int argc,char** argv)
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-  if (argc!=1) {
+  if (argc==2) {
     // batch mode
 //    G4String command = "/control/execute ";
 //    G4String fileName = argv[1];
