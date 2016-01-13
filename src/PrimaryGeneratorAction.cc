@@ -168,6 +168,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //printf("%f %f %f\n", position.getX(), position.getY(), position.getZ());
 
 
+  if(fPdgId==1000010010){
+    fPdgId=2212; // proton
+  }
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4int particleId=(G4int)fPdgId;
