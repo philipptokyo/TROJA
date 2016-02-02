@@ -2,7 +2,7 @@
 
 
 
-output_rootfile_reaction /mnt/raid/OEDO/philipp/events/reaction_output.root
+//output_rootfile_reaction /mnt/raid/OEDO/philipp/events/reaction_output.root
 output_rootfile_makeEvents /mnt/raid/OEDO/philipp/events/132Sn_test.root
 output_rootfile_troja /mnt/raid/OEDO/philipp/geant/132Sn_test.root
 output_rootfile_analysis /mnt/raid/OEDO/philipp/analysis/132Sn_test.root
@@ -20,9 +20,9 @@ projectile_A 132
 projectile_Z 50
 target_A 2
 target_Z 1
-light_A 1 //outgoing proton is hard-coded a.t.m. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-light_Z 1
-number_of_states 5
+light_A 1 
+light_Z 1 //outgoing Z needs to be equal to target Z, a.t.m. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+number_of_states 2
 max_excitation_energy 4.0
 
 // beam energy per nucleon in MeV/u

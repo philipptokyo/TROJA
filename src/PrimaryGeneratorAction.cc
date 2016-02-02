@@ -52,6 +52,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(InputInfo* info)
     = particleTable->FindParticle(particleName="proton");
   fParticleGun->SetParticleDefinition(particle);
 
+
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0, 0, 1));
   fParticleGun->SetParticleEnergy(10.0*MeV);
   
@@ -159,9 +160,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 
   G4ThreeVector direction(0.0, 0.0, -1.0);
-  direction.setRhoPhiTheta(1.0, fPhi, fTheta);
+  direction.setRThetaPhi(1.0, fTheta, fPhi);
   //direction.setTheta(fTheta);
   //direction.setPhi(fPhi);
+  //printf("fTheta %f, vector theta %f, fPhi %f, vector phi %f\n", fTheta, direction.getTheta() ,fPhi, direction.getPhi());
 
   //G4ThreeVector position(0.0, 0.0, 0.0);
   G4ThreeVector position(fX0*mm, fY0*mm, fZ0*mm);
@@ -191,6 +193,38 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   fParticleGun->SetParticlePosition(position);
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
+
+
+
+
+
+
+//  // print used masses
+//
+//  particleTable->SetVerboseLevel(4);
+//  //particleTable->DumpTable();
+//
+//  printf("Proton mass is %06.20f\n", particle->GetPDGMass());
+//
+//  G4int particleId1=1000010020; // deuteron
+//  G4ParticleDefinition* particle1 = particleTable->FindParticle(particleId1);
+//  printf("particle ID %d, mass is %06.20f\n", particleId1, particle1->GetPDGMass());
+//  
+//  G4int particleId2=1000501320; // 132Sn
+//  G4ParticleDefinition* particle2 = particleTable->FindParticle(particleId2);
+//  printf("particle ID %d, mass is %06.20f\n", particleId2, particle2->GetPDGMass());
+//
+//  G4int particleId3=1000501330; // 133Sn
+//  G4ParticleDefinition* particle3 = particleTable->FindParticle(particleId3);
+//  printf("particle ID %d, mass is %06.20f\n", particleId3, particle3->GetPDGMass());
+//
+//  abort();
+//  // end of printing masses
+
+
+
+
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
