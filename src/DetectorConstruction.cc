@@ -5,6 +5,7 @@
 /// \brief Implementation of the DetectorConstruction class
 
 #include "DetectorConstruction.hh"
+#include "DetectorInfo.hh"
 #include "SteppingAction.hh"
    // use of stepping action to set the accounting volume
 
@@ -64,7 +65,15 @@
 
 DetectorConstruction::DetectorConstruction()
 : G4VUserDetectorConstruction()
-{ }
+{ 
+  fDetInfo = new DetectorInfo();  
+}
+
+DetectorConstruction::DetectorConstruction(DetectorInfo* detInfo)
+: G4VUserDetectorConstruction()
+{ 
+  fDetInfo=detInfo;  
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -153,6 +162,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 //
 //
 //
+
+
 //  //     
 //  // second layer of thick Si for E measurement 
 //  //
@@ -162,7 +173,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 //
 //  // Sphere shape
 ////  G4double shape2_rmin = 10.50*cm, shape2_rmax = 10.6*cm;  //1 mm full-size Si??
-//  G4double shape2_rmin = 10.50*cm, shape2_rmax = 12.5*cm;  //10 mm full-size Si??
+//  G4double shape2_rmin = 15.50*cm, shape2_rmax = 17.5*cm;  //10 mm full-size Si??
 //  G4double shape2_thetamin = 0.*deg, shape2_thetamax =  180.*deg;    
 //  G4double shape2_phimin = 0.*deg, shape2_phimax =  360.*deg;    
 //  G4Sphere* solidShape2 =    
@@ -181,7 +192,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 //                    pos2,                    //at position
 //                    logicShape2,             //its logical volume
 //                    "Shape2",                //its name
-//                    logicWorld,                //its mother  volume
+//                    logicWorld,              //its mother  volume
 //                    false,                   //no boolean operation
 //                    0,                       //copy number
 //                    checkOverlaps);          //overlaps checking
@@ -209,37 +220,49 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //------------------- Target-----------------------------
   
   G4ThreeVector fTargetPos(0,0,0);
-  G4ThreeVector ssd1pos(10.0*cm, 0.0*cm, -10.0*cm);
 
-  G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*0.5*mm);//1um
+  G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*0.5*mm);  //1um
 
   G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
 
-  G4VPhysicalVolume* target_phys = new G4PVPlacement(0,fTargetPos,
+  //G4VPhysicalVolume* target_phys = new G4PVPlacement(0,fTargetPos,
+  new G4PVPlacement(0,fTargetPos,
                 logicTarget,"Target", logicWorld,false,0);
 
   logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
 
   //----------- Silicon Strip Detectors -------------------
 
-  G4RotationMatrix* ssd1_rm = new G4RotationMatrix(); 
-  ssd1_rm->rotateY(45*deg);
 
-  G4int numStrips   = 128; //number of strips
-  G4double SSDx     = 0.684*0.5*mm;//pitch
-  G4double SSDenc_x = 0.684*0.5*numStrips*mm;
-  G4double SSDy     = 0.684*0.5*numStrips*mm;//length
-  G4double SSDz     = 0.325*0.5*mm;//thickness
+
+  G4ThreeVector ssd1pos(fDetInfo->GetCenterX(), fDetInfo->GetCenterY(), fDetInfo->GetCenterZ());
+  G4RotationMatrix* ssd1_rm = new G4RotationMatrix(); 
+  
+  ssd1_rm->rotateX(fDetInfo->GetRotationX());
+  ssd1_rm->rotateY(fDetInfo->GetRotationY());
+  ssd1_rm->rotateZ(fDetInfo->GetRotationZ());
+
+  G4int numStrips   = fDetInfo->GetNuStripsX(); //number of strips
+  G4double SSDx     = fDetInfo->GetSizeX()/((G4double)(numStrips))*0.5; //pitch, half width
+  G4double SSDenc_x = SSDx*numStrips;
+  G4double SSDy     = fDetInfo->GetSizeY()*0.5; //length, half 
+  G4double SSDz     = fDetInfo->GetSizeZ()*0.5; // half thickness
 
   //----- Logical enclosure ---------
   G4Box* SSDenc_box = new G4Box("SSDenc_box",SSDenc_x,SSDy,SSDz);
 
   G4LogicalVolume* SSD1enc_log = new G4LogicalVolume(SSDenc_box,world_mat,"SSD1enc_log");
 
-  //SSD1enc_log->SetVisAttributes(new G4VisAttributes(false));//invisible
+  //SSD1enc_log->SetVisAttributes(new G4VisAttributes(false)); //invisible
 
-  G4VPhysicalVolume* SSD1enc_phys = new G4PVPlacement(ssd1_rm, ssd1pos,
-                  SSD1enc_log,"SSD1enc",logicWorld,false,0);
+  new G4PVPlacement(ssd1_rm, 
+                    ssd1pos,
+                    SSD1enc_log,
+                    "SSD1enc",
+                    logicWorld,
+                    false,
+                    0,
+                    checkOverlaps);
 
 
 
@@ -251,8 +274,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //ssdVisAtt->SetForceSolid(true);
   ssd_log->SetVisAttributes(ssdVisAtt);
 
-  G4VPhysicalVolume* ssd1_phys = new G4PVReplica("ssd1",
-                  ssd_log,SSD1enc_log,kXAxis,numStrips,2*SSDx);
+  new G4PVReplica("ssd1",
+                  ssd_log,
+                  SSD1enc_log,
+                  kXAxis,
+                  numStrips,
+                  2*SSDx);
 
 
 
@@ -292,7 +319,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
   SteppingAction* steppingAction = SteppingAction::Instance(); 
   //steppingAction->SetVolume(logicShape1);
-  //steppingAction->SetVolume(logicShape2);
+//  steppingAction->SetVolume(logicShape2);
   steppingAction->SetVolume(ssd_log);
 
   //

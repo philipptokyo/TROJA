@@ -3,6 +3,7 @@
 /// \brief Main program
 
 #include "DetectorConstruction.hh"
+#include "DetectorInfo.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
@@ -59,6 +60,43 @@ int main(int argc,char** argv)
   InputInfo* info = new InputInfo();
   
   info->parse(inputFileName);
+  
+  
+
+
+
+  // contains detector information
+  DetectorInfo* detInfo = new DetectorInfo();
+  
+
+  detInfo->SetCenterX( 10.0*cm);
+  detInfo->SetCenterY(  0.0*cm);
+  detInfo->SetCenterZ(-10.0*cm);
+
+  detInfo->SetRotationX( 0.0*deg);
+  detInfo->SetRotationY(45.0*deg);
+  detInfo->SetRotationZ( 0.0*deg);
+
+  detInfo->SetNuStripsX(100);
+  detInfo->SetNuStripsY(1);
+
+  detInfo->SetSizeX(100*mm); // full size
+  detInfo->SetSizeY(100*mm); // full size
+  detInfo->SetSizeZ(0.1*mm); // full thickness
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Choose the Random engine
   //
@@ -71,7 +109,7 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new DetectorConstruction());
+  runManager->SetUserInitialization(new DetectorConstruction(detInfo));
 
   // Physics list
 //  G4VModularPhysicsList* physicsList = new QGSP_BIC_EMY;
@@ -86,7 +124,8 @@ int main(int argc,char** argv)
   // Set user action classes
   //
   // Stepping action
-  runManager->SetUserAction(new SteppingAction());     
+  //runManager->SetUserAction(new SteppingAction());     
+  runManager->SetUserAction(new SteppingAction(detInfo));     
 
   // Event action
   runManager->SetUserAction(new EventAction());
@@ -125,7 +164,14 @@ int main(int argc,char** argv)
     command = "/run/beamOn " + command;
     G4cout << "EXECUTING " << command << G4endl;
     
+    TStopwatch* watch = new TStopwatch();
+    watch->Start();
+        
     UImanager->ApplyCommand(command);
+
+    watch->Stop();
+    printf("Took: real time %f sec., CPU time %f sec.\n", watch->RealTime(), watch->CpuTime());
+    
   }
   else {
     // interactive mode : define UI session

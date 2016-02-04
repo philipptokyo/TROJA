@@ -38,7 +38,7 @@ RunAction::RunAction(InputInfo* info)
   
   // Create ntuple
   man->CreateNtuple("troja", "sim outputs");
-  man->CreateNtupleDColumn("eventNumber");
+  man->CreateNtupleIColumn("eventNumber");
   man->CreateNtupleDColumn("energyLoss");
   man->CreateNtupleDColumn("energyTotal");
   man->CreateNtupleDColumn("x");
@@ -46,6 +46,8 @@ RunAction::RunAction(InputInfo* info)
   man->CreateNtupleDColumn("z");
   man->CreateNtupleDColumn("theta");
   man->CreateNtupleDColumn("phi");
+  man->CreateNtupleIColumn("stripNo1");
+  man->CreateNtupleIColumn("stripNoRec");
   man->FinishNtuple();
   
 }

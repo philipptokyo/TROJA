@@ -9,6 +9,7 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
+#include "DetectorInfo.hh"
 
 class G4VPhysicalVolume;
 
@@ -18,10 +19,17 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
     DetectorConstruction();
+    DetectorConstruction(DetectorInfo* detInfo);
     virtual ~DetectorConstruction();
 
   public:
     virtual G4VPhysicalVolume* Construct();
+    G4VPhysicalVolume* Construct(DetectorInfo* detInfo);
+
+    DetectorInfo* GetDetectorInfo() {return fDetInfo;}
+
+  private:
+    DetectorInfo* fDetInfo;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

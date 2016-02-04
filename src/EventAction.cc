@@ -14,6 +14,8 @@
 // for root file writing
 #include "g4analysis_defs.hh"
 
+#include "TMath.h"
+
 using namespace G4Root;
 
 
@@ -78,6 +80,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
   fY1  = SteppingAction::Instance()->GetY1();
   fZ1  = SteppingAction::Instance()->GetZ1();
   
+  fStripNo1 = SteppingAction::Instance()->GetStripNo1();
+  fStripNoRec = SteppingAction::Instance()->GetStripNoRec();
+  
   //calculate theta and phi
   //at this point the target position needs to be included, 
   //if the particles do not start at origin
@@ -87,15 +92,17 @@ void EventAction::EndOfEventAction(const G4Event* event)
   fEvntNr = event->GetEventID(); 
  
   G4AnalysisManager* man = G4AnalysisManager::Instance();
-  man->FillNtupleDColumn(0, fEvntNr);
+  man->FillNtupleIColumn(0, fEvntNr);
   man->FillNtupleDColumn(1, fEnergy1);
   man->FillNtupleDColumn(2, fEnergy2);
   man->FillNtupleDColumn(3, fX1);
   man->FillNtupleDColumn(4, fY1);
   man->FillNtupleDColumn(5, fZ1);
   //man->FillNtupleDColumn(6, fTh); //in deg
-  man->FillNtupleDColumn(6, fTh/3.1415926535*180.0); //in deg
+  man->FillNtupleDColumn(6, fTh/TMath::Pi()*180.0); //in deg
   man->FillNtupleDColumn(7, fPh);
+  man->FillNtupleIColumn(8, fStripNo1);
+  man->FillNtupleIColumn(9, fStripNoRec);
 
   man->AddNtupleRow();  
   
@@ -108,11 +115,13 @@ void EventAction::Reset()
 {
   //reset cumulative quantities
   //
-  fEnergy1 = 0.;
-  fEnergy2 = 0.;
-  fX1 = 0.;
-  fY1 = 0.;
-  fZ1 = 0.;
+  fEnergy1 = NAN;
+  fEnergy2 = NAN;
+  fX1 = NAN;
+  fY1 = NAN;
+  fZ1 = NAN;
+  fStripNo1 = -1;
+  fStripNoRec = -999;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
