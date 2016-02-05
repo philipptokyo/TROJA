@@ -77,8 +77,8 @@ int main(int argc,char** argv)
   detInfo->SetRotationY( 0.0*deg);
   detInfo->SetRotationZ( 0.0*deg);
 
-  detInfo->SetNuStripsX(100);
-  detInfo->SetNuStripsY(100);
+  detInfo->SetNoStripsX(100);
+  detInfo->SetNoStripsY(100);
 
   detInfo->SetSizeX(100*mm); // full size
   detInfo->SetSizeY(100*mm); // full size
