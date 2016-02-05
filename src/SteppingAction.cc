@@ -130,7 +130,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // *************************** Silicon SSD ********************************
   // ************************************************************************
   
-  if (std::strcmp(volume->GetName(), "ssd_log")==0 ){
+  if (std::strcmp(volume->GetName(), "logical0")==0 ){
     //printf("in SSD1\n");
     if(TMath::IsNaN(fEnergy1)){ // default is nan, set to zero in case of hit
       fEnergy1 = 0.0;

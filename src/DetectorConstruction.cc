@@ -208,7 +208,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
   //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
-  G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
   //G4Material* fIron    = nist->FindOrBuildMaterial("G4_Fe");
   G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
 
@@ -234,52 +233,78 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //----------- Silicon Strip Detectors -------------------
 
 
-
-  G4ThreeVector ssd_pos(fDetInfo->GetCenterX(), fDetInfo->GetCenterY(), fDetInfo->GetCenterZ());
-  G4RotationMatrix* ssd_rm = new G4RotationMatrix(); 
+  G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
   
-  ssd_rm->rotateX(fDetInfo->GetRotationX());
-  ssd_rm->rotateY(fDetInfo->GetRotationY());
-  ssd_rm->rotateZ(fDetInfo->GetRotationZ());
+  const G4int maxDet = 2;
+  
+  G4ThreeVector pos[maxDet];
+  pos[0].set(fDetInfo->GetCenterX(), fDetInfo->GetCenterY(), fDetInfo->GetCenterZ());
+  pos[1].set(fDetInfo->GetCenterX()+5*cm, fDetInfo->GetCenterY()+5*cm, fDetInfo->GetCenterZ());
 
-  //G4int numStrips   = fDetInfo->GetNuStripsX(); //number of strips
-  G4double ssdx     = fDetInfo->GetSizeX()*0.5; //width, half width
-  //G4double SSDenc_x = SSDx*numStrips;
-  G4double ssdy     = fDetInfo->GetSizeY()*0.5; //length, half 
-  G4double ssdz     = fDetInfo->GetSizeZ()*0.5; // half thickness
+  G4RotationMatrix* rotMat[maxDet];  
+  rotMat[0] = new G4RotationMatrix();
+  rotMat[1] = new G4RotationMatrix();
 
-  //----- Logical enclosure ---------
-  G4Box* ssd_box = new G4Box("ssd_box", ssdx, ssdy, ssdz);
 
-  G4LogicalVolume* ssd_log = new G4LogicalVolume(ssd_box, fSilicon, "ssd_log"); // SSD1enc_log
+  rotMat[0]->rotateX(fDetInfo->GetRotationX());
+  rotMat[0]->rotateY(fDetInfo->GetRotationY());
+  rotMat[0]->rotateZ(fDetInfo->GetRotationZ());
 
-  //SSD1enc_log->SetVisAttributes(new G4VisAttributes(false)); //invisible
+  rotMat[1]->rotateX(fDetInfo->GetRotationX());
+  rotMat[1]->rotateY(fDetInfo->GetRotationY());
+  rotMat[1]->rotateZ(fDetInfo->GetRotationZ());
+  
 
-  new G4PVPlacement(ssd_rm, 
-                    ssd_pos,
-                    ssd_log,
-                    "ssd",
+  G4double size[maxDet][3] = {{0.0}};
+  
+  size[0][0]     = fDetInfo->GetSizeX()*0.5; // half width
+  size[0][1]     = fDetInfo->GetSizeY()*0.5; // half length 
+  size[0][2]     = fDetInfo->GetSizeZ()*0.5; // half thickness
+
+  size[1][0]     = fDetInfo->GetSizeX()*0.5; // half width
+  size[1][1]     = fDetInfo->GetSizeY()*0.5; // half length 
+  size[1][2]     = fDetInfo->GetSizeZ()*0.5; // half thickness
+  
+
+  G4Box* box[maxDet];
+  box[0] = new G4Box("box0", size[0][0], size[0][1], size[0][2]);
+  box[1] = new G4Box("box1", size[1][0], size[1][1], size[1][2]);
+
+  G4LogicalVolume* logical[maxDet];
+  logical[0] = new G4LogicalVolume(box[0], fSilicon, "logical0"); 
+  logical[1] = new G4LogicalVolume(box[1], fSilicon, "logical1"); 
+
+
+  new G4PVPlacement(rotMat[0], 
+                    pos[0],
+                    logical[0],
+                    "ssd0",
+                    logicWorld,
+                    false,
+                    0,
+                    checkOverlaps);
+
+  new G4PVPlacement(rotMat[1], 
+                    pos[1],
+                    logical[1],
+                    "ssd1",
                     logicWorld,
                     false,
                     0,
                     checkOverlaps);
 
 
+//  new G4PVPlacement(ssd_rm, 
+//                    ssd_pos,
+//                    ssd_log,
+//                    "ssd",
+//                    logicWorld,
+//                    false,
+//                    0,
+//                    checkOverlaps);
 
-  ////----- Physical volume -----------
 
-  //G4Box* ssd_box = new G4Box("hod_box",SSDx,SSDy,SSDz);
-  //G4LogicalVolume* ssd_log = new G4LogicalVolume(ssd_box,fSilicon,"ssd_log");
-  //G4VisAttributes* ssdVisAtt = new G4VisAttributes(G4Colour::Green());
-  ////ssdVisAtt->SetForceSolid(true);
-  //ssd_log->SetVisAttributes(ssdVisAtt);
 
-  //new G4PVReplica("ssd1",
-  //                ssd_log,
-  //                SSD1enc_log,
-  //                kXAxis,
-  //                numStrips,
-  //                2*SSDx);
 
 
 
@@ -292,8 +317,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
   SteppingAction* steppingAction = SteppingAction::Instance(); 
   //steppingAction->SetVolume(logicShape1);
-//  steppingAction->SetVolume(logicShape2);
-  steppingAction->SetVolume(ssd_log);
+  //steppingAction->SetVolume(logicShape2);
+  //steppingAction->SetVolume(ssd_log);
+  
+  steppingAction->SetVolume(logical[0]);
 
   //
   //always return the physical World
