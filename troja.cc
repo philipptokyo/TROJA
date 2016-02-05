@@ -69,16 +69,16 @@ int main(int argc,char** argv)
   DetectorInfo* detInfo = new DetectorInfo();
   
 
-  detInfo->SetCenterX( 10.0*cm);
-  detInfo->SetCenterY(  0.0*cm);
+  detInfo->SetCenterX(  0.0*cm);
+  detInfo->SetCenterY( 10.0*cm);
   detInfo->SetCenterZ(-10.0*cm);
 
-  detInfo->SetRotationX( 0.0*deg);
-  detInfo->SetRotationY(45.0*deg);
+  detInfo->SetRotationX(-45.0*deg);
+  detInfo->SetRotationY( 0.0*deg);
   detInfo->SetRotationZ( 0.0*deg);
 
   detInfo->SetNuStripsX(100);
-  detInfo->SetNuStripsY(1);
+  detInfo->SetNuStripsY(100);
 
   detInfo->SetSizeX(100*mm); // full size
   detInfo->SetSizeY(100*mm); // full size
@@ -171,6 +171,8 @@ int main(int argc,char** argv)
 
     watch->Stop();
     printf("Took: real time %f sec., CPU time %f sec.\n", watch->RealTime(), watch->CpuTime());
+
+    printf("Events written to file '%s'\n", info->fOutFileNameTroja);
     
   }
   else {

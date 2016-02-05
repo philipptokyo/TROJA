@@ -36,8 +36,8 @@ class EventAction : public G4UserEventAction
     G4double GetX1() const { return fX1; }
     G4double GetY1() const { return fY1; }
     G4double GetZ1() const { return fZ1; }
-    G4int    GetStripNo1() const { return fStripNo1; }
-    G4int    GetStripNoRec() const { return fStripNoRec; }
+    G4int    GetStripX() const { return fStripX; }
+    G4int    GetStripY() const { return fStripY; }
      
      
   private:
@@ -50,8 +50,8 @@ class EventAction : public G4UserEventAction
     G4double  fX1;
     G4double  fY1;
     G4double  fZ1;
-    G4int     fStripNo1;
-    G4int     fStripNoRec;
+    G4int     fStripX;
+    G4int     fStripY;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

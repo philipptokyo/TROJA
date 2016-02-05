@@ -42,7 +42,9 @@ SteppingAction::SteppingAction()
   fEnergy2(0.),
   fX1(0.),
   fY1(0.),
-  fZ1(0.)
+  fZ1(0.),
+  fStripX(-1),
+  fStripY(-1)
 { 
   fgInstance = this;
 }
@@ -54,7 +56,9 @@ SteppingAction::SteppingAction(DetectorInfo* detInfo)
   fEnergy2(0.),
   fX1(0.),
   fY1(0.),
-  fZ1(0.)
+  fZ1(0.),
+  fStripX(-1),
+  fStripY(-1)
 { 
   fDetInfo=detInfo;
   fgInstance = this;
@@ -128,7 +132,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
   if (std::strcmp(volume->GetName(), "ssd_log")==0 ){
     //printf("in SSD1\n");
-    if(TMath::IsNaN(fEnergy1)){
+    if(TMath::IsNaN(fEnergy1)){ // default is nan, set to zero in case of hit
       fEnergy1 = 0.0;
     }
     G4double edep = step->GetTotalEnergyDeposit();
@@ -139,15 +143,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
       
     //if (point1->GetStepStatus() == fGeomBoundary) { // first interaction point?
-    if ((point1->GetStepStatus() == fGeomBoundary) && (fStripNo1 == -1) ) { // first interaction point?
+    if ((point1->GetStepStatus() == fGeomBoundary) && (fStripX == -1) ) { // first interaction point?
       //printf("FI ");
-      fStripNo1 = point1->GetTouchableHandle()->GetReplicaNumber(); 
       G4ThreeVector pos1 = point1->GetPosition();
       fX1=pos1.getX();
       fY1=pos1.getY();
       fZ1=pos1.getZ();
 
-      fStripNoRec = fDetInfo->CalcStripNoX(fX1, fY1, fZ1);
+      fDetInfo->CalcStripNumbers(fX1, fY1, fZ1, fStripX, fStripY);
       //printf("x=%f y=%f z=%f\n", fX1, fY1, fZ1);
     }
 
@@ -181,8 +184,8 @@ void SteppingAction::Reset()
   fX1 = NAN;
   fY1 = NAN;
   fZ1 = NAN;
-  fStripNo1 = -1;
-  fStripNoRec = -999;
+  fStripX = -1;
+  fStripY = -1;
 
 }
 

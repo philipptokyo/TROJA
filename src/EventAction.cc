@@ -36,13 +36,15 @@ EventAction* EventAction::Instance()
 
 EventAction::EventAction()
 : G4UserEventAction(),
-  fPrintModulo(10000),
+  fPrintModulo(100000),
   fEvntNr(0),
   fEnergy1(0.),
   fEnergy2(0.),
   fX1(0.),
   fY1(0.),
-  fZ1(0.)
+  fZ1(0.),
+  fStripX(-1),
+  fStripY(-1)
 { 
   fgInstance = this;
 }
@@ -80,8 +82,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
   fY1  = SteppingAction::Instance()->GetY1();
   fZ1  = SteppingAction::Instance()->GetZ1();
   
-  fStripNo1 = SteppingAction::Instance()->GetStripNo1();
-  fStripNoRec = SteppingAction::Instance()->GetStripNoRec();
+  fStripX = SteppingAction::Instance()->GetStripX();
+  fStripY = SteppingAction::Instance()->GetStripY();
   
   //calculate theta and phi
   //at this point the target position needs to be included, 
@@ -101,8 +103,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
   //man->FillNtupleDColumn(6, fTh); //in deg
   man->FillNtupleDColumn(6, fTh/TMath::Pi()*180.0); //in deg
   man->FillNtupleDColumn(7, fPh);
-  man->FillNtupleIColumn(8, fStripNo1);
-  man->FillNtupleIColumn(9, fStripNoRec);
+  man->FillNtupleIColumn(8, fStripX);
+  man->FillNtupleIColumn(9, fStripY);
 
   man->AddNtupleRow();  
   
@@ -120,8 +122,8 @@ void EventAction::Reset()
   fX1 = NAN;
   fY1 = NAN;
   fZ1 = NAN;
-  fStripNo1 = -1;
-  fStripNoRec = -999;
+  fStripX = -1;
+  fStripY = -1;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

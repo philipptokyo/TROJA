@@ -47,8 +47,8 @@ class SteppingAction : public G4UserSteppingAction
     G4double GetX1() const { return fX1; }
     G4double GetY1() const { return fY1; }
     G4double GetZ1() const { return fZ1; }
-    G4int    GetStripNo1() const { return fStripNo1; }
-    G4int    GetStripNoRec() const { return fStripNoRec; }
+    G4int    GetStripX() const { return fStripX; }
+    G4int    GetStripY() const { return fStripY; }
    
   private:
     static SteppingAction* fgInstance;  
@@ -59,8 +59,8 @@ class SteppingAction : public G4UserSteppingAction
     G4double  fX1; //first Si
     G4double  fY1; //first Si
     G4double  fZ1; //first Si
-    G4int     fStripNo1; // SSD 1
-    G4int     fStripNoRec; // SSD 1
+    G4int     fStripX; // SSD 1
+    G4int     fStripY; // SSD 1
 
     DetectorInfo* fDetInfo;
 

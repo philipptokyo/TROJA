@@ -46,8 +46,8 @@ RunAction::RunAction(InputInfo* info)
   man->CreateNtupleDColumn("z");
   man->CreateNtupleDColumn("theta");
   man->CreateNtupleDColumn("phi");
-  man->CreateNtupleIColumn("stripNo1");
-  man->CreateNtupleIColumn("stripNoRec");
+  man->CreateNtupleIColumn("stripX");
+  man->CreateNtupleIColumn("stripY");
   man->FinishNtuple();
   
 }
