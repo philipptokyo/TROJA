@@ -68,21 +68,22 @@ int main(int argc,char** argv)
   // contains detector information
   DetectorInfo* detInfo = new DetectorInfo();
   
+  detInfo->Parse("/home/philipp/sim/troja/detector_geometry.txt");  
 
-  detInfo->SetCenterX(  0.0*cm);
-  detInfo->SetCenterY( 10.0*cm);
-  detInfo->SetCenterZ(-10.0*cm);
-
-  detInfo->SetRotationX(-45.0*deg);
-  detInfo->SetRotationY( 0.0*deg);
-  detInfo->SetRotationZ( 0.0*deg);
-
-  detInfo->SetNoStripsX(100);
-  detInfo->SetNoStripsY(100);
-
-  detInfo->SetSizeX(100*mm); // full size
-  detInfo->SetSizeY(100*mm); // full size
-  detInfo->SetSizeZ(0.1*mm); // full thickness
+//    detInfo->SetCenterX(0,   0.0*cm);
+//    detInfo->SetCenterY(0,  10.0*cm);
+//    detInfo->SetCenterZ(0, -10.0*cm);
+//
+//  detInfo->SetRotationX(0, -45.0*deg);
+//  detInfo->SetRotationY(0,  0.0*deg);
+//  detInfo->SetRotationZ(0,  0.0*deg);
+//
+//  detInfo->SetNoStripsX(0, 100);
+//  detInfo->SetNoStripsY(0, 100);
+//
+//      detInfo->SetSizeX(0, 10*cm); // full size
+//      detInfo->SetSizeY(0, 10*cm); // full size
+//      detInfo->SetSizeZ(0, 0.01*cm); // full thickness
 
 
 

@@ -67,6 +67,7 @@ DetectorConstruction::DetectorConstruction()
 : G4VUserDetectorConstruction()
 { 
   fDetInfo = new DetectorInfo();  
+  printf("WARNING: Empty detector information in DetectorConstruction.cc!!!\n");
 }
 
 DetectorConstruction::DetectorConstruction(DetectorInfo* detInfo)
@@ -213,9 +214,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
 
-  //=========================  Beam Line =======================================
-
-
   //------------------- Target-----------------------------
   
   G4ThreeVector fTargetPos(0,0,0);
@@ -229,41 +227,46 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                 logicTarget,"Target", logicWorld,false,0);
 
   logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
+  
+
+
+
+
 
   //----------- Silicon Strip Detectors -------------------
 
 
   G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
   
-  const G4int maxDet = 2;
+  const G4int maxDet = 2; // fDetInfo->GetMaxNoDetectors();
   
   G4ThreeVector pos[maxDet];
-  pos[0].set(fDetInfo->GetCenterX(), fDetInfo->GetCenterY(), fDetInfo->GetCenterZ());
-  pos[1].set(fDetInfo->GetCenterX()+5*cm, fDetInfo->GetCenterY()+5*cm, fDetInfo->GetCenterZ());
+  pos[0].set(fDetInfo->GetCenterX(0), fDetInfo->GetCenterY(0), fDetInfo->GetCenterZ(0));
+  pos[1].set(fDetInfo->GetCenterX(0)+5*cm, fDetInfo->GetCenterY(0)+5*cm, fDetInfo->GetCenterZ(0)); // todo -- dirty hack for testing
 
   G4RotationMatrix* rotMat[maxDet];  
   rotMat[0] = new G4RotationMatrix();
   rotMat[1] = new G4RotationMatrix();
 
 
-  rotMat[0]->rotateX(fDetInfo->GetRotationX());
-  rotMat[0]->rotateY(fDetInfo->GetRotationY());
-  rotMat[0]->rotateZ(fDetInfo->GetRotationZ());
+  rotMat[0]->rotateX(fDetInfo->GetRotationX(0));
+  rotMat[0]->rotateY(fDetInfo->GetRotationY(0));
+  rotMat[0]->rotateZ(fDetInfo->GetRotationZ(0));
 
-  rotMat[1]->rotateX(fDetInfo->GetRotationX());
-  rotMat[1]->rotateY(fDetInfo->GetRotationY());
-  rotMat[1]->rotateZ(fDetInfo->GetRotationZ());
+  rotMat[1]->rotateX(fDetInfo->GetRotationX(0)); // todo -- dirty hack for testing 
+  rotMat[1]->rotateY(fDetInfo->GetRotationY(0)); // todo -- dirty hack for testing 
+  rotMat[1]->rotateZ(fDetInfo->GetRotationZ(0)); // todo -- dirty hack for testing 
   
 
   G4double size[maxDet][3] = {{0.0}};
   
-  size[0][0]     = fDetInfo->GetSizeX()*0.5; // half width
-  size[0][1]     = fDetInfo->GetSizeY()*0.5; // half length 
-  size[0][2]     = fDetInfo->GetSizeZ()*0.5; // half thickness
+  size[0][0]     = fDetInfo->GetSizeX(0)*0.5; // half width
+  size[0][1]     = fDetInfo->GetSizeY(0)*0.5; // half length 
+  size[0][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness
 
-  size[1][0]     = fDetInfo->GetSizeX()*0.5; // half width
-  size[1][1]     = fDetInfo->GetSizeY()*0.5; // half length 
-  size[1][2]     = fDetInfo->GetSizeZ()*0.5; // half thickness
+  size[1][0]     = fDetInfo->GetSizeX(0)*0.5; // half width      // todo -- dirty hack for testing   
+  size[1][1]     = fDetInfo->GetSizeY(0)*0.5; // half length     // todo -- dirty hack for testing 
+  size[1][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness  // todo -- dirty hack for testing 
   
 
   G4Box* box[maxDet];
@@ -284,14 +287,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                     0,
                     checkOverlaps);
 
-  new G4PVPlacement(rotMat[1], 
-                    pos[1],
-                    logical[1],
-                    "ssd1",
-                    logicWorld,
-                    false,
-                    0,
-                    checkOverlaps);
+//  new G4PVPlacement(rotMat[1], 
+//                    pos[1],
+//                    logical[1],
+//                    "ssd1",
+//                    logicWorld,
+//                    false,
+//                    0,
+//                    checkOverlaps);
 
 
 //  new G4PVPlacement(ssd_rm, 
