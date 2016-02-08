@@ -223,8 +223,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
 
   //G4VPhysicalVolume* target_phys = new G4PVPlacement(0,fTargetPos,
-  new G4PVPlacement(0,fTargetPos,
-                logicTarget,"Target", logicWorld,false,0);
+  new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
 
   logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
   
@@ -238,54 +237,91 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
   
-  const G4int maxDet = 2; // fDetInfo->GetMaxNoDetectors();
+  const G4int maxDet = 10; // fDetInfo->GetMaxNoDetectors();
+  if(maxDet>fDetInfo->GetMaxNoDetectors()){
+    printf("Error: More detectors requested (%d) in DetectorConstruction than allowed in DetectorInfo (%d). Change this in DetectorInfo!\n\n", maxDet, fDetInfo->GetMaxNoDetectors());
+    abort();
+  }
+
+  G4int noOfDet = fDetInfo->GetNoOfDetectors();
   
   G4ThreeVector pos[maxDet];
-  pos[0].set(fDetInfo->GetCenterX(0), fDetInfo->GetCenterY(0), fDetInfo->GetCenterZ(0));
-  pos[1].set(fDetInfo->GetCenterX(0)+5*cm, fDetInfo->GetCenterY(0)+5*cm, fDetInfo->GetCenterZ(0)); // todo -- dirty hack for testing
-
   G4RotationMatrix* rotMat[maxDet];  
-  rotMat[0] = new G4RotationMatrix();
-  rotMat[1] = new G4RotationMatrix();
-
-
-  rotMat[0]->rotateX(fDetInfo->GetRotationX(0));
-  rotMat[0]->rotateY(fDetInfo->GetRotationY(0));
-  rotMat[0]->rotateZ(fDetInfo->GetRotationZ(0));
-
-  rotMat[1]->rotateX(fDetInfo->GetRotationX(0)); // todo -- dirty hack for testing 
-  rotMat[1]->rotateY(fDetInfo->GetRotationY(0)); // todo -- dirty hack for testing 
-  rotMat[1]->rotateZ(fDetInfo->GetRotationZ(0)); // todo -- dirty hack for testing 
-  
-
   G4double size[maxDet][3] = {{0.0}};
-  
-  size[0][0]     = fDetInfo->GetSizeX(0)*0.5; // half width
-  size[0][1]     = fDetInfo->GetSizeY(0)*0.5; // half length 
-  size[0][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness
-
-  size[1][0]     = fDetInfo->GetSizeX(0)*0.5; // half width      // todo -- dirty hack for testing   
-  size[1][1]     = fDetInfo->GetSizeY(0)*0.5; // half length     // todo -- dirty hack for testing 
-  size[1][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness  // todo -- dirty hack for testing 
-  
-
   G4Box* box[maxDet];
-  box[0] = new G4Box("box0", size[0][0], size[0][1], size[0][2]);
-  box[1] = new G4Box("box1", size[1][0], size[1][1], size[1][2]);
-
   G4LogicalVolume* logical[maxDet];
-  logical[0] = new G4LogicalVolume(box[0], fSilicon, "logical0"); 
-  logical[1] = new G4LogicalVolume(box[1], fSilicon, "logical1"); 
+  
+  
+  for(G4int d=0; d<noOfDet; d++){
+    pos[d].set(fDetInfo->GetCenterX(d), fDetInfo->GetCenterY(d), fDetInfo->GetCenterZ(d));
+    
+    rotMat[d] = new G4RotationMatrix();
+    rotMat[d]->rotateX(fDetInfo->GetRotationX(d));
+    rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
+    rotMat[d]->rotateZ(fDetInfo->GetRotationZ(d));
+
+    size[d][0]     = fDetInfo->GetSizeX(d)*0.5; // half width
+    size[d][1]     = fDetInfo->GetSizeY(d)*0.5; // half length 
+    size[d][2]     = fDetInfo->GetSizeZ(d)*0.5; // half thickness
+
+    char tmpName[50];
+
+    sprintf(tmpName, "box%02d", d);
+    box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+
+    sprintf(tmpName, "logical%02d", d);
+    logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+
+    sprintf(tmpName, "%02d%s", d, fDetInfo->GetName(d).data());
+    new G4PVPlacement(rotMat[d], 
+                      pos[d],
+                      logical[d],
+                      tmpName,
+                      logicWorld,
+                      false,
+                      0,
+                      checkOverlaps);
+  }
+  //pos[0].set(fDetInfo->GetCenterX(0), fDetInfo->GetCenterY(0), fDetInfo->GetCenterZ(0));
+  //pos[1].set(fDetInfo->GetCenterX(0)+5*cm, fDetInfo->GetCenterY(0)+5*cm, fDetInfo->GetCenterZ(0)); // todo -- dirty hack for testing
+
+  //rotMat[0] = new G4RotationMatrix();
+  //rotMat[1] = new G4RotationMatrix();
+
+  //rotMat[0]->rotateX(fDetInfo->GetRotationX(0));
+  //rotMat[0]->rotateY(fDetInfo->GetRotationY(0));
+  //rotMat[0]->rotateZ(fDetInfo->GetRotationZ(0));
+
+  //rotMat[1]->rotateX(fDetInfo->GetRotationX(0)); // todo -- dirty hack for testing 
+  //rotMat[1]->rotateY(fDetInfo->GetRotationY(0)); // todo -- dirty hack for testing 
+  //rotMat[1]->rotateZ(fDetInfo->GetRotationZ(0)); // todo -- dirty hack for testing 
+  
+
+  
+  //size[0][0]     = fDetInfo->GetSizeX(0)*0.5; // half width
+  //size[0][1]     = fDetInfo->GetSizeY(0)*0.5; // half length 
+  //size[0][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness
+
+  //size[1][0]     = fDetInfo->GetSizeX(0)*0.5; // half width      // todo -- dirty hack for testing   
+  //size[1][1]     = fDetInfo->GetSizeY(0)*0.5; // half length     // todo -- dirty hack for testing 
+  //size[1][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness  // todo -- dirty hack for testing 
+  
+
+  //box[0] = new G4Box("box0", size[0][0], size[0][1], size[0][2]);
+  //box[1] = new G4Box("box1", size[1][0], size[1][1], size[1][2]);
+
+  //logical[0] = new G4LogicalVolume(box[0], fSilicon, "logical0"); 
+  //logical[1] = new G4LogicalVolume(box[1], fSilicon, "logical1"); 
 
 
-  new G4PVPlacement(rotMat[0], 
-                    pos[0],
-                    logical[0],
-                    "ssd0",
-                    logicWorld,
-                    false,
-                    0,
-                    checkOverlaps);
+  //new G4PVPlacement(rotMat[0], 
+  //                  pos[0],
+  //                  logical[0],
+  //                  "ssd0",
+  //                  logicWorld,
+  //                  false,
+  //                  0,
+  //                  checkOverlaps);
 
 //  new G4PVPlacement(rotMat[1], 
 //                    pos[1],
@@ -323,7 +359,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //steppingAction->SetVolume(logicShape2);
   //steppingAction->SetVolume(ssd_log);
   
-  steppingAction->SetVolume(logical[0]);
+  for(G4int d=0; d<noOfDet; d++){
+    steppingAction->SetVolume(logical[d]);
+  }
 
   //
   //always return the physical World

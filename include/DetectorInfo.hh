@@ -3,7 +3,7 @@
 
 #include "globals.hh"
 
-#define maxDetectors 2
+#define maxDetectors 10
 
 typedef struct _geo
 {
@@ -59,6 +59,8 @@ class DetectorInfo
 
     // setter
     
+    void SetNoOfDetectors(G4int n) { fNoOfDet=n; }
+    
       void SetCenterX(G4int d, G4double c) { det[d].center[0]=c ;}
       void SetCenterY(G4int d, G4double c) { det[d].center[1]=c ;}
       void SetCenterZ(G4int d, G4double c) { det[d].center[2]=c ;}
@@ -73,6 +75,10 @@ class DetectorInfo
 
     void SetNoStripsX(G4int d, G4int n)    { det[d].noStrips[0]=n; }
     void SetNoStripsY(G4int d, G4int n)    { det[d].noStrips[1]=n; }
+
+         void SetName(G4int d, G4String n) { det[d].name=n; }
+         void SetType(G4int d, G4String n) { det[d].type=n; }
+
 
   private:
 

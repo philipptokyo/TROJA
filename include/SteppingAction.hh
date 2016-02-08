@@ -64,6 +64,8 @@ class SteppingAction : public G4UserSteppingAction
 
     DetectorInfo* fDetInfo;
 
+    G4bool    fFI;
+
     
 };
 
