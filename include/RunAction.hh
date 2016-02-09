@@ -14,8 +14,6 @@
 #include "DetectorInfo.hh"
 #include "DetectorGlobals.hh"
 
-//#include "TFile.h"
-//#include "TTree.h"
 #include "../LibPerso.h"
 
 class G4Run;
@@ -41,16 +39,6 @@ class RunAction : public G4UserRunAction
 
   private:
     
-//    G4int fEventNumber;
-//    G4double fFIX, fFIY, fFIZ; // first interaction point, x, y, z
-//
-//    G4int fNoOfDet[maxDetectors];
-//    G4int fDetID[maxDetectors];
-//
-//    G4double fEnergy[maxDetectors];
-//    G4int fStripX[maxDetectors];
-//    G4int fStripY[maxDetectors];
-
     DetectorInfo* fDetInfo;
 
     TFile* fOutFile;

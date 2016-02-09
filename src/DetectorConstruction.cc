@@ -14,10 +14,7 @@
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
 #include "G4Box.hh"
-//#include "G4Cons.hh"
-//#include "G4Orb.hh"
 #include "G4Sphere.hh"
-//#include "G4Trd.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 
@@ -62,7 +59,6 @@
 
 
 // using namespace CLHEP
-//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -91,10 +87,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
   
-  // Envelope parameters
-  //
-//  G4double env_sizeXY = 30*cm, env_sizeZ = 30*cm;
-//  G4Material* env_mat = nist->FindOrBuildMaterial("G4_Galactic");
    
   // Option to switch on/off checking of volumes overlaps
   //
@@ -103,9 +95,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //     
   // World
   //
-//  G4double world_sizeXY = 1.2*env_sizeXY;
   G4double world_sizeXY = 100*cm;
-//  G4double world_sizeZ  = 1.2*env_sizeZ;
   G4double world_sizeZ  = 100*cm;
 //  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
@@ -225,7 +215,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
 
-  //G4VPhysicalVolume* target_phys = new G4PVPlacement(0,fTargetPos,
   new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
 
   logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
@@ -240,11 +229,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
   
-//  const G4int maxDet = 10; // fDetInfo->GetMaxNoDetectors();
-//  if(maxDet>fDetInfo->GetMaxNoDetectors()){
-//    printf("Error: More detectors requested (%d) in DetectorConstruction than allowed in DetectorInfo (%d). Change this in DetectorInfo!\n\n", maxDet, fDetInfo->GetMaxNoDetectors());
-//    abort();
-//  }
 
   G4int noOfDet = fDetInfo->GetNoOfDetectors();
   
@@ -285,70 +269,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                       0,
                       checkOverlaps);
   }
-  //pos[0].set(fDetInfo->GetCenterX(0), fDetInfo->GetCenterY(0), fDetInfo->GetCenterZ(0));
-  //pos[1].set(fDetInfo->GetCenterX(0)+5*cm, fDetInfo->GetCenterY(0)+5*cm, fDetInfo->GetCenterZ(0)); // todo -- dirty hack for testing
-
-  //rotMat[0] = new G4RotationMatrix();
-  //rotMat[1] = new G4RotationMatrix();
-
-  //rotMat[0]->rotateX(fDetInfo->GetRotationX(0));
-  //rotMat[0]->rotateY(fDetInfo->GetRotationY(0));
-  //rotMat[0]->rotateZ(fDetInfo->GetRotationZ(0));
-
-  //rotMat[1]->rotateX(fDetInfo->GetRotationX(0)); // todo -- dirty hack for testing 
-  //rotMat[1]->rotateY(fDetInfo->GetRotationY(0)); // todo -- dirty hack for testing 
-  //rotMat[1]->rotateZ(fDetInfo->GetRotationZ(0)); // todo -- dirty hack for testing 
-  
-
-  
-  //size[0][0]     = fDetInfo->GetSizeX(0)*0.5; // half width
-  //size[0][1]     = fDetInfo->GetSizeY(0)*0.5; // half length 
-  //size[0][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness
-
-  //size[1][0]     = fDetInfo->GetSizeX(0)*0.5; // half width      // todo -- dirty hack for testing   
-  //size[1][1]     = fDetInfo->GetSizeY(0)*0.5; // half length     // todo -- dirty hack for testing 
-  //size[1][2]     = fDetInfo->GetSizeZ(0)*0.5; // half thickness  // todo -- dirty hack for testing 
-  
-
-  //box[0] = new G4Box("box0", size[0][0], size[0][1], size[0][2]);
-  //box[1] = new G4Box("box1", size[1][0], size[1][1], size[1][2]);
-
-  //logical[0] = new G4LogicalVolume(box[0], fSilicon, "logical0"); 
-  //logical[1] = new G4LogicalVolume(box[1], fSilicon, "logical1"); 
-
-
-  //new G4PVPlacement(rotMat[0], 
-  //                  pos[0],
-  //                  logical[0],
-  //                  "ssd0",
-  //                  logicWorld,
-  //                  false,
-  //                  0,
-  //                  checkOverlaps);
-
-//  new G4PVPlacement(rotMat[1], 
-//                    pos[1],
-//                    logical[1],
-//                    "ssd1",
-//                    logicWorld,
-//                    false,
-//                    0,
-//                    checkOverlaps);
-
-
-//  new G4PVPlacement(ssd_rm, 
-//                    ssd_pos,
-//                    ssd_log,
-//                    "ssd",
-//                    logicWorld,
-//                    false,
-//                    0,
-//                    checkOverlaps);
-
-
-
-
-
 
 
 
@@ -360,7 +280,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   SteppingAction* steppingAction = SteppingAction::Instance(); 
   //steppingAction->SetVolume(logicShape1);
   //steppingAction->SetVolume(logicShape2);
-  //steppingAction->SetVolume(ssd_log);
   
   for(G4int d=0; d<noOfDet; d++){
     steppingAction->SetVolume(logical[d]);

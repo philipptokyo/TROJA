@@ -19,7 +19,6 @@
 #include "TMath.h"
 
 using namespace G4Root;
-//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -39,14 +38,6 @@ EventAction* EventAction::Instance()
 EventAction::EventAction()
 : G4UserEventAction(),
   fPrintModulo(100000)
-//  fEvntNr(0),
-//  fEnergy1(0.),
-//  fEnergy2(0.),
-//  fX1(0.),
-//  fY1(0.),
-//  fZ1(0.),
-//  fStripX(-1),
-//  fStripY(-1)
 { 
   fgInstance = this;
 }
@@ -95,20 +86,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 //  G4double fPh = v.getPhi();
 //  fEvntNr = event->GetEventID(); 
  
-//  G4AnalysisManager* man = G4AnalysisManager::Instance();
-//  man->FillNtupleIColumn(0, fEvntNr);
-//  man->FillNtupleDColumn(1, fEnergy1);
-//  man->FillNtupleDColumn(2, fEnergy2);
-//  man->FillNtupleDColumn(3, fX1);
-//  man->FillNtupleDColumn(4, fY1);
-//  man->FillNtupleDColumn(5, fZ1);
-//  //man->FillNtupleDColumn(6, fTh); //in deg
-//  man->FillNtupleDColumn(6, fTh/TMath::Pi()*180.0); //in deg
-//  man->FillNtupleDColumn(7, fPh);
-//  man->FillNtupleIColumn(8, fStripX);
-//  man->FillNtupleIColumn(9, fStripY);
-//
-//  man->AddNtupleRow();  
+  G4int evntNo = event->GetEventID(); 
   
   //printf("Got: Eloss=%f Etot=%f x=%f y=%f z=%f\n", fEnergy1, fEnergy2, fX1, fY1, fZ1);  
 
@@ -117,6 +95,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
   outTree->Fill();
 
+  if(evntNo != runact->GetDetInfo()->detData.eventNumber){
+    printf("ERROR: Mismatch in header event numbers! (EventAction)! Please check...!\n");
+    abort();
+  }
 
 
 }  
@@ -125,15 +107,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
 void EventAction::Reset()
 {
-  //reset cumulative quantities
-  //
-//  fEnergy1 = NAN;
-//  fEnergy2 = NAN;
-//  fX1 = NAN;
-//  fY1 = NAN;
-//  fZ1 = NAN;
-//  fStripX = -1;
-//  fStripY = -1;
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

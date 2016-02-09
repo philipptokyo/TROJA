@@ -15,13 +15,8 @@
 #include "G4UnitsTable.hh"
 
 #include "TMath.h"
-//#include <iostream>
 #include <cmath>
-//#include <ctgmath>
-//#include <cstdint>
-//#include <cstring>
 
-//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -41,14 +36,6 @@ SteppingAction* SteppingAction::Instance()
 SteppingAction::SteppingAction()
 : G4UserSteppingAction(),
   fVolume(0)
-//  fEnergy1(0.),
-//  fEnergy2(0.),
-//  fX1(0.),
-//  fY1(0.),
-//  fZ1(0.),
-//  fStripX(-1),
-//  fStripY(-1),
-//  fFI(0)
 { 
   fgInstance = this;
 }
@@ -56,14 +43,6 @@ SteppingAction::SteppingAction()
 SteppingAction::SteppingAction(DetectorInfo* detInfo)
 : G4UserSteppingAction(),
   fVolume(0)
-//  fEnergy1(0.),
-//  fEnergy2(0.),
-//  fX1(0.),
-//  fY1(0.),
-//  fZ1(0.),
-//  fStripX(-1),
-//  fStripY(-1),
-//  fFI(0)
 { 
   fDetInfo=detInfo;
   fgInstance = this;
@@ -146,12 +125,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 //    fFI = 1;
 
     G4ThreeVector pos1 = point1->GetPosition();
-//    fX1=pos1.getX();
-//    fY1=pos1.getY();
-//    fZ1=pos1.getZ();
-//    fDetInfo->detData.fIX=pos1.getX();
-//    fDetInfo->detData.fIY=pos1.getY();
-//    fDetInfo->detData.fIZ=pos1.getZ();
 
     G4int detID1 = atoi(point1->GetPhysicalVolume()->GetName().data());
     G4int detID2 = -1; // for cross checking
@@ -180,7 +153,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
          
         // get strip number of FI
         // for later position determination in the analysis
-        //fDetInfo->CalcStripNumbers(detID2, fX1, fY1, fZ1, fStripX, fStripY);
         fDetInfo->CalcStripNumbers(detID1, 
                                    fDetInfo->detData.fIX, 
                                    fDetInfo->detData.fIY, 
@@ -193,13 +165,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
           fDetInfo->detData.energy[dd]=0.0; // was NAN 
         }
 
-//        printf("Event %d, Found first interaction point\n", eID);
-//        printf("Is in %s (detID1 %d, detID2 %d)\n", point1->GetPhysicalVolume()->GetName().data(), detID1, detID2);
-//        printf("Is in %s\n", volume->GetName().data());
-//        //printf("Position x %f, y %f, z %f\n", X1, fY1, fZ1);
-//        printf("Position x %f, y %f, z %f\n", fDetInfo->detData.fIX, fDetInfo->detData.fIY, fDetInfo->detData.fIZ);
-//        printf("Detector ID %d, strip x %d, strip y %d\n", detID1, fStripX, fStripY);
-//        printf("\n");
         
         // leave the FI loop
         break;
@@ -214,42 +179,18 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // now, sum up the energies in each detector
 
   G4double edep = step->GetTotalEnergyDeposit(); // HERE IS A PROBLEM!!!!!!!!!!!!!!! todo
-
+  
+  //printf("\nEvent %d\n", eID);
   for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
       char tmpName[50];
       sprintf(tmpName, "logical%02d", d);
       //printf("looking for %s\n", tmpName);
       if(std::strcmp(volume->GetName(), tmpName)==0){
         fDetInfo->detData.energy[d] += edep;
+        //printf("EnergyDeposit in %s is %f\n", tmpName, edep);
       }
 
   }
-  
-//  if (std::strcmp(volume->GetName(), "logical00")==0 ){
-//    //printf("in SSD1\n");
-//    if(TMath::IsNaN(fEnergy1)){ // default is nan, set to zero in case of hit
-//      fEnergy1 = 0.0;
-//    }
-//    G4double edep = step->GetTotalEnergyDeposit();
-//    fEnergy1 += edep;
-//    //printf("fEnergy1 = %f\n", fEnergy1);
-//
-//
-//      
-//    //if (point1->GetStepStatus() == fGeomBoundary) { // first interaction point?
-//    if ((point1->GetStepStatus() == fGeomBoundary) && (fStripX == -1) ) { // first interaction point?
-//      //printf("FI ");
-//
-//      fDetInfo->CalcStripNumbers(0, fX1, fY1, fZ1, fStripX, fStripY);
-//      //printf("x=%f y=%f z=%f\n", fX1, fY1, fZ1);
-//    }
-//
-//    //printf("Got: fEnergy1 = %f, fStripNo1 %i, fX1 %f, fY1 %f, fZ1 %f\n", fEnergy1, fStripNo1, fX1, fY1, fZ1);
-//
-//
-//  }
-  
-  
   
   
   

@@ -6,7 +6,6 @@
 //#define maxDetectors 10
 #include "DetectorGlobals.hh"
 
-//using namespace DetectorGlobals;
 
 typedef struct _geo
 {
@@ -15,9 +14,7 @@ typedef struct _geo
   G4String type;
 
   G4double center[3];
-
   G4double rotation[3]; // rotation angle 
-
   G4double size[3]; // size in x, y, z direction (detector coordinate system)
 
   G4int noStrips[2]; // in x and y
@@ -28,6 +25,7 @@ typedef struct _geo
 typedef struct _dat
 {
   G4int eventNumber;
+
   G4double fIX, fIY, fIZ; // first interaction point, x, y, z
 
   //G4int noOfDet[maxDetectors];
@@ -99,7 +97,7 @@ class DetectorInfo
          void SetName(G4int d, G4String n) { det[d].name=n; }
          void SetType(G4int d, G4String n) { det[d].type=n; }
     
-    dat detData;
+    dat detData; // todo: this should be private, ne
 
 
   private:

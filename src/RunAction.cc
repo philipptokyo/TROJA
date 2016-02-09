@@ -28,7 +28,6 @@
 #include "DetectorInfo.hh"
 
 using namespace G4Root;
-//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -38,12 +37,6 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   
   fDetInfo = detInfo;
 
-  // Create analysis manager
-  //G4AnalysisManager* man = G4AnalysisManager::Instance();
-
-  //man->OpenFile("troja.root");
-  //man->OpenFile(info->GetOutfileNameString().c_str());
-  //man->OpenFile(info->fOutFileNameTroja);
 
   char tmpName[50];
 
@@ -56,7 +49,7 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   fOutTree->Branch("FIz", &(fDetInfo->detData.fIZ), "FIz/D");
   
 
-  fOutTree->Branch("detID", &(fDetInfo->detData.detID), "detID/I");
+  fOutTree->Branch("FIdetID", &(fDetInfo->detData.detID), "FIdetID/I"); // ID of the detector with the first interaction point
 
   sprintf(tmpName, "energy[%i]/D", maxDetectors);
   fOutTree->Branch("energy", (fDetInfo->detData.energy), tmpName);
@@ -69,20 +62,6 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
 
 
 
-  // Create ntuple
-//  man->CreateNtuple("troja", "sim outputs");
-//  man->CreateNtupleIColumn("eventNumber");
-//  man->CreateNtupleDColumn("energyLoss");
-//  man->CreateNtupleDColumn("energyTotal");
-//  man->CreateNtupleDColumn("x");
-//  man->CreateNtupleDColumn("y");
-//  man->CreateNtupleDColumn("z");
-//  man->CreateNtupleDColumn("theta");
-//  man->CreateNtupleDColumn("phi");
-//  man->CreateNtupleIColumn("stripX");
-//  man->CreateNtupleIColumn("stripY");
-//  man->FinishNtuple();
-  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -112,11 +91,8 @@ void RunAction::BeginOfRunAction(const G4Run* aRun)
 
 void RunAction::EndOfRunAction(const G4Run* aRun)
 {
-  //G4int nofEvents = aRun->GetNumberOfEvent();
   fDetInfo->detData.eventNumber = aRun->GetNumberOfEvent();
 
-
-  //if (nofEvents == 0) return;
   if (fDetInfo->detData.eventNumber == 0) return;
   
 
@@ -128,11 +104,6 @@ void RunAction::EndOfRunAction(const G4Run* aRun)
     = particleGun->GetParticleDefinition()->GetParticleName();                       
   G4double particleEnergy = particleGun->GetParticleEnergy();
   
-  // Save histograms
-//  G4AnalysisManager* man = G4AnalysisManager::Instance();
-//  man->Write();
-//  man->CloseFile();
-
   fOutTree->Write("troja");   
   fOutFile->Close();
  
@@ -140,7 +111,6 @@ void RunAction::EndOfRunAction(const G4Run* aRun)
   //  
   G4cout
      << "\n--------------------End of Run------------------------------\n"
-     //<< " The run consists of " << nofEvents << " "<< particleName << " of "
      << " The run consists of " << fDetInfo->detData.eventNumber << " "<< particleName << " of "
      <<   G4BestUnit(particleEnergy,"Energy")      
      << "\n------------------------------------------------------------\n"
