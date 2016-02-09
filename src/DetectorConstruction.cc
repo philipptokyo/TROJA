@@ -9,6 +9,8 @@
 #include "SteppingAction.hh"
    // use of stepping action to set the accounting volume
 
+#include "DetectorGlobals.hh"
+
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
 #include "G4Box.hh"
@@ -60,6 +62,7 @@
 
 
 // using namespace CLHEP
+//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -237,19 +240,19 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
   
-  const G4int maxDet = 10; // fDetInfo->GetMaxNoDetectors();
-  if(maxDet>fDetInfo->GetMaxNoDetectors()){
-    printf("Error: More detectors requested (%d) in DetectorConstruction than allowed in DetectorInfo (%d). Change this in DetectorInfo!\n\n", maxDet, fDetInfo->GetMaxNoDetectors());
-    abort();
-  }
+//  const G4int maxDet = 10; // fDetInfo->GetMaxNoDetectors();
+//  if(maxDet>fDetInfo->GetMaxNoDetectors()){
+//    printf("Error: More detectors requested (%d) in DetectorConstruction than allowed in DetectorInfo (%d). Change this in DetectorInfo!\n\n", maxDet, fDetInfo->GetMaxNoDetectors());
+//    abort();
+//  }
 
   G4int noOfDet = fDetInfo->GetNoOfDetectors();
   
-  G4ThreeVector pos[maxDet];
-  G4RotationMatrix* rotMat[maxDet];  
-  G4double size[maxDet][3] = {{0.0}};
-  G4Box* box[maxDet];
-  G4LogicalVolume* logical[maxDet];
+  G4ThreeVector pos[maxDetectors]; // from detector globals
+  G4RotationMatrix* rotMat[maxDetectors];  
+  G4double size[maxDetectors][3] = {{0.0}};
+  G4Box* box[maxDetectors];
+  G4LogicalVolume* logical[maxDetectors];
   
   
   for(G4int d=0; d<noOfDet; d++){

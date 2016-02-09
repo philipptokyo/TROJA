@@ -9,7 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include        <string>
+#include <string>
 
 //#include        <stdio.h>
 //#include        <cstdio>
@@ -185,11 +185,6 @@ void DetectorInfo::Parse(G4String filename)
 
 
 }
-
-
-
-
-
 
 
 

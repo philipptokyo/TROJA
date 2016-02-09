@@ -3,7 +3,10 @@
 
 #include "globals.hh"
 
-#define maxDetectors 10
+//#define maxDetectors 10
+#include "DetectorGlobals.hh"
+
+//using namespace DetectorGlobals;
 
 typedef struct _geo
 {
@@ -20,6 +23,23 @@ typedef struct _geo
   G4int noStrips[2]; // in x and y
 
 } geo;
+
+
+typedef struct _dat
+{
+  G4int eventNumber;
+  G4double fIX, fIY, fIZ; // first interaction point, x, y, z
+
+  //G4int noOfDet[maxDetectors];
+  G4int detID;
+
+  G4double energy[maxDetectors];
+  G4int stripX[maxDetectors];
+  G4int stripY[maxDetectors];
+
+} dat;
+
+
 
 
 class DetectorInfo
@@ -78,11 +98,14 @@ class DetectorInfo
 
          void SetName(G4int d, G4String n) { det[d].name=n; }
          void SetType(G4int d, G4String n) { det[d].type=n; }
+    
+    dat detData;
 
 
   private:
 
     geo det[maxDetectors];
+
     G4int fNoOfDet; // number of detectors
 
 

@@ -42,25 +42,27 @@ class SteppingAction : public G4UserSteppingAction
   
     // get methods
     G4LogicalVolume* GetVolume() const { return fVolume; }
-    G4double GetEnergy1() const { return fEnergy1; }
-    G4double GetEnergy2() const { return fEnergy2; }
-    G4double GetX1() const { return fX1; }
-    G4double GetY1() const { return fY1; }
-    G4double GetZ1() const { return fZ1; }
-    G4int    GetStripX() const { return fStripX; }
-    G4int    GetStripY() const { return fStripY; }
+
+//    G4double GetEnergy1() const { return fEnergy1; }
+//    G4double GetEnergy2() const { return fEnergy2; }
+//    G4double GetX1() const { return fX1; }
+//    G4double GetY1() const { return fY1; }
+//    G4double GetZ1() const { return fZ1; }
+//    G4int    GetStripX() const { return fStripX; }
+//    G4int    GetStripY() const { return fStripY; }
    
   private:
     static SteppingAction* fgInstance;  
   
     G4LogicalVolume* fVolume;
-    G4double  fEnergy1; //first Si
-    G4double  fEnergy2; //second Si
-    G4double  fX1; //first Si
-    G4double  fY1; //first Si
-    G4double  fZ1; //first Si
-    G4int     fStripX; // SSD 1
-    G4int     fStripY; // SSD 1
+
+//    G4double  fEnergy1; //first Si
+//    G4double  fEnergy2; //second Si
+//    G4double  fX1; //first Si
+//    G4double  fY1; //first Si
+//    G4double  fZ1; //first Si
+//    G4int     fStripX; // SSD 1
+//    G4int     fStripY; // SSD 1
 
     DetectorInfo* fDetInfo;
 

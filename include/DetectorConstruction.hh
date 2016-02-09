@@ -10,6 +10,7 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 #include "DetectorInfo.hh"
+//#include "DetectorGlobals.hh"
 
 class G4VPhysicalVolume;
 

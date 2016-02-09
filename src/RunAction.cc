@@ -21,34 +21,67 @@
 
 #include "InputInfo.hh"
 
-using namespace G4Root;
+#include "TFile.h"
+#include "TTree.h"
 
+#include "DetectorGlobals.hh"
+#include "DetectorInfo.hh"
+
+using namespace G4Root;
+//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::RunAction(InputInfo* info)
+RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
 : G4UserRunAction()
 {
+  
+  fDetInfo = detInfo;
+
   // Create analysis manager
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  //G4AnalysisManager* man = G4AnalysisManager::Instance();
 
   //man->OpenFile("troja.root");
   //man->OpenFile(info->GetOutfileNameString().c_str());
-  man->OpenFile(info->fOutFileNameTroja);
+  //man->OpenFile(info->fOutFileNameTroja);
+
+  char tmpName[50];
+
+  fOutFile = new TFile(info->fOutFileNameTroja, "recreate");
+  fOutTree = new TTree("troja", "Transfer at OEDO in Japan, Geant4 simulation file");
   
+  fOutTree->Branch("eventNumber", &(fDetInfo->detData.eventNumber), "eventNumber/I");
+  fOutTree->Branch("FIx", &(fDetInfo->detData.fIX), "FIx/D");
+  fOutTree->Branch("FIy", &(fDetInfo->detData.fIY), "FIy/D");
+  fOutTree->Branch("FIz", &(fDetInfo->detData.fIZ), "FIz/D");
+  
+
+  fOutTree->Branch("detID", &(fDetInfo->detData.detID), "detID/I");
+
+  sprintf(tmpName, "energy[%i]/D", maxDetectors);
+  fOutTree->Branch("energy", (fDetInfo->detData.energy), tmpName);
+
+  sprintf(tmpName, "stripX[%i]/I", maxDetectors);
+  fOutTree->Branch("stripX", (fDetInfo->detData.stripX), tmpName);
+
+  sprintf(tmpName, "stripY[%i]/I", maxDetectors);
+  fOutTree->Branch("stripY", (fDetInfo->detData.stripY), tmpName);
+
+
+
   // Create ntuple
-  man->CreateNtuple("troja", "sim outputs");
-  man->CreateNtupleIColumn("eventNumber");
-  man->CreateNtupleDColumn("energyLoss");
-  man->CreateNtupleDColumn("energyTotal");
-  man->CreateNtupleDColumn("x");
-  man->CreateNtupleDColumn("y");
-  man->CreateNtupleDColumn("z");
-  man->CreateNtupleDColumn("theta");
-  man->CreateNtupleDColumn("phi");
-  man->CreateNtupleIColumn("stripX");
-  man->CreateNtupleIColumn("stripY");
-  man->FinishNtuple();
+//  man->CreateNtuple("troja", "sim outputs");
+//  man->CreateNtupleIColumn("eventNumber");
+//  man->CreateNtupleDColumn("energyLoss");
+//  man->CreateNtupleDColumn("energyTotal");
+//  man->CreateNtupleDColumn("x");
+//  man->CreateNtupleDColumn("y");
+//  man->CreateNtupleDColumn("z");
+//  man->CreateNtupleDColumn("theta");
+//  man->CreateNtupleDColumn("phi");
+//  man->CreateNtupleIColumn("stripX");
+//  man->CreateNtupleIColumn("stripY");
+//  man->FinishNtuple();
   
 }
 
@@ -79,10 +112,12 @@ void RunAction::BeginOfRunAction(const G4Run* aRun)
 
 void RunAction::EndOfRunAction(const G4Run* aRun)
 {
-  G4int nofEvents = aRun->GetNumberOfEvent();
+  //G4int nofEvents = aRun->GetNumberOfEvent();
+  fDetInfo->detData.eventNumber = aRun->GetNumberOfEvent();
 
 
-  if (nofEvents == 0) return;
+  //if (nofEvents == 0) return;
+  if (fDetInfo->detData.eventNumber == 0) return;
   
 
   // Run conditions
@@ -94,16 +129,19 @@ void RunAction::EndOfRunAction(const G4Run* aRun)
   G4double particleEnergy = particleGun->GetParticleEnergy();
   
   // Save histograms
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
-  man->Write();
-  man->CloseFile();
-   
+//  G4AnalysisManager* man = G4AnalysisManager::Instance();
+//  man->Write();
+//  man->CloseFile();
+
+  fOutTree->Write("troja");   
+  fOutFile->Close();
  
   // Print
   //  
   G4cout
      << "\n--------------------End of Run------------------------------\n"
-     << " The run consists of " << nofEvents << " "<< particleName << " of "
+     //<< " The run consists of " << nofEvents << " "<< particleName << " of "
+     << " The run consists of " << fDetInfo->detData.eventNumber << " "<< particleName << " of "
      <<   G4BestUnit(particleEnergy,"Energy")      
      << "\n------------------------------------------------------------\n"
      << G4endl;

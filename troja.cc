@@ -4,6 +4,8 @@
 
 #include "DetectorConstruction.hh"
 #include "DetectorInfo.hh"
+#include "DetectorGlobals.hh"
+
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
@@ -32,6 +34,8 @@
 #include "LibPerso.h"
 #include "InputInfo.hh"
 
+
+//using namespace DetectorGlobals;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -132,7 +136,7 @@ int main(int argc,char** argv)
   runManager->SetUserAction(new EventAction());
 
   // Run action
-  runManager->SetUserAction(new RunAction(info));
+  runManager->SetUserAction(new RunAction(info, detInfo));
      
   // Initialize G4 kernel
   //

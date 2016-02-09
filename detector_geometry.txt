@@ -1,6 +1,6 @@
 
 
-number_of_detectors 4
+number_of_detectors 5
 
 position 0 0.0 10.0 -10.0
 rotation 0 -45.0 0.0 0.0
@@ -11,8 +11,8 @@ type 0 DSSD
 
 position 1 0.0 -10.0 -10.0
 rotation 1 45.0 0.0 0.0
-size 1 10.0 10.0 0.1
-number_of_stripes 1 50 50
+size 1 10.0 10.0 0.01
+number_of_stripes 1 100 100
 name 1 DSSD
 type 1 DSSD
 
@@ -29,6 +29,13 @@ size 3 10.0 10.0 0.01
 number_of_stripes 3 100 100
 name 3 DSSD
 type 3 DSSD
+
+position 4 -10.0 0.0 -11.0
+rotation 4 0.0 -45.0 0.0
+size 4 10.0 10.0 0.1
+number_of_stripes 4 1 1
+name 4 DSSD
+type 4 DSSD
 
 
 
