@@ -6,8 +6,9 @@
 
 #include "RunAction.hh"
 #include "SteppingAction.hh"
-  // use of stepping action to get and reset accumulated energy  
+// use of stepping action to get and reset accumulated energy  
 
+#include "PrimaryGeneratorAction.hh"
 #include "G4RunManager.hh"
 #include "G4Event.hh"
 
@@ -85,9 +86,15 @@ void EventAction::EndOfEventAction(const G4Event* event)
 //  G4double fTh = v.getTheta(); 
 //  G4double fPh = v.getPhi();
 //  fEvntNr = event->GetEventID(); 
- 
-  G4int evntNo = event->GetEventID(); 
   
+  
+  G4int evntNoGen = PrimaryGeneratorAction::Instance()->GetEventNumber();
+  G4int evntNoSim = event->GetEventID(); 
+  
+  if(evntNoGen != evntNoSim){
+    printf("ERROR: Mismatch in event numbers! Generator %d, Simulation %d! Please check (EventAction)...!\n", evntNoGen, evntNoSim);
+    abort();
+  }
   //printf("Got: Eloss=%f Etot=%f x=%f y=%f z=%f\n", fEnergy1, fEnergy2, fX1, fY1, fZ1);  
 
   RunAction *runact = (RunAction*)G4RunManager::GetRunManager()->GetUserRunAction(); 
@@ -95,10 +102,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
   outTree->Fill();
 
-  if(evntNo != runact->GetDetInfo()->detData.eventNumber){
-    printf("ERROR: Mismatch in header event numbers! (EventAction)! Please check...!\n");
-    abort();
-  }
 
 
 }  

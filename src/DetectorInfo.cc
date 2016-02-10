@@ -1,10 +1,13 @@
 #include "DetectorInfo.hh"
+#include "DetectorGlobals.hh"
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
 #include "G4Material.hh"
 #include "G4ThreeVector.hh"
+
+#include "TMath.h"
 
 #include <iostream>
 #include <sstream>
@@ -19,17 +22,17 @@ DetectorInfo::DetectorInfo()
   
 
   for(G4int d=0; d<GetMaxNoDetectors(); d++){
-      SetCenterX(d, 0.0);
-      SetCenterY(d, 0.0);
-      SetCenterZ(d, 0.0);
+      SetCenterX(d, NAN);
+      SetCenterY(d, NAN);
+      SetCenterZ(d, NAN);
     
-    SetRotationX(d, 0.0); 
-    SetRotationY(d, 0.0); 
-    SetRotationZ(d, 0.0); 
+    SetRotationX(d, NAN); 
+    SetRotationY(d, NAN); 
+    SetRotationZ(d, NAN); 
     
-        SetSizeX(d, 0.0); 
-        SetSizeY(d, 0.0); 
-        SetSizeZ(d, 0.0); 
+        SetSizeX(d, NAN); 
+        SetSizeY(d, NAN); 
+        SetSizeZ(d, NAN); 
            
     SetNoStripsX(d, 0);  
     SetNoStripsY(d, 0);  
@@ -157,13 +160,13 @@ void DetectorInfo::Parse(G4String filename)
       printf("Got number of strips of detector %d: x = %d, y = %d\n", index, GetNoStripsX(index), GetNoStripsY(index));
     }
     else if(strcmp(temp[0],"name")==0){
-      printf("Info: 'name' not yet implemented.\n");
+      printf("Info: 'name' not yet implemented (is 'logical').\n");
     }
     else if(strcmp(temp[0],"type")==0){
-      printf("Info: 'type' not yet implemented.\n");
+      printf("Info: 'type' not yet implemented (is 'DSSD').\n");
     }
     else {
-      printf("Could not read your input keyword '%s'. Aborting program.\n", temp[0]);
+      printf("Cannot read your input keyword '%s'. Aborting program.\n", temp[0]);
       abort();
     }
 
@@ -176,10 +179,71 @@ void DetectorInfo::Parse(G4String filename)
     }
   } // end of reading input file
 
-  printf("\n");
+  
+  printf("DetectorInfo::Parse done! Checking input...\n");
+  CheckInput();
+
+
+}
 
 
 
+
+
+
+
+
+
+
+
+
+void DetectorInfo::CheckInput()
+{
+  
+  if(fNoOfDet>maxDetectors){
+    printf("Error: more detectors in input file (%d) than allowed in DetectorGlobals.hh (%d)\n", fNoOfDet, maxDetectors);
+    abort();
+  }
+
+  if(fNoOfDet==0){
+    printf("Info: number of detectors is 0!\n");
+  }else if(fNoOfDet<0){
+    printf("Error: invalid (negative) number of detectors: %d\n", fNoOfDet);
+    abort();
+  }
+
+  for(G4int d=0; d<fNoOfDet; d++){
+    G4double checkSum=0.0;
+    
+    checkSum = det[d].center[0] * det[d].center[1] * det[d].center[2];
+    if(TMath::IsNaN(checkSum)){
+      printf("Error: invalid position for detector %d: x = %f, y = %f, z = %f\n", d, det[d].center[0], det[d].center[1], det[d].center[2]);
+      abort();
+    }
+
+    checkSum = det[d].rotation[0] * det[d].rotation[1] * det[d].rotation[2];
+    if(TMath::IsNaN(checkSum)){
+      printf("Error: invalid rotation for detector %d: x = %f, y = %f, z = %f\n", d, det[d].rotation[0], det[d].rotation[1], det[d].rotation[2]);
+      abort();
+    } 
+
+    checkSum = det[d].size[0] * det[d].size[1] * det[d].size[2];
+    if(TMath::IsNaN(checkSum) || checkSum==0){
+      printf("Error: invalid size for detector %d: x = %f, y = %f, z = %f\n", d, det[d].size[0], det[d].size[1], det[d].size[2]);
+      abort();
+    }
+    
+    if( (det[d].noStrips[0] < 0) || (det[d].noStrips[1] < 0) ){
+      printf("Error: invalid number of strips in detector %d: %d x, %d y (have to be nonnegative; 0 and 1 is same geometry)\n", d, det[d].noStrips[0], det[d].noStrips[1]);
+      abort();
+    }
+  }
+
+
+
+  //for testing:
+  printf("CheckInput completed sucessfully!\n");
+  //abort();
 }
 
 

@@ -47,6 +47,7 @@ class DetectorInfo
     virtual ~DetectorInfo();
 
     void Parse(G4String filename);    
+    void CheckInput();
     
     void CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4double hz, G4int &stripx, G4int &stripy);
         

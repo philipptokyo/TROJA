@@ -47,8 +47,11 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
 
     // getter and setter for root file name
+    // todo: incomplete!
     void SetRootInputFileName(std::string name){fRootInputFileName=name;}
     std::string GetRootInputFileName(){return fRootInputFileName;}
+
+    G4int GetEventNumber() const {return fEventNumber;}
   
   private:
     static PrimaryGeneratorAction* fgInstance;

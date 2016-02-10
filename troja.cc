@@ -71,7 +71,8 @@ int main(int argc,char** argv)
   // contains detector information
   DetectorInfo* detInfo = new DetectorInfo();
   
-  detInfo->Parse("/home/philipp/sim/troja/detector_geometry.txt");  // this file should be defined in InputInfo (todo)
+  //detInfo->Parse("/home/philipp/sim/troja/detector_geometry.txt");  // this file should be defined in InputInfo (todo)
+  detInfo->Parse(info->fInFileNameGeometry);  
 
 
 
