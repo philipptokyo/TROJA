@@ -234,8 +234,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   
   G4ThreeVector pos[maxDetectors]; // from detector globals
   G4RotationMatrix* rotMat[maxDetectors];  
-  G4double size[maxDetectors][3] = {{0.0}};
+  G4double size[maxDetectors][5] = {{0.0}};
   G4Box* box[maxDetectors];
+  G4Tubs* tube[maxDetectors];
   G4LogicalVolume* logical[maxDetectors];
   
   
@@ -247,17 +248,41 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
     rotMat[d]->rotateZ(fDetInfo->GetRotationZ(d));
 
-    size[d][0]     = fDetInfo->GetSizeX(d)*0.5; // half width
-    size[d][1]     = fDetInfo->GetSizeY(d)*0.5; // half length 
-    size[d][2]     = fDetInfo->GetSizeZ(d)*0.5; // half thickness
+    size[d][0]     = fDetInfo->GetSize0(d)*0.5; // half width
+    size[d][1]     = fDetInfo->GetSize1(d)*0.5; // half length 
+    size[d][2]     = fDetInfo->GetSize2(d)*0.5; // half thickness
+    size[d][3]     = fDetInfo->GetSize3(d); // phi_start
+    size[d][4]     = fDetInfo->GetSize4(d); // phi_detector
 
     char tmpName[50];
 
-    sprintf(tmpName, "box%02d", d);
-    box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+    //sprintf(tmpName, "box%02d", d);
+    //box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+    //sprintf(tmpName, "tube%02d", d);
+    //tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
 
-    sprintf(tmpName, "logical%02d", d);
-    logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+    if( strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0 ){
+      
+      sprintf(tmpName, "box%02d", d);
+      box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+      
+      sprintf(tmpName, "logical%02d", d);
+      logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+
+    } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
+      
+      size[d][0] *= 2.0; // radii are given in full length
+      size[d][1] *= 2.0;       
+      sprintf(tmpName, "tube%02d", d);
+      tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
+      
+      sprintf(tmpName, "logical%02d", d);
+      logical[d] = new G4LogicalVolume(tube[d], fSilicon, tmpName);
+
+    } else {
+      printf("Error in detector construction: unknown type '%s' (id %d)\n", fDetInfo->GetType(d).data(), d);
+      abort();
+    }
 
     sprintf(tmpName, "%02d%s", d, fDetInfo->GetName(d).data());
     new G4PVPlacement(rotMat[d], 

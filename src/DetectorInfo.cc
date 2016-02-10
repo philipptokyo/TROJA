@@ -30,12 +30,17 @@ DetectorInfo::DetectorInfo()
     SetRotationY(d, NAN); 
     SetRotationZ(d, NAN); 
     
-        SetSizeX(d, NAN); 
-        SetSizeY(d, NAN); 
-        SetSizeZ(d, NAN); 
+        SetSize0(d, NAN); 
+        SetSize1(d, NAN); 
+        SetSize2(d, NAN); 
+        SetSize3(d, NAN); 
+        SetSize4(d, NAN); 
            
     SetNoStripsX(d, 0);  
     SetNoStripsY(d, 0);  
+
+         SetName(d, "");
+         SetType(d, "");
   }
   
 }
@@ -47,22 +52,44 @@ DetectorInfo::~DetectorInfo()
 void DetectorInfo::CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4double hz, G4int &stripx, G4int &stripy)
 {
   //printf("inside: calculating strip no x\n");
-
   G4ThreeVector vhit(hx, hy, hz); // vector from origin to FI
   G4ThreeVector vcen(GetCenterX(detID), GetCenterY(detID), GetCenterZ(detID)); // vector from origin to center detector
-  G4ThreeVector vori(GetSizeX(detID)/2.0, GetSizeY(detID)/2.0, 0.0); // vector to move origin to center of lower left corner of detector
-  
-  G4ThreeVector vdet=vhit-vcen;
 
+  G4ThreeVector vdet=vhit-vcen; // hit with respect to center of detector
+  
   vdet.rotateX(GetRotationX(detID));
   vdet.rotateY(GetRotationY(detID));
   vdet.rotateZ(GetRotationZ(detID));
-  
-  G4ThreeVector vpix=vdet+vori;
-  
 
-  stripx = (G4int)(vpix.getX()/(GetSizeX(detID)/GetNoStripsX(detID)));
-  stripy = (G4int)(vpix.getY()/(GetSizeY(detID)/GetNoStripsY(detID)));
+  if(strcmp(det[detID].type.data(), "DSSDbox")==0){
+    
+    G4ThreeVector vori(GetSize0(detID)/2.0, GetSize1(detID)/2.0, 0.0); // vector to move origin to center of lower left corner of detector
+  
+    G4ThreeVector vpix=vdet+vori;
+
+    stripx = (G4int)(vpix.getX()/(GetSize0(detID)/GetNoStripsX(detID)));
+    stripy = (G4int)(vpix.getY()/(GetSize1(detID)/GetNoStripsY(detID)));
+
+  } else if(strcmp(det[detID].type.data(), "DSSDtube")==0){
+    
+    G4double phips = GetSize4(detID)/((G4double)GetNoStripsX(detID));  // angle coverage phi per x strip
+    G4double radps = (GetSize1(detID)-GetSize0(detID))/((G4double)GetNoStripsY(detID)); // radius coverage per y strip
+    
+    G4double hitPhi = vdet.phi();
+    G4double hitRad = vdet.mag();
+    
+    stripx = (G4int)((hitPhi-GetSize3(detID))/phips);
+    stripy = (G4int)((hitRad-GetSize0(detID))/radps);
+    
+    //printf("FIglob: %f %f %f\n", hx, hy, hz);
+    //printf("FIdet:  %f %f %f\n", vdet.x(), vdet.y(), vdet.z());
+    //printf("hitPhi %f, phi_s %f, phips %f;      hitRad %f, radMin %f, radps %f\n", hitPhi, GetSize3(detID), phips, hitRad, GetSize0(detID), radps);
+    //printf("CalcStrip: got strip x = %d, strip y = %d\n\n", stripx, stripy);
+
+  } else {
+    stripx = -1;
+    stripy = -1;
+  }
   
 }
 
@@ -92,7 +119,7 @@ void DetectorInfo::Parse(G4String filename)
   G4int counter=0;
   const G4int stopper=10000;
 
-  const G4int maxArg=5;
+  const G4int maxArg=7;
   char temp[maxArg][500];
 
 
@@ -148,10 +175,12 @@ void DetectorInfo::Parse(G4String filename)
     }
     else if(strcmp(temp[0],"size")==0){
       G4int index = atoi(temp[1]);
-      SetSizeX(index, atof(temp[2])*cm);
-      SetSizeY(index, atof(temp[3])*cm);
-      SetSizeZ(index, atof(temp[4])*cm);
-      printf("Got full size of detector %d: x = %f, y = %f, z = %f\n", index, GetSizeX(index), GetSizeY(index), GetSizeZ(index));
+      SetSize0(index, atof(temp[2])*cm);
+      SetSize1(index, atof(temp[3])*cm);
+      SetSize2(index, atof(temp[4])*cm);
+      SetSize3(index, atof(temp[5])*deg);
+      SetSize4(index, atof(temp[6])*deg);
+      printf("Got full size of detector %d: 1st (x or r_min) = %f, 2nd (y or r_max) = %f, 3rd (z) = %f, 4th (void or phi_start) = %f, 5th (void or phi_D) = %f\n", index, GetSize0(index), GetSize1(index), GetSize2(index), GetSize3(index), GetSize4(index));
     }
     else if(strcmp(temp[0],"number_of_stripes")==0){
       G4int index = atoi(temp[1]);
@@ -163,7 +192,9 @@ void DetectorInfo::Parse(G4String filename)
       printf("Info: 'name' not yet implemented (is 'logical').\n");
     }
     else if(strcmp(temp[0],"type")==0){
-      printf("Info: 'type' not yet implemented (is 'DSSD').\n");
+      G4int index = atoi(temp[1]);
+      SetType(index, temp[2]);
+      printf("Got type '%s'.\n", GetType(index).data());
     }
     else {
       printf("Cannot read your input keyword '%s'. Aborting program.\n", temp[0]);
@@ -215,6 +246,11 @@ void DetectorInfo::CheckInput()
   for(G4int d=0; d<fNoOfDet; d++){
     G4double checkSum=0.0;
     
+    if( !((strcmp(det[d].type.data(),"DSSDbox")==0) || (strcmp(det[d].type.data(),"DSSDtube")==0)) ){
+      printf("Error: invalid detector type '%s'!\n", GetType(d).data());
+      abort();
+    }
+    
     checkSum = det[d].center[0] * det[d].center[1] * det[d].center[2];
     if(TMath::IsNaN(checkSum)){
       printf("Error: invalid position for detector %d: x = %f, y = %f, z = %f\n", d, det[d].center[0], det[d].center[1], det[d].center[2]);
@@ -229,7 +265,12 @@ void DetectorInfo::CheckInput()
 
     checkSum = det[d].size[0] * det[d].size[1] * det[d].size[2];
     if(TMath::IsNaN(checkSum) || checkSum==0){
-      printf("Error: invalid size for detector %d: x = %f, y = %f, z = %f\n", d, det[d].size[0], det[d].size[1], det[d].size[2]);
+      printf("Error: invalid size for detector %d: 1st = %f, 2nd = %f, 3rd = %f\n", d, det[d].size[0], det[d].size[1], det[d].size[2]);
+      abort();
+    }
+    checkSum = det[d].size[3] * det[d].size[4];
+    if( (strcmp(det[d].type.data(),"DSSDtube")==0) && TMath::IsNaN(checkSum) ){
+      printf("Error: invalid angle for type 'DSSDtube': phi_start = %f, phi_D = %f\n", det[d].size[3], det[d].size[4]);
       abort();
     }
     
@@ -237,6 +278,7 @@ void DetectorInfo::CheckInput()
       printf("Error: invalid number of strips in detector %d: %d x, %d y (have to be nonnegative; 0 and 1 is same geometry)\n", d, det[d].noStrips[0], det[d].noStrips[1]);
       abort();
     }
+
   }
 
 

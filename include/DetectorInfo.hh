@@ -15,7 +15,9 @@ typedef struct _geo
 
   G4double center[3];
   G4double rotation[3]; // rotation angle 
-  G4double size[3]; // size in x, y, z direction (detector coordinate system)
+  G4double size[5]; 
+  // size for box: x, y, z direction (detector coordinate system)
+  // size for tube: rmin, rmax, dz, phistart, phiD
 
   G4int noStrips[2]; // in x and y
 
@@ -64,9 +66,11 @@ class DetectorInfo
     G4double GetRotationY(G4int d) const { return det[d].rotation[1] ;}
     G4double GetRotationZ(G4int d) const { return det[d].rotation[2] ;}
 
-        G4double GetSizeX(G4int d) const { return det[d].size[0] ;}
-        G4double GetSizeY(G4int d) const { return det[d].size[1] ;}
-        G4double GetSizeZ(G4int d) const { return det[d].size[2] ;}
+        G4double GetSize0(G4int d) const { return det[d].size[0] ;}
+        G4double GetSize1(G4int d) const { return det[d].size[1] ;}
+        G4double GetSize2(G4int d) const { return det[d].size[2] ;}
+        G4double GetSize3(G4int d) const { return det[d].size[3] ;}
+        G4double GetSize4(G4int d) const { return det[d].size[4] ;}
 
        G4int GetNoStripsX(G4int d) const { return det[d].noStrips[0]; }
        G4int GetNoStripsY(G4int d) const { return det[d].noStrips[1]; }
@@ -88,9 +92,11 @@ class DetectorInfo
     void SetRotationY(G4int d, G4double r) { det[d].rotation[1]=r;}
     void SetRotationZ(G4int d, G4double r) { det[d].rotation[2]=r;}
 
-        void SetSizeX(G4int d, G4double s) { det[d].size[0]=s ;}
-        void SetSizeY(G4int d, G4double s) { det[d].size[1]=s ;}
-        void SetSizeZ(G4int d, G4double s) { det[d].size[2]=s ;}
+        void SetSize0(G4int d, G4double s) { det[d].size[0]=s ;}
+        void SetSize1(G4int d, G4double s) { det[d].size[1]=s ;}
+        void SetSize2(G4int d, G4double s) { det[d].size[2]=s ;}
+        void SetSize3(G4int d, G4double s) { det[d].size[3]=s ;}
+        void SetSize4(G4int d, G4double s) { det[d].size[4]=s ;}
 
     void SetNoStripsX(G4int d, G4int n)    { det[d].noStrips[0]=n; }
     void SetNoStripsY(G4int d, G4int n)    { det[d].noStrips[1]=n; }

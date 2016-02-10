@@ -133,7 +133,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
       char tmpName[50];
       sprintf(tmpName, "logical%02d", d);
-      //printf("looking for %s\n", tmpName);
+      //printf("looking for %s, found %s\n", tmpName, volume->GetName().data());
       if(std::strcmp(volume->GetName(), tmpName)==0){
         fFI = 1;
         detID2 = d;
@@ -159,6 +159,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                                    fDetInfo->detData.fIZ, 
                                    fDetInfo->detData.stripX[detID1], 
                                    fDetInfo->detData.stripY[detID1] );
+
+        //printf("Found FI x = %f, y = %f, z = %f, stripx = %d, stripy = %d\n", fDetInfo->detData.fIX, fDetInfo->detData.fIY, fDetInfo->detData.fIZ, fDetInfo->detData.stripX[detID1], fDetInfo->detData.stripY[detID1]);
         
         // to sum up energies in each detector, set them from NAN to 0.0
         for(G4int dd=0; dd<fDetInfo->GetNoOfDetectors(); dd++){
