@@ -20,33 +20,66 @@
 DetectorInfo::DetectorInfo()
 { 
   
-
-  for(G4int d=0; d<GetMaxNoDetectors(); d++){
-      SetCenterX(d, NAN);
-      SetCenterY(d, NAN);
-      SetCenterZ(d, NAN);
-    
-    SetRotationX(d, NAN); 
-    SetRotationY(d, NAN); 
-    SetRotationZ(d, NAN); 
-    
-        SetSize0(d, NAN); 
-        SetSize1(d, NAN); 
-        SetSize2(d, NAN); 
-        SetSize3(d, NAN); 
-        SetSize4(d, NAN); 
-           
-    SetNoStripsX(d, 0);  
-    SetNoStripsY(d, 0);  
-
-         SetName(d, "");
-         SetType(d, "");
-  }
+  ClearGeometry();
+  ResetData();
   
 }
 
 DetectorInfo::~DetectorInfo()
 { }
+
+
+void DetectorInfo::ClearGeometry()
+{
+  
+  for(G4int d=0; d<GetMaxNoDetectors(); d++){
+      SetCenterX(d, NAN);
+      SetCenterY(d, NAN);
+      SetCenterZ(d, NAN);
+
+    SetRotationX(d, NAN);
+    SetRotationY(d, NAN);
+    SetRotationZ(d, NAN);
+
+        SetSize0(d, NAN);
+        SetSize1(d, NAN);
+        SetSize2(d, NAN);
+        SetSize3(d, NAN);
+        SetSize4(d, NAN);
+
+    SetNoStripsX(d, 0);
+    SetNoStripsY(d, 0);
+
+         SetName(d, "");
+         SetType(d, "");
+  }
+
+}
+
+void DetectorInfo::ResetData()
+{
+
+  // keep first interaction point information
+  // for debugging...
+  detData.fIDetID = -1; // first interaction point detector ID
+
+  detData.fIX = NAN; // first interaction point, x coordinate (origin: center of target)
+  detData.fIY = NAN;
+  detData.fIZ = NAN;
+  
+  for(G4int d=0; d<maxDetectors; d++){
+    detData.haveHit[d]= 0;
+    detData.haveHitID[d]= -1;
+    detData.stripX[d] = -1;
+    detData.stripY[d] = -1;
+    detData.energy[d] = NAN;
+  }
+
+  
+  
+}
+
+
 
 
 void DetectorInfo::CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4double hz, G4int &stripx, G4int &stripy)
@@ -75,7 +108,10 @@ void DetectorInfo::CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4dou
     G4double phips = GetSize4(detID)/((G4double)GetNoStripsX(detID));  // angle coverage phi per x strip
     G4double radps = (GetSize1(detID)-GetSize0(detID))/((G4double)GetNoStripsY(detID)); // radius coverage per y strip
     
-    G4double hitPhi = vdet.phi();
+    G4double hitPhi = vdet.phi(); // vector: phi = -pi ... pi
+    if(hitPhi<0.0){ // detector: phi = 0 ... 2pi
+      hitPhi+=2.0*TMath::Pi();
+    }
     G4double hitRad = vdet.mag();
     
     stripx = (G4int)((hitPhi-GetSize3(detID))/phips);

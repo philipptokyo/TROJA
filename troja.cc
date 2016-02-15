@@ -71,7 +71,7 @@ int main(int argc,char** argv)
   // contains detector information
   DetectorInfo* detInfo = new DetectorInfo();
   
-  //detInfo->Parse("/home/philipp/sim/troja/detector_geometry.txt");  // this file should be defined in InputInfo (todo)
+  //detInfo->Parse("/home/philipp/sim/troja/detector_geometry.txt");  // this file is defined in InputInfo 
   detInfo->Parse(info->fInFileNameGeometry);  
 
 
@@ -96,7 +96,8 @@ int main(int argc,char** argv)
   // Physics list
 //  G4VModularPhysicsList* physicsList = new QGSP_BIC_EMY;
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  physicsList->SetVerboseLevel(1);
+  //physicsList->SetVerboseLevel(1);
+  physicsList->SetVerboseLevel(0);
   runManager->SetUserInitialization(physicsList);
     
   // Primary generator action

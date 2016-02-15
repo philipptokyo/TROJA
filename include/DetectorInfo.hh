@@ -31,8 +31,11 @@ typedef struct _dat
   G4double fIX, fIY, fIZ; // first interaction point, x, y, z
 
   //G4int noOfDet[maxDetectors];
-  G4int detID;
+  G4int fIDetID; // ID of detector with first interaction point
 
+  G4int haveHit[maxDetectors]; // flag if detector was hit by particle
+  G4int haveHitID[maxDetectors]; // aux for quicker debugging... 
+  
   G4double energy[maxDetectors];
   G4int stripX[maxDetectors];
   G4int stripY[maxDetectors];
@@ -50,6 +53,9 @@ class DetectorInfo
 
     void Parse(G4String filename);    
     void CheckInput();
+
+    void ResetData();
+    void ClearGeometry();
     
     void CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4double hz, G4int &stripx, G4int &stripy);
         
@@ -74,6 +80,8 @@ class DetectorInfo
 
        G4int GetNoStripsX(G4int d) const { return det[d].noStrips[0]; }
        G4int GetNoStripsY(G4int d) const { return det[d].noStrips[1]; }
+       
+//           G4bool HaveHit(G4int d) const { return det[d].haveHit; }
 
          G4String GetName(G4int d) { return det[d].name; }
          G4String GetType(G4int d) { return det[d].type; }
@@ -100,6 +108,8 @@ class DetectorInfo
 
     void SetNoStripsX(G4int d, G4int n)    { det[d].noStrips[0]=n; }
     void SetNoStripsY(G4int d, G4int n)    { det[d].noStrips[1]=n; }
+
+//      void SetHaveHit(G4int d, G4bool h)   { det[d].haveHit=h; }
 
          void SetName(G4int d, G4String n) { det[d].name=n; }
          void SetType(G4int d, G4String n) { det[d].type=n; }

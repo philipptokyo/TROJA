@@ -49,7 +49,13 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   fOutTree->Branch("FIz", &(fDetInfo->detData.fIZ), "FIz/D");
   
 
-  fOutTree->Branch("FIdetID", &(fDetInfo->detData.detID), "FIdetID/I"); // ID of the detector with the first interaction point
+  fOutTree->Branch("FIdetID", &(fDetInfo->detData.fIDetID), "FIdetID/I"); // ID of the detector with the first interaction point
+  
+  sprintf(tmpName, "detHit[%i]/I", maxDetectors);
+  fOutTree->Branch("detHit", &(fDetInfo->detData.haveHit), tmpName); // flag which detectors were hit
+
+  sprintf(tmpName, "detHitID[%i]/I", maxDetectors);
+  fOutTree->Branch("detHitID", &(fDetInfo->detData.haveHitID), tmpName); // ID which detectors were hit, aux
 
   sprintf(tmpName, "energy[%i]/D", maxDetectors);
   fOutTree->Branch("energy", (fDetInfo->detData.energy), tmpName);

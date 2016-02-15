@@ -149,7 +149,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
           abort();
         }
         
-        //fDetInfo->detData.detID = detID1;
+        fDetInfo->detData.fIDetID = detID1;
          
         // get strip number of FI
         // for later position determination in the analysis
@@ -189,6 +189,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       //printf("looking for %s\n", tmpName);
       if(std::strcmp(volume->GetName(), tmpName)==0){
         fDetInfo->detData.energy[d] += edep;
+        fDetInfo->detData.haveHit[d] = 1;
+        fDetInfo->detData.haveHitID[d] = d; // aux
         //printf("EnergyDeposit in %s is %f\n", tmpName, edep);
       }
 
@@ -213,18 +215,19 @@ void SteppingAction::Reset()
 //  fStripX = -1;
 //  fStripY = -1;
 
-  fDetInfo->detData.detID = -1;
+//  fDetInfo->detData.detID = -1;
+//
+//  fDetInfo->detData.fIX = NAN;
+//  fDetInfo->detData.fIY = NAN;
+//  fDetInfo->detData.fIZ = NAN;
+//  
+//  for(G4int d=0; d<maxDetectors; d++){
+//    fDetInfo->detData.stripX[d] = -1;
+//    fDetInfo->detData.stripY[d] = -1;
+//    fDetInfo->detData.energy[d] = NAN;
+//  }
 
-  fDetInfo->detData.fIX = NAN;
-  fDetInfo->detData.fIY = NAN;
-  fDetInfo->detData.fIZ = NAN;
-  
-  for(G4int d=0; d<maxDetectors; d++){
-    fDetInfo->detData.stripX[d] = -1;
-    fDetInfo->detData.stripY[d] = -1;
-    fDetInfo->detData.energy[d] = NAN;
-  }
-  
+  fDetInfo->ResetData();  
   fFI = 0;
 
 }
