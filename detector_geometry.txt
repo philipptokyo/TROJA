@@ -1,7 +1,7 @@
 
 // two layers of DSSD tubes
 
-number_of_detectors 2
+number_of_detectors 1
 
 position 0 0.0 0.0 -30.0
 rotation 0 0.0 0.0 0.0

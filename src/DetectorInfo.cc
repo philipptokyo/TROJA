@@ -73,6 +73,10 @@ void DetectorInfo::ResetData()
     detData.stripX[d] = -1;
     detData.stripY[d] = -1;
     detData.energy[d] = NAN;
+
+    detData.hitPositionX[d]=NAN;
+    detData.hitPositionY[d]=NAN;
+    detData.hitPositionZ[d]=NAN;
   }
 
   
@@ -128,6 +132,69 @@ void DetectorInfo::CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4dou
   }
   
 }
+
+
+
+
+
+
+void DetectorInfo::CalcHitPosition(G4int detID, G4int stripx, G4int stripy, G4double &hx, G4double &hy, G4double &hz)
+{
+
+  G4ThreeVector vcen(GetCenterX(detID), GetCenterY(detID), GetCenterZ(detID)); // vector from origin to center detector
+  G4ThreeVector vdet(1.0, 1.0, 1.0);
+
+  if(strcmp(det[detID].type.data(), "DSSDbox")==0){
+    printf("<DetectorInfo::CalcHitPosition> DSSDbox not yet implemented!\n");
+    hx = NAN;
+    hy = NAN;
+    hz = NAN;
+  } else if(strcmp(det[detID].type.data(), "DSSDtube")==0){
+
+    G4double phips = GetSize4(detID)/((G4double)GetNoStripsX(detID));  // angle coverage phi per x strip
+    G4double radps = (GetSize1(detID)-GetSize0(detID))/((G4double)GetNoStripsY(detID)); // radius coverage per y strip
+
+    G4double hitPhi = (G4double)(stripx+1) * phips + GetSize3(detID) ;
+    G4double hitRad = (G4double)(stripy+1) * radps + GetSize0(detID) ;
+
+    if(hitPhi>TMath::Pi()){
+      hitPhi-=2.0*TMath::Pi();
+    }
+
+    // vector from origin of detector to center of strip
+    vdet.setMag(hitRad);
+    vdet.setPhi(hitPhi);
+
+
+  } else {
+    printf("<DetectorInfo::CalcHitPosition> invalid geometry type '%s'! Cannot determine position!\n", det[detID].type.data());
+    abort();
+  }
+
+  vdet.rotateX(-GetRotationX(detID));
+  vdet.rotateY(-GetRotationY(detID));
+  vdet.rotateZ(-GetRotationZ(detID));
+
+  G4ThreeVector vhit=vdet+vcen;
+
+  hx = vhit.x();
+  hy = vhit.y();
+  hz = vhit.z();
+}
+
+
+
+
+
+void DetectorInfo::CalcHitPosition(G4int detID, G4int stripx, G4int stripy)
+{
+  CalcHitPosition(detID, stripx, stripy, detData.hitPositionX[detID], detData.hitPositionY[detID], detData.hitPositionZ[detID]);
+}
+
+
+
+
+
 
 
 

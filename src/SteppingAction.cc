@@ -161,6 +161,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                                    fDetInfo->detData.stripX[detID1], 
                                    fDetInfo->detData.stripY[detID1] );
 
+        fDetInfo->CalcHitPosition(detID1, fDetInfo->detData.stripX[detID1], fDetInfo->detData.stripY[detID1]);
+
         //printf("Found FI x = %f, y = %f, z = %f, stripx = %d, stripy = %d\n", fDetInfo->detData.fIX, fDetInfo->detData.fIY, fDetInfo->detData.fIZ, fDetInfo->detData.stripX[detID1], fDetInfo->detData.stripY[detID1]);
         
         // to sum up energies in each detector, set them from NAN to 0.0

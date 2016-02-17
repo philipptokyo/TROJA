@@ -66,6 +66,15 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   sprintf(tmpName, "stripY[%i]/I", maxDetectors);
   fOutTree->Branch("stripY", (fDetInfo->detData.stripY), tmpName);
 
+  sprintf(tmpName, "recoPosX[%i]/D", maxDetectors);
+  fOutTree->Branch("recoPosX", (fDetInfo->detData.hitPositionX), tmpName);
+
+  sprintf(tmpName, "recoPosY[%i]/D", maxDetectors);
+  fOutTree->Branch("recoPosY", (fDetInfo->detData.hitPositionY), tmpName);
+
+  sprintf(tmpName, "recoPosZ[%i]/D", maxDetectors);
+  fOutTree->Branch("recoPosZ", (fDetInfo->detData.hitPositionZ), tmpName);
+
 
 
 }

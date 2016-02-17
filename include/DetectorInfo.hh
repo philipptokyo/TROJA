@@ -40,6 +40,10 @@ typedef struct _dat
   G4int stripX[maxDetectors];
   G4int stripY[maxDetectors];
 
+  G4double hitPositionX[maxDetectors]; // x, y, z in cartesian coordinates, origin: center of target
+  G4double hitPositionY[maxDetectors]; // x, y, z in cartesian coordinates, origin: center of target
+  G4double hitPositionZ[maxDetectors]; // x, y, z in cartesian coordinates, origin: center of target
+
 } dat;
 
 
@@ -58,6 +62,8 @@ class DetectorInfo
     void ClearGeometry();
     
     void CalcStripNumbers(G4int detID, G4double hx, G4double hy, G4double hz, G4int &stripx, G4int &stripy);
+    void CalcHitPosition(G4int detID, G4int stripx, G4int stripy);
+    void CalcHitPosition(G4int detID, G4int stripx, G4int stripy, G4double &hx, G4double &hy, G4double &hz);
         
 
     // getter
