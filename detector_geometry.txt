@@ -3,14 +3,14 @@
 
 number_of_detectors 2
 
-position 0 0.0 0.0 -5.0
+position 0 0.0 0.0 -3.0
 rotation 0 0.0 0.0 0.0
-size 0 2.0 10.0 0.01 0.0 90.0
+size 0 2.0 10.0 0.001 0.0 90.0
 number_of_stripes 0 9 8
 name 0 DSSD
 type 0 DSSDtube
 
-position 1 0.0 0.0 -6.0
+position 1 0.0 0.0 -4.0
 rotation 1 0.0 0.0 0.0
 size 1 2.0 10.0 0.1 0.0 90.0
 number_of_stripes 1 9 8
