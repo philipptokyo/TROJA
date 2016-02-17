@@ -197,9 +197,9 @@ void DetectorInfo::Parse(G4String filename)
     }
     else if(strcmp(temp[0],"position")==0){
       G4int index = atoi(temp[1]);
-      SetCenterX(index, atof(temp[2])*cm);
-      SetCenterY(index, atof(temp[3])*cm);
-      SetCenterZ(index, atof(temp[4])*cm);
+      SetCenterX(index, atof(temp[2])*mm);
+      SetCenterY(index, atof(temp[3])*mm);
+      SetCenterZ(index, atof(temp[4])*mm);
       printf("Got position of detector %d: x = %f, y = %f, z = %f\n", index, GetCenterX(index), GetCenterY(index), GetCenterZ(index));
     }
     else if(strcmp(temp[0],"rotation")==0){
@@ -211,9 +211,9 @@ void DetectorInfo::Parse(G4String filename)
     }
     else if(strcmp(temp[0],"size")==0){
       G4int index = atoi(temp[1]);
-      SetSize0(index, atof(temp[2])*cm);
-      SetSize1(index, atof(temp[3])*cm);
-      SetSize2(index, atof(temp[4])*cm);
+      SetSize0(index, atof(temp[2])*mm);
+      SetSize1(index, atof(temp[3])*mm);
+      SetSize2(index, atof(temp[4])*mm);
       SetSize3(index, atof(temp[5])*deg);
       SetSize4(index, atof(temp[6])*deg);
       printf("Got full size of detector %d: 1st (x or r_min) = %f, 2nd (y or r_max) = %f, 3rd (z) = %f, 4th (void or phi_start) = %f, 5th (void or phi_D) = %f\n", index, GetSize0(index), GetSize1(index), GetSize2(index), GetSize3(index), GetSize4(index));

@@ -3,16 +3,16 @@
 
 number_of_detectors 2
 
-position 0 0.0 0.0 -3.0
+position 0 0.0 0.0 -30.0
 rotation 0 0.0 0.0 0.0
-size 0 2.0 10.0 0.001 0.0 90.0
+size 0 20.0 100.0 0.01 0.0 90.0
 number_of_stripes 0 9 8
 name 0 DSSD
 type 0 DSSDtube
 
-position 1 0.0 0.0 -4.0
+position 1 0.0 0.0 -40.0
 rotation 1 0.0 0.0 0.0
-size 1 2.0 10.0 0.1 0.0 90.0
+size 1 20.0 100.0 1.0 0.0 90.0
 number_of_stripes 1 9 8
 name 1 DSSD
 type 1 DSSDtube
@@ -24,59 +24,59 @@ type 1 DSSDtube
 
 //number_of_detectors 8
 //
-//position 0 0.0 0.0 -5.0
+//position 0 0.0 0.0 -50.0
 //rotation 0 -32.0 32.0 -19.0
-//size 0 2.0 10.0 0.01 0.0 71.0
+//size 0 20.0 100.0 0.1 0.0 71.0
 //number_of_stripes 0 13 8
 //name 0 DSSD
 //type 0 DSSDtube
 //
-//position 1 0.0 0.0 -5.0
+//position 1 0.0 0.0 -50.0
 //rotation 1 32.0 32.0 90.0
-//size 1 2.0 10.0 0.01 0.0 71.0
+//size 1 20.0 100.0 0.1 0.0 71.0
 //number_of_stripes 1 13 8
 //name 1 DSSD
 //type 1 DSSDtube
 //
-//position 2 0.0 0.0 -5.0
+//position 2 0.0 0.0 -50.0
 //rotation 2 32.0 -32.0 161.0
-//size 2 2.0 10.0 0.01 0.0 71.0
+//size 2 20.0 100.0 0.1 0.0 71.0
 //number_of_stripes 2 13 8
 //name 2 DSSD
 //type 2 DSSDtube
 //
-//position 3 0.0 0.0 -5.0
+//position 3 0.0 0.0 -50.0
 //rotation 3 -32.0 -32.0 251.0
-//size 3 2.0 10.0 0.01 0.0 71.0
+//size 3 20.0 100.0 0.1 0.0 71.0
 //number_of_stripes 3 13 8
 //name 3 DSSD
 //type 3 DSSDtube
 //
 //
-//position 4 0.0 0.0 -6.0
+//position 4 0.0 0.0 -60.0
 //rotation 4 -32.0 32.0 -19.0
-//size 4 2.0 10.0 0.1 0.0 71.0
+//size 4 20.0 100.0 1.0 0.0 71.0
 //number_of_stripes 4 13 8
 //name 4 DSSD
 //type 4 DSSDtube
 //
-//position 5 0.0 0.0 -6.0
+//position 5 0.0 0.0 -60.0
 //rotation 5 32.0 32.0 90.0
-//size 5 2.0 10.0 0.1 0.0 71.0
+//size 5 20.0 100.0 1.0 0.0 71.0
 //number_of_stripes 5 13 8
 //name 5 DSSD
 //type 5 DSSDtube
 //
-//position 6 0.0 0.0 -6.0
+//position 6 0.0 0.0 -60.0
 //rotation 6 32.0 -32.0 161.0
-//size 6 2.0 10.0 0.1 0.0 71.0
+//size 6 20.0 100.0 1.0 0.0 71.0
 //number_of_stripes 6 13 8
 //name 6 DSSD
 //type 6 DSSDtube
 //
-//position 7 0.0 0.0 -6.0
+//position 7 0.0 0.0 -60.0
 //rotation 7 -32.0 -32.0 251.0
-//size 7 2.0 10.0 0.1 0.0 71.0
+//size 7 20.0 100.0 1.0 0.0 71.0
 //number_of_stripes 7 13 8
 //name 7 DSSD
 //type 7 DSSDtube
@@ -101,9 +101,9 @@ type 1 DSSDtube
 
 //number_of_detectors 1
 //
-//position 1 0.0 0.0 -10.0
+//position 1 0.0 0.0 -100.0
 //rotation 1 0.0 0.0 0.0
-//size 1 10.0 10.0 0.01
+//size 1 100.0 100.0 0.1
 //number_of_stripes 1 10 10
 //name 1 DSSD
 //type 1 DSSDbox
@@ -114,37 +114,37 @@ type 1 DSSDtube
 
 //number_of_detectors 5
 //
-//position 0 0.0 10.0 -10.0
+//position 0 0.0 100.0 -100.0
 //rotation 0 -45.0 0.0 0.0
-//size 0 10.0 10.0 0.01
+//size 0 100.0 100.0 0.1
 //number_of_stripes 0 100 100
 //name 0 DSSD
 //type 0 DSSDbox
 //
-//position 1 0.0 -10.0 -10.0
+//position 1 0.0 -100.0 -100.0
 //rotation 1 45.0 0.0 0.0
-//size 1 10.0 10.0 0.01
+//size 1 100.0 100.0 0.1
 //number_of_stripes 1 100 100
 //name 1 DSSD
 //type 1 DSSDbox
 //
-//position 2 10.0 0.0 -10.0
+//position 2 100.0 0.0 -100.0
 //rotation 2 0.0 45.0 0.0
-//size 2 10.0 10.0 0.01
+//size 2 100.0 100.0 0.1
 //number_of_stripes 2 100 100
 //name 2 DSSD
 //type 2 DSSDbox
 //
-//position 3 -10.0 0.0 -10.0
+//position 3 -100.0 0.0 -100.0
 //rotation 3 0.0 -45.0 0.0
-//size 3 10.0 10.0 0.01
+//size 3 100.0 100.0 0.1
 //number_of_stripes 3 100 100
 //name 3 DSSD
 //type 3 DSSDbox
 //
-//position 4 -10.0 0.0 -11.0
+//position 4 -100.0 0.0 -110.0
 //rotation 4 0.0 -45.0 0.0
-//size 4 10.0 10.0 0.1
+//size 4 100.0 100.0 0.1
 //number_of_stripes 4 1 1
 //name 4 DSSD
 //type 4 DSSDbox

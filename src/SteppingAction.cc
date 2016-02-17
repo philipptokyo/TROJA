@@ -13,6 +13,7 @@
 #include "G4Step.hh"
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 #include "TMath.h"
 #include <cmath>
@@ -180,7 +181,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
   // now, sum up the energies in each detector
 
-  G4double edep = step->GetTotalEnergyDeposit(); // HERE IS A PROBLEM!!!!!!!!!!!!!!! todo
+  G4double edep = step->GetTotalEnergyDeposit()/MeV; 
   
   //printf("\nEvent %d\n", eID);
   for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
