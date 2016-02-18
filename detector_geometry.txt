@@ -1,21 +1,21 @@
 
-// two layers of DSSD tubes
-
-number_of_detectors 1
-
-position 0 0.0 0.0 -30.0
-rotation 0 0.0 0.0 0.0
-size 0 20.0 100.0 0.01 0.0 90.0
-number_of_stripes 0 9 8
-name 0 DSSD
-type 0 DSSDtube
-
-position 1 0.0 0.0 -40.0
-rotation 1 0.0 0.0 0.0
-size 1 20.0 100.0 1.0 0.0 90.0
-number_of_stripes 1 9 8
-name 1 DSSD
-type 1 DSSDtube
+//// two layers of DSSD tubes
+//
+//number_of_detectors 1
+//
+//position 0 0.0 00.0 -100.0
+//rotation 0 45.0 45.0 45.0
+//size 0 20.0 100.0 0.01 0.0 90.0
+//number_of_stripes 0 9 8
+//name 0 DSSD
+//type 0 DSSDtube
+//
+//position 1 0.0 0.0 -40.0
+//rotation 1 0.0 0.0 0.0
+//size 1 20.0 100.0 1.0 0.0 90.0
+//number_of_stripes 1 9 8
+//name 1 DSSD
+//type 1 DSSDtube
 
 
 
@@ -99,14 +99,14 @@ type 1 DSSDtube
 
 // one DSSD box
 
-//number_of_detectors 1
-//
-//position 1 0.0 0.0 -100.0
-//rotation 1 0.0 0.0 0.0
-//size 1 100.0 100.0 0.1
-//number_of_stripes 1 10 10
-//name 1 DSSD
-//type 1 DSSDbox
+number_of_detectors 1
+
+position 0 0.0 0.0 -100.0
+rotation 0 0.0 0.0 0.0
+size 0 100.0 100.0 0.1
+number_of_stripes 0 50 50
+name 0 DSSD
+type 0 DSSDbox
 
 
 

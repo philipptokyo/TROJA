@@ -142,20 +142,27 @@ void DetectorInfo::CalcHitPosition(G4int detID, G4int stripx, G4int stripy, G4do
 {
 
   G4ThreeVector vcen(GetCenterX(detID), GetCenterY(detID), GetCenterZ(detID)); // vector from origin to center detector
-  G4ThreeVector vdet(1.0, 1.0, 1.0);
+  G4ThreeVector vdet(0.0, 1.0, 0.0);
 
   if(strcmp(det[detID].type.data(), "DSSDbox")==0){
-    printf("<DetectorInfo::CalcHitPosition> DSSDbox not yet implemented!\n");
-    hx = NAN;
-    hy = NAN;
-    hz = NAN;
+
+    G4double pixx = (G4double)stripx * (GetSize0(detID)/GetNoStripsX(detID)) + (GetSize0(detID)/GetNoStripsX(detID))/2.0;
+    G4double pixy = (G4double)stripy * (GetSize1(detID)/GetNoStripsY(detID)) + (GetSize1(detID)/GetNoStripsY(detID))/2.0;
+
+    G4ThreeVector vpix(pixx, pixy, 0.0);
+
+    G4ThreeVector vori(GetSize0(detID)/2.0, GetSize1(detID)/2.0, 0.0);
+
+    vdet = vpix-vori;
+
+
   } else if(strcmp(det[detID].type.data(), "DSSDtube")==0){
 
     G4double phips = GetSize4(detID)/((G4double)GetNoStripsX(detID));  // angle coverage phi per x strip
     G4double radps = (GetSize1(detID)-GetSize0(detID))/((G4double)GetNoStripsY(detID)); // radius coverage per y strip
 
-    G4double hitPhi = (G4double)(stripx+1) * phips + GetSize3(detID) ;
-    G4double hitRad = (G4double)(stripy+1) * radps + GetSize0(detID) ;
+    G4double hitPhi = (G4double)(stripx) * phips + GetSize3(detID) + phips/2.0 ;
+    G4double hitRad = (G4double)(stripy) * radps + GetSize0(detID) + radps/2.0;
 
     if(hitPhi>TMath::Pi()){
       hitPhi-=2.0*TMath::Pi();
@@ -171,9 +178,9 @@ void DetectorInfo::CalcHitPosition(G4int detID, G4int stripx, G4int stripy, G4do
     abort();
   }
 
-  vdet.rotateX(-GetRotationX(detID));
-  vdet.rotateY(-GetRotationY(detID));
   vdet.rotateZ(-GetRotationZ(detID));
+  vdet.rotateY(-GetRotationY(detID));
+  vdet.rotateX(-GetRotationX(detID));
 
   G4ThreeVector vhit=vdet+vcen;
 
