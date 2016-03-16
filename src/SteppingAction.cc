@@ -168,7 +168,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         
         // to sum up energies in each detector, set them from NAN to 0.0
         for(G4int dd=0; dd<fDetInfo->GetNoOfDetectors(); dd++){
-          fDetInfo->detData.energy[dd]=0.0; // was NAN 
+          fDetInfo->detData.energyNotSmeared[dd]=0.0; // was NAN 
         }
 
         
@@ -192,7 +192,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       sprintf(tmpName, "logical%02d", d);
       //printf("looking for %s\n", tmpName);
       if(std::strcmp(volume->GetName(), tmpName)==0){
-        fDetInfo->detData.energy[d] += edep;
+        fDetInfo->detData.energyNotSmeared[d] += edep;
         fDetInfo->detData.haveHit[d] = 1;
         fDetInfo->detData.haveHitID[d] = d; // aux
         //printf("EnergyDeposit in %s is %f\n", tmpName, edep);

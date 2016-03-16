@@ -60,6 +60,9 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   sprintf(tmpName, "energy[%i]/D", maxDetectors);
   fOutTree->Branch("energy", (fDetInfo->detData.energy), tmpName);
 
+  sprintf(tmpName, "energyNotSmeared[%i]/D", maxDetectors);
+  fOutTree->Branch("energyNotSmeared", (fDetInfo->detData.energyNotSmeared), tmpName);
+
   sprintf(tmpName, "stripX[%i]/I", maxDetectors);
   fOutTree->Branch("stripX", (fDetInfo->detData.stripX), tmpName);
 

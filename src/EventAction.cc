@@ -6,6 +6,7 @@
 
 #include "RunAction.hh"
 #include "SteppingAction.hh"
+#include "DetectorInfo.hh"
 // use of stepping action to get and reset accumulated energy  
 
 #include "PrimaryGeneratorAction.hh"
@@ -99,6 +100,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
   RunAction *runact = (RunAction*)G4RunManager::GetRunManager()->GetUserRunAction(); 
   TTree* outTree = (TTree*)runact->GetOutTree();
+  
+  DetectorInfo* detInfo = runact->GetDetInfo();
+  for(G4int d=0; d<maxDetectors; d++){
+    detInfo->detData.energy[d] = detInfo->SmearEnergy(d, detInfo->detData.energyNotSmeared[d]);
+  }
 
   outTree->Fill();
 
