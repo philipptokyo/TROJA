@@ -122,84 +122,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   
 
                     
-//  //     
-//  // first layer of thin Si for dE / x,y,z measurements 
-//  //
-//  
-//  G4Material* shape1_mat = nist->FindOrBuildMaterial("G4_Si");
-//  G4ThreeVector pos1 = G4ThreeVector(0.0*cm, 0.0*cm, 0.0*cm);
-//
-//  // Sphere shape
-//  G4double shape1_rmin = 10.0*cm, shape1_rmax = 10.01*cm;  //100 mum full-size Si???
-//  G4double shape1_thetamin = 0.*deg, shape1_thetamax =  180.*deg;    
-//  G4double shape1_phimin = 0.*deg, shape1_phimax =  360.*deg;    
-//  G4Sphere* solidShape1 =    
-//    new G4Sphere("Shape1",                  //its name
-//        shape1_rmin, shape1_rmax,                //its size
-//        shape1_phimin, shape1_phimax,            //phi angle
-//        shape1_thetamin, shape1_thetamax);       //theta angle
-//     
-//                      
-//  G4LogicalVolume* logicShape1 =                         
-//    new G4LogicalVolume(solidShape1,         //its solid
-//                        shape1_mat,          //its material
-//                        "Shape1");           //its name
-//               
-//  new G4PVPlacement(0,                       //no rotation
-//                    pos1,                    //at position
-//                    logicShape1,             //its logical volume
-//                    "Shape1",                //its name
-//                    logicWorld,                //its mother  volume
-//                    false,                   //no boolean operation
-//                    0,                       //copy number
-//                    checkOverlaps);          //overlaps checking
-//
-//
-//
-
-
-//  //     
-//  // second layer of thick Si for E measurement 
-//  //
-//  
-//  G4Material* shape2_mat = nist->FindOrBuildMaterial("G4_Si");
-//  G4ThreeVector pos2 = G4ThreeVector(0.0*cm, 0.0*cm, 0.0*cm);
-//
-//  // Sphere shape
-////  G4double shape2_rmin = 10.50*cm, shape2_rmax = 10.6*cm;  //1 mm full-size Si??
-//  G4double shape2_rmin = 15.50*cm, shape2_rmax = 17.5*cm;  //10 mm full-size Si??
-//  G4double shape2_thetamin = 0.*deg, shape2_thetamax =  180.*deg;    
-//  G4double shape2_phimin = 0.*deg, shape2_phimax =  360.*deg;    
-//  G4Sphere* solidShape2 =    
-//    new G4Sphere("Shape2",                  //its name
-//        shape2_rmin, shape2_rmax,                //its size
-//        shape2_phimin, shape2_phimax,            //phi angle
-//        shape2_thetamin, shape2_thetamax);       //theta angle
-//     
-//                      
-//  G4LogicalVolume* logicShape2 =                         
-//    new G4LogicalVolume(solidShape2,         //its solid
-//                        shape2_mat,          //its material
-//                        "Shape2");           //its name
-//               
-//  new G4PVPlacement(0,                       //no rotation
-//                    pos2,                    //at position
-//                    logicShape2,             //its logical volume
-//                    "Shape2",                //its name
-//                    logicWorld,              //its mother  volume
-//                    false,                   //no boolean operation
-//                    0,                       //copy number
-//                    checkOverlaps);          //overlaps checking
-
-
-
-
-
-
-
-
-
-
 
   //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
   //G4Material* fIron    = nist->FindOrBuildMaterial("G4_Fe");
@@ -303,8 +225,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // (where we will account energy deposit)
   //
   SteppingAction* steppingAction = SteppingAction::Instance(); 
-  //steppingAction->SetVolume(logicShape1);
-  //steppingAction->SetVolume(logicShape2);
   
   for(G4int d=0; d<noOfDet; d++){
     steppingAction->SetVolume(logical[d]);
