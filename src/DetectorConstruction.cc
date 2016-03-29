@@ -215,7 +215,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
 
-//  new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
+  new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
 
   logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
   
