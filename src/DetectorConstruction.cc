@@ -211,6 +211,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     //tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
 
     if( strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0 ){
+
+      //todo: rot matrix here
       
       sprintf(tmpName, "box%02d", d);
       box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
@@ -219,6 +221,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
 
     } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
+
+      //todo: rot matrix here
       
       size[d][0] *= 2.0; // radii are given in full length
       size[d][1] *= 2.0;       
