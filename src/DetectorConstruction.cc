@@ -171,36 +171,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     size[d][3]     = fDetInfo->GetSize3(d); // phi_start
     size[d][4]     = fDetInfo->GetSize4(d); // phi_detector
 
-//    G4ThreeVector vCen(1.0, 0.0, 0.0); // vector through center of detector
-    G4ThreeVector vRot(1.0, 0.0, 0.0); // rotation vector
-
-    vRot.rotateZ(size[d][3] + size[d][4]/2.0);
-    vRot.rotateZ(-fDetInfo->GetRotationY(d));
-    vRot.rotateZ(90*deg);
-//    vRot.rotateZ(size[d][3] + size[d][4]/2.0);
-//    vRot.rotateZ(fDetInfo->GetRotationY(d));
-
-//    vCen.rotate(-fDetInfo->GetRotationX(d), vRot);
-//    vCen.rotateY(-fDetInfo->GetRotationX(d));
-//    vCen.rotateZ(fDetInfo->GetRotationY(d));
-//    vCen.rotateZ( (size[d][3] + size[d][4]/2.0));
-
-    
     rotMat[d] = new G4RotationMatrix();
-    //rotMat[d]->rotateX(fDetInfo->GetRotationX(d));
-    //rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
-    //rotMat[d]->rotateZ(fDetInfo->GetRotationZ(d));
-    //rotMat[d]->rotate(fDetInfo->GetRotationX(d), G4ThreeVector(1.0, 0.0, 0.0));
-    //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 1.0, 0.0));
-    //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), G4ThreeVector(0.0, 0.0, 1.0));
-
-    rotMat[d]->rotateZ(size[d][3] + size[d][4]/2.0);
-    rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
-    rotMat[d]->rotateZ(fDetInfo->GetRotationY(d));
-//    rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
-//    rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
-//    rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
-//    rotMat[d]->rotate(fDetInfo->GetRotationZ(d), vCen); // around detectors axis
 
 
     char tmpName[50];
@@ -212,8 +183,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
     if( strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0 ){
 
-      //todo: rot matrix here
-      
+      rotMat[d]->rotateX(fDetInfo->GetRotationX(d));
+      rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
+      rotMat[d]->rotateZ(fDetInfo->GetRotationZ(d));
+      //rotMat[d]->rotate(fDetInfo->GetRotationX(d), G4ThreeVector(1.0, 0.0, 0.0));
+      //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 1.0, 0.0));
+      //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), G4ThreeVector(0.0, 0.0, 1.0));
+
       sprintf(tmpName, "box%02d", d);
       box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
       
@@ -222,7 +198,26 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
     } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
 
-      //todo: rot matrix here
+  //    G4ThreeVector vCen(1.0, 0.0, 0.0); // vector through center of detector
+      G4ThreeVector vRot(1.0, 0.0, 0.0); // rotation vector
+  
+      vRot.rotateZ(size[d][3] + size[d][4]/2.0);
+      vRot.rotateZ(-fDetInfo->GetRotationY(d));
+      vRot.rotateZ(90*deg);
+  
+      //vCen.rotate(-fDetInfo->GetRotationX(d), vRot);
+      //vCen.rotateY(-fDetInfo->GetRotationX(d));
+      //vCen.rotateZ(fDetInfo->GetRotationY(d));
+      //vCen.rotateZ( (size[d][3] + size[d][4]/2.0));
+  
+      
+      rotMat[d]->rotateZ(size[d][3] + size[d][4]/2.0);
+      rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
+      rotMat[d]->rotateZ(fDetInfo->GetRotationY(d));
+      //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
+      //rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
+      //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
+      //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), vCen); // around detectors axis
       
       size[d][0] *= 2.0; // radii are given in full length
       size[d][1] *= 2.0;       
