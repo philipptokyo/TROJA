@@ -7,7 +7,7 @@
 
 //#include "globals.hh"
 
-#define maxDetectors 10
+#define maxDetectors 50
 
 
 #endif
