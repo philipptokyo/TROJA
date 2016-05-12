@@ -14,7 +14,8 @@
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
 // #include "QGSP_BIC_EMY.hh" //geant4.9
-#include "FTFP_BERT.hh" //geant4.10
+//#include "FTFP_BERT.hh" //geant4.10
+#include "QGSC_EMV.hh" //geant4.10
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 

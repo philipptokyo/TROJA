@@ -146,10 +146,16 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
 
-  //----------- Silicon Strip Detectors -------------------
+  //----------- Silicon Strip and CsI Detectors -------------------
 
 
   G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
+
+  G4Element* Cs = new G4Element("Cesium", "Cs", 55., 132.9*g/mole);
+  G4Element* I = new G4Element("Iodine", "I", 53., 126.9*g/mole);
+  G4Material* fCsI = new G4Material("CsI", 4.51*g/cm3, 2);
+  fCsI->AddElement(I, .5);
+  fCsI->AddElement(Cs, .5);
   
 
   G4int noOfDet = fDetInfo->GetNoOfDetectors();
@@ -181,7 +187,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     //sprintf(tmpName, "tube%02d", d);
     //tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
 
-    if( strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0 ){
+    if( (strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0) || (strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0) ){
 
       rotMat[d]->rotateX(fDetInfo->GetRotationX(d));
       rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
@@ -194,7 +200,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
       
       sprintf(tmpName, "logical%02d", d);
-      logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+      if((strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0)){
+        logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+      }else if(strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0){ // this if is redundant, ne
+        logical[d] = new G4LogicalVolume(box[d], fCsI, tmpName);
+      }
 
     } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
 
