@@ -15,7 +15,8 @@
 #include "G4UImanager.hh"
 // #include "QGSP_BIC_EMY.hh" //geant4.9
 //#include "FTFP_BERT.hh" //geant4.10
-#include "QGSC_EMV.hh" //geant4.10
+//#include "G4EmStandardPhysics_option3.hh" //geant4.10
+#include "PhysicsList.hh" //geant4.10.0
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -96,9 +97,12 @@ int main(int argc,char** argv)
 
   // Physics list
 //  G4VModularPhysicsList* physicsList = new QGSP_BIC_EMY;
-  G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  //physicsList->SetVerboseLevel(1);
-  physicsList->SetVerboseLevel(0);
+//  G4VModularPhysicsList* physicsList = new FTFP_BERT;
+//  G4VModularPhysicsList* physicsList = new PhysicsList();
+  PhysicsList* physicsList = new PhysicsList();
+  physicsList->AddPhysicsList("emstandard_opt4");
+  physicsList->SetVerboseLevel(2);
+  //physicsList->SetVerboseLevel(0);
   runManager->SetUserInitialization(physicsList);
     
   // Primary generator action

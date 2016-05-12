@@ -170,14 +170,35 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //printf("%f %f %f\n", position.getX(), position.getY(), position.getZ());
 
 
-  if(fPdgId==1000010010){
-    fPdgId=2212; // proton
-  }
+  //if(fPdgId==1000010010){
+  //  fPdgId=2212; // proton
+  //}
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4int particleId=(G4int)fPdgId;
-  //particleId=1000010020; //deuteron
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleId);
+
+//for debugging
+//particleId=1000010010; //deuteron
+
+  //G4ParticleDefinition* particle = particleTable->FindParticle(particleId);
+  G4ParticleDefinition* particle;
+  G4String particleName;
+
+  if(particleId==1000010010){ //proton
+    particle = particleTable->FindParticle(particleName="proton");
+  }else if(particleId==1000010020){ //deuteron
+    particle = particleTable->FindParticle(particleName="deuteron");
+  }else if(particleId==1000010030){ //triton
+    particle = particleTable->FindParticle(particleName="triton");
+  }else if(particleId==1000020030){ //3He
+    particle = particleTable->FindParticle(particleName="He3");
+  }else if(particleId==1000020040){ //Alpha
+    particle = particleTable->FindParticle(particleName="alpha");
+  }else{
+    particle = particleTable->FindParticle(particleId);
+  }
+
+
   //printf("particle ID is %d\n", particleId);
   //printf("PDGMass %f, ParticleType %s, PDGEncoding %d, PDGCharge %f\n", particle->GetPDGMass(), particle->GetParticleType().c_str(), particle->GetPDGEncoding(), particle->GetPDGCharge());
 

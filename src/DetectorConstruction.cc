@@ -150,6 +150,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
   G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
+  printf("Material G4_Si has density %f g/cm3\n", fSilicon->GetDensity()/g*cm3);
 
   G4Element* Cs = new G4Element("Cesium", "Cs", 55., 132.9*g/mole);
   G4Element* I = new G4Element("Iodine", "I", 53., 126.9*g/mole);
