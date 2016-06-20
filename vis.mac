@@ -106,6 +106,7 @@
 /vis/viewer/set/hiddenMarker true
 #/vis/viewer/set/viewpointThetaPhi 120 90
 /vis/viewer/set/viewpointThetaPhi 50 140
+#/vis/viewer/set/viewpointThetaPhi 180 180
 #
 # Re-establish auto refreshing and verbosity:
 /vis/viewer/set/autoRefresh true
