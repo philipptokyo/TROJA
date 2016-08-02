@@ -126,6 +126,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
   //G4Material* fIron    = nist->FindOrBuildMaterial("G4_Fe");
   G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
+  G4Material* fPE    = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
 
 
 
@@ -133,11 +134,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   
   G4ThreeVector fTargetPos(0,0,0);
 
-  G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*0.5*mm);  //1um
+  //G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*0.5*mm);  //1um
+  G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*2.65*mm);  //5.3um
 
-  G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
+  //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
+  G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fiPE, "target_log");
 
-//  new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
+  new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
 
   logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
   
