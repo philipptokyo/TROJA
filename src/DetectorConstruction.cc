@@ -125,155 +125,161 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
   //G4Material* fIron    = nist->FindOrBuildMaterial("G4_Fe");
-  G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
-  G4Material* fPE    = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  //G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
+  //G4Material* fPE    = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  G4Material* fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
 
 
 
   //------------------- Target-----------------------------
   
-  G4ThreeVector fTargetPos(0,0,0);
+  //G4ThreeVector fTargetPos(0,0,0);
+  G4ThreeVector fTargetPos(fDetInfo->GetTargetPosition(0), fDetInfo->GetTargetPosition(1), fDetInfo->GetTargetPosition(2));
 
-  //G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*0.5*mm);  //1um
-  G4Box* solidTarget = new G4Box("tgt_box",40*0.5*mm,40*0.5*mm,0.00100*2.65*mm);  //5.3um
+  //G4Box* solidTarget = new G4Box("tgt_box", 40*0.5*mm, 40*0.5*mm, 0.00100*0.5*mm);  //1um
+  //G4Box* solidTarget = new G4Box("tgt_box", 40*0.5*mm, 40*0.5*mm, 0.00100*2.65*mm);  //5.3um
+  //G4Box* solidTarget = new G4Box("tgt_box", 60*0.5*mm, 60*0.5*mm, 0.00100*2.65*mm);  //5.3um
+  //G4Box* solidTarget = new G4Box("tgt_box", 60*0.5*mm, 60*0.5*mm, 0.00100*0.1*0.5*mm);  //0.1um
+  G4Box* solidTarget = new G4Box("tgt_box", fDetInfo->GetTargetSize(0)*0.5*mm, fDetInfo->GetTargetSize(1)*0.5*mm, fDetInfo->GetTargetSize(2)*0.5*mm); 
 
-  //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
-  G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fiPE, "target_log");
+    //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
+    //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fPE, "target_log");
+    G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fTarget, "target_log");
 
-  new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
+    new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
 
-  logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
-  
-
-
-
-
-
-  //----------- Silicon Strip and CsI Detectors -------------------
-
-
-  G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
-  printf("Material G4_Si has density %f g/cm3\n", fSilicon->GetDensity()/g*cm3);
-
-  G4Element* Cs = new G4Element("Cesium", "Cs", 55., 132.9*g/mole);
-  G4Element* I = new G4Element("Iodine", "I", 53., 126.9*g/mole);
-  G4Material* fCsI = new G4Material("CsI", 4.51*g/cm3, 2);
-  fCsI->AddElement(I, .5);
-  fCsI->AddElement(Cs, .5);
-  
-
-  G4int noOfDet = fDetInfo->GetNoOfDetectors();
-  
-  G4ThreeVector pos[maxDetectors]; // from detector globals
-  G4RotationMatrix* rotMat[maxDetectors];  
-  G4double size[maxDetectors][5] = {{0.0}};
-  G4Box* box[maxDetectors];
-  G4Tubs* tube[maxDetectors];
-  G4LogicalVolume* logical[maxDetectors];
-  
-  
-  for(G4int d=0; d<noOfDet; d++){
-    pos[d].set(fDetInfo->GetCenterX(d), fDetInfo->GetCenterY(d), fDetInfo->GetCenterZ(d));
+    logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
     
-    size[d][0]     = fDetInfo->GetSize0(d)*0.5; // half width
-    size[d][1]     = fDetInfo->GetSize1(d)*0.5; // half length 
-    size[d][2]     = fDetInfo->GetSize2(d)*0.5; // half thickness
-    size[d][3]     = fDetInfo->GetSize3(d); // phi_start
-    size[d][4]     = fDetInfo->GetSize4(d); // phi_detector
-
-    rotMat[d] = new G4RotationMatrix();
 
 
-    char tmpName[50];
 
-    //sprintf(tmpName, "box%02d", d);
-    //box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
-    //sprintf(tmpName, "tube%02d", d);
-    //tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
 
-    if( (strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0) || (strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0) ){
 
-      rotMat[d]->rotateX(fDetInfo->GetRotationX(d));
-      rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
-      rotMat[d]->rotateZ(fDetInfo->GetRotationZ(d));
-      //rotMat[d]->rotate(fDetInfo->GetRotationX(d), G4ThreeVector(1.0, 0.0, 0.0));
-      //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 1.0, 0.0));
-      //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), G4ThreeVector(0.0, 0.0, 1.0));
+    //----------- Silicon Strip and CsI Detectors -------------------
 
-      sprintf(tmpName, "box%02d", d);
-      box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+
+    G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
+    printf("Material G4_Si has density %f g/cm3\n", fSilicon->GetDensity()/g*cm3);
+
+    G4Element* Cs = new G4Element("Cesium", "Cs", 55., 132.9*g/mole);
+    G4Element* I = new G4Element("Iodine", "I", 53., 126.9*g/mole);
+    G4Material* fCsI = new G4Material("CsI", 4.51*g/cm3, 2);
+    fCsI->AddElement(I, .5);
+    fCsI->AddElement(Cs, .5);
+    
+
+    G4int noOfDet = fDetInfo->GetNoOfDetectors();
+    
+    G4ThreeVector pos[maxDetectors]; // from detector globals
+    G4RotationMatrix* rotMat[maxDetectors];  
+    G4double size[maxDetectors][5] = {{0.0}};
+    G4Box* box[maxDetectors];
+    G4Tubs* tube[maxDetectors];
+    G4LogicalVolume* logical[maxDetectors];
+    
+    
+    for(G4int d=0; d<noOfDet; d++){
+      pos[d].set(fDetInfo->GetCenterX(d), fDetInfo->GetCenterY(d), fDetInfo->GetCenterZ(d));
       
-      sprintf(tmpName, "logical%02d", d);
-      if((strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0)){
-        logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
-      }else if(strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0){ // this if is redundant, ne
-        logical[d] = new G4LogicalVolume(box[d], fCsI, tmpName);
+      size[d][0]     = fDetInfo->GetSize0(d)*0.5; // half width
+      size[d][1]     = fDetInfo->GetSize1(d)*0.5; // half length 
+      size[d][2]     = fDetInfo->GetSize2(d)*0.5; // half thickness
+      size[d][3]     = fDetInfo->GetSize3(d); // phi_start
+      size[d][4]     = fDetInfo->GetSize4(d); // phi_detector
+
+      rotMat[d] = new G4RotationMatrix();
+
+
+      char tmpName[50];
+
+      //sprintf(tmpName, "box%02d", d);
+      //box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+      //sprintf(tmpName, "tube%02d", d);
+      //tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
+
+      if( (strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0) || (strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0) ){
+
+        rotMat[d]->rotateX(fDetInfo->GetRotationX(d));
+        rotMat[d]->rotateY(fDetInfo->GetRotationY(d));
+        rotMat[d]->rotateZ(fDetInfo->GetRotationZ(d));
+        //rotMat[d]->rotate(fDetInfo->GetRotationX(d), G4ThreeVector(1.0, 0.0, 0.0));
+        //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 1.0, 0.0));
+        //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), G4ThreeVector(0.0, 0.0, 1.0));
+
+        sprintf(tmpName, "box%02d", d);
+        box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
+        
+        sprintf(tmpName, "logical%02d", d);
+        if((strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0)){
+          logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+        }else if(strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0){ // this if is redundant, ne
+          logical[d] = new G4LogicalVolume(box[d], fCsI, tmpName);
+        }
+
+      } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
+
+    //    G4ThreeVector vCen(1.0, 0.0, 0.0); // vector through center of detector
+        G4ThreeVector vRot(1.0, 0.0, 0.0); // rotation vector
+    
+        vRot.rotateZ(size[d][3] + size[d][4]/2.0);
+        vRot.rotateZ(-fDetInfo->GetRotationY(d));
+        vRot.rotateZ(90*deg);
+    
+        //vCen.rotate(-fDetInfo->GetRotationX(d), vRot);
+        //vCen.rotateY(-fDetInfo->GetRotationX(d));
+        //vCen.rotateZ(fDetInfo->GetRotationY(d));
+        //vCen.rotateZ( (size[d][3] + size[d][4]/2.0));
+    
+        
+        rotMat[d]->rotateZ(size[d][3] + size[d][4]/2.0);
+        rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
+        rotMat[d]->rotateZ(fDetInfo->GetRotationY(d));
+        //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
+        //rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
+        //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
+        //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), vCen); // around detectors axis
+        
+        size[d][0] *= 2.0; // radii are given in full length
+        size[d][1] *= 2.0;       
+        sprintf(tmpName, "tube%02d", d);
+        tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
+        
+        sprintf(tmpName, "logical%02d", d);
+        logical[d] = new G4LogicalVolume(tube[d], fSilicon, tmpName);
+
+      } else {
+        printf("Error in detector construction: unknown type '%s' (id %d)\n", fDetInfo->GetType(d).data(), d);
+        abort();
       }
 
-    } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
-
-  //    G4ThreeVector vCen(1.0, 0.0, 0.0); // vector through center of detector
-      G4ThreeVector vRot(1.0, 0.0, 0.0); // rotation vector
-  
-      vRot.rotateZ(size[d][3] + size[d][4]/2.0);
-      vRot.rotateZ(-fDetInfo->GetRotationY(d));
-      vRot.rotateZ(90*deg);
-  
-      //vCen.rotate(-fDetInfo->GetRotationX(d), vRot);
-      //vCen.rotateY(-fDetInfo->GetRotationX(d));
-      //vCen.rotateZ(fDetInfo->GetRotationY(d));
-      //vCen.rotateZ( (size[d][3] + size[d][4]/2.0));
-  
-      
-      rotMat[d]->rotateZ(size[d][3] + size[d][4]/2.0);
-      rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
-      rotMat[d]->rotateZ(fDetInfo->GetRotationY(d));
-      //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
-      //rotMat[d]->rotate(fDetInfo->GetRotationX(d), vRot); // theta rotation
-      //rotMat[d]->rotate(fDetInfo->GetRotationY(d), G4ThreeVector(0.0, 0.0, 1.0));      // phi rotation
-      //rotMat[d]->rotate(fDetInfo->GetRotationZ(d), vCen); // around detectors axis
-      
-      size[d][0] *= 2.0; // radii are given in full length
-      size[d][1] *= 2.0;       
-      sprintf(tmpName, "tube%02d", d);
-      tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
-      
-      sprintf(tmpName, "logical%02d", d);
-      logical[d] = new G4LogicalVolume(tube[d], fSilicon, tmpName);
-
-    } else {
-      printf("Error in detector construction: unknown type '%s' (id %d)\n", fDetInfo->GetType(d).data(), d);
-      abort();
+      sprintf(tmpName, "%02d%s", d, fDetInfo->GetName(d).data());
+      new G4PVPlacement(rotMat[d], 
+                        pos[d],
+                        logical[d],
+                        tmpName,
+                        logicWorld,
+                        false,
+                        0,
+                        checkOverlaps);
     }
 
-    sprintf(tmpName, "%02d%s", d, fDetInfo->GetName(d).data());
-    new G4PVPlacement(rotMat[d], 
-                      pos[d],
-                      logical[d],
-                      tmpName,
-                      logicWorld,
-                      false,
-                      0,
-                      checkOverlaps);
+
+
+
+
+    // Set scoring volume to stepping action 
+    // (where we will account energy deposit)
+    //
+    SteppingAction* steppingAction = SteppingAction::Instance(); 
+    
+    for(G4int d=0; d<noOfDet; d++){
+      steppingAction->SetVolume(logical[d]);
+    }
+
+    //
+    //always return the physical World
+    //
+    return physWorld;
   }
 
-
-
-
-
-  // Set scoring volume to stepping action 
-  // (where we will account energy deposit)
-  //
-  SteppingAction* steppingAction = SteppingAction::Instance(); 
-  
-  for(G4int d=0; d<noOfDet; d++){
-    steppingAction->SetVolume(logical[d]);
-  }
-
-  //
-  //always return the physical World
-  //
-  return physWorld;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+  //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
