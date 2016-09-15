@@ -74,52 +74,17 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   fDetInfo->detData.eventNumber = eID;
 
-  // ************************************************************************
-  // ************************* Silicon Spheres ******************************
-  // ************************************************************************
-  
-  // collect energy and track length step by step
-  // first Si
-    //printf("volume name is %s\n",volume->GetName().c_str());
-//  if (std::strcmp(volume->GetName(), "Shape1")==0 ){
-//    //printf("in volume 1\n");
-//    G4double edep = step->GetTotalEnergyDeposit();
-//    fEnergy1 += edep;
-//    //printf("fEnergy1 = %f\n", fEnergy1);
-//    
-//    // check if the particle just entered Shape1
-//    // if so, get the position of the first interaction point
-//    if (point1->GetStepStatus() == fGeomBoundary) {
-//      //printf("FI ");
-//      G4ThreeVector pos1 = point1->GetPosition();
-//      fX1=pos1.getX();
-//      fY1=pos1.getY();
-//      fZ1=pos1.getZ();
-//      //printf("x=%f y=%f z=%f\n", fX1, fY1, fZ1);
-//    }
-//  }
-//  
-//  
-//  if (std::strcmp(volume->GetName(), "Shape2")==0 ){
-//    //printf("in volume 2\n");
-//    if(TMath::IsNaN(fEnergy2)){
-//      fEnergy2 = 0.0;
-//    }
-//    G4double edep = step->GetTotalEnergyDeposit();
-//    fEnergy2 += edep;
-//    //printf("fEnergy2 = %f\n", fEnergy2);
-//    
-//  }
-  
-  
-  
-  
-  
+  G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+  G4int pdgCode = thisDef->GetPDGEncoding();
+  G4int parentID = step->GetTrack()->GetParentID();
+  //printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
   
   // ************************************************************************
   // *************************** Silicon SSD ********************************
   // ************************************************************************
-  
+
+
+
   // check if it is the first interaction point in a Silicon detector
   if ((point1->GetStepStatus() == fGeomBoundary) && !(fFI) ) {
 
@@ -143,6 +108,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         fDetInfo->detData.fIX=pos1.getX();
         fDetInfo->detData.fIY=pos1.getY();
         fDetInfo->detData.fIZ=pos1.getZ();
+        fDetInfo->detData.fITheta=pos1.getTheta();
         
         // cross check detector IDs
         if(detID1 != detID2){
@@ -203,6 +169,51 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
   
   
+  // ************************************************************************
+  // ****************************** GRAPE ***********************************
+  // ************************************************************************
+  
+
+  if(fDetInfo->IncludeGrape()){
+  if( (parentID==0 && pdgCode==22) || (fDetInfo->detData.grapeEnergy>0 && parentID>0 && pdgCode<=22) ){ // gammas and it's secondaries
+    
+    if(TMath::IsNaN(fDetInfo->detData.grapeEnergy)){
+      fDetInfo->detData.grapeEnergy=0.0;
+    }
+    G4Track * theTrack = step->GetTrack();
+    int trackVolume = theTrack->GetVolume()->GetCopyNo();
+    
+    if(trackVolume >=200100 && trackVolume <= 202000)
+        {
+          //the copy number is 2xxxyz, with xxx=detector number(0-17),y=crystal(0-1),z=segment(0-8)
+          // for all other material belonging to the detector, y>=20 
+          // reminder of the variables:
+          // grapeCrystalFlag[20][2][20];
+          //  grapeCrystalEnergyGamma[20][2][20];
+          if(trackVolume%100<20)
+          {
+            //G4cout <<"TrackVolume: "<<trackVolume<<G4endl;
+            int seg = trackVolume%10;
+            int cry = ((trackVolume-seg)/10)%10;
+            int det = (trackVolume-10*cry-seg-200000)/100 -1;
+            //G4cout <<"det: "<<det<<G4endl;
+            //G4cout <<"cry: "<<cry<<G4endl;
+    //        fDetector->fGrapeArray->SetCrystalFlagTrue(det,cry,0);  // The entire crystal
+    //        fDetector->fGrapeArray->AddCrystalEnergy(det,cry,0,edep);
+    //
+    //        fDetector->fGrapeArray->SetCrystalFlagTrue(det,cry,seg+1);  // The individual segments
+    //        fDetector->fGrapeArray->AddCrystalEnergy(det,cry,seg+1,edep);
+
+            //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+
+            fDetInfo->detData.grapeEnergy += edep;
+    
+          }
+        }
+
+
+  } // cut on primary gammas
+  } // IncludeGrape
   
      
 }

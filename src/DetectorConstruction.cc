@@ -358,10 +358,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       int id;
       string nameList = "ABCDEFGHIJKLMNOPQR";
   
-      FILE* fFileIn = fopen("/home/philipp/sim/grape/grape_geometry_in.txt","r");
-      FILE* fFileOut = fopen("/home/philipp/sim/grape/grape_geometry_out.txt","w");
+      FILE* fFileIn = fopen("/home/philipp/sim/troja/grape_geometry_in.txt","r");
+      FILE* fFileOut = fopen("/home/philipp/sim/troja/grape_geometry_out.txt","w");
   
-      const Int_t NUMBEROFGRAPEDETECTORS=6;
+      Int_t NUMBEROFGRAPEDETECTORS=18;
   
       int i = 0;
       while (!feof(fFileIn)&&i<NUMBEROFGRAPEDETECTORS)  {//Maximum 18 Detectors  

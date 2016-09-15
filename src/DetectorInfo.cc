@@ -66,9 +66,9 @@ void DetectorInfo::ClearGeometry()
          SetName(d, "");
          SetType(d, "");
 
-    for(Int_t p=0; p<GetResNoPars(d); p++){
-       SetResPar(d, p, 0.0);
-    }
+//    for(Int_t p=0; p<GetResNoPars(d); p++){
+//       SetResPar(d, p, 0.0);
+//    }
       SetResType(d, 0);
   }
 
@@ -98,7 +98,7 @@ void DetectorInfo::ResetData()
     detData.hitPositionZ[d]=NAN;
   }
 
-  
+  detData.grapeEnergy=NAN;  
   
 }
 

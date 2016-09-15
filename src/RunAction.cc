@@ -47,6 +47,7 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   fOutTree->Branch("FIx", &(fDetInfo->detData.fIX), "FIx/D");
   fOutTree->Branch("FIy", &(fDetInfo->detData.fIY), "FIy/D");
   fOutTree->Branch("FIz", &(fDetInfo->detData.fIZ), "FIz/D");
+  fOutTree->Branch("FItheta", &(fDetInfo->detData.fITheta), "FItheta/D");
   
 
   fOutTree->Branch("FIdetID", &(fDetInfo->detData.fIDetID), "FIdetID/I"); // ID of the detector with the first interaction point
@@ -78,6 +79,7 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
 //  sprintf(tmpName, "recoPosZ[%i]/D", maxDetectors);
 //  fOutTree->Branch("recoPosZ", (fDetInfo->detData.hitPositionZ), tmpName);
 
+  fOutTree->Branch("grapeEnergy", &(fDetInfo->detData.grapeEnergy), "grapeEnergy/D"); // ID of the detector with the first interaction point
 
 
 }
