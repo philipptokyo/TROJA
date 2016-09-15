@@ -131,6 +131,7 @@ Double_t GetResPar(Int_t d, Int_t p) const { return detGeo[d].resPar[p] ;}
     TRotation* GetRotationMatrix(Int_t d);
     TRotation GetInverseRotationMatrix(Int_t d);
 
+    Bool_t IncludeGrape() {return fIncludeGrape;}
 
     // setter
     
@@ -187,6 +188,8 @@ void SetResPar(Int_t d, Int_t p, Double_t v) { detGeo[d].resPar[p]=v ;}
     tar fTarget;
 
     Int_t fNoOfDet; // number of detectors
+
+    Bool_t fIncludeGrape;
 
 
 };

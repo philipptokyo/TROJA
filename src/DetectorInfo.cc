@@ -33,6 +33,8 @@ DetectorInfo::DetectorInfo()
 
   fRandomizer = new TRandom3();
   fRandomizer->SetSeed(0);
+
+  fIncludeGrape=false;
   
 }
 
@@ -410,6 +412,9 @@ void DetectorInfo::Parse(string filename)
         printf("%f ", GetResPar(index, p));
       }
       printf("\n");
+    }
+    else if(strcmp(temp[0],"include_grape")==0){
+      fIncludeGrape=true;
     }
     else if(strcmp(temp[0],"target")==0){
       fTarget.material = temp[1];

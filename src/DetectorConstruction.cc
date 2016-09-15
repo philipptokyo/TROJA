@@ -56,7 +56,7 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
-
+#include "G4IntersectionSolid.hh"
 
 // using namespace CLHEP
 
@@ -275,6 +275,224 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     for(G4int d=0; d<noOfDet; d++){
       steppingAction->SetVolume(logical[d]);
     }
+    
+
+
+
+
+    
+
+    if(fDetInfo->IncludeGrape()){
+      char fTempname[100];
+  
+  
+      Float_t fPosX[20][2][10];
+      Float_t fPosY[20][2][10];
+      Float_t fPosZ[20][2][10];
+  
+      for(int i=0;i<20;i++)  {
+        for(int j=0;j<2;j++)  {
+          for(int k=0;k<10;k++)  {
+            fPosX[i][j][k] = fPosY[i][j][k] = fPosZ[i][j][k] = 0.0;
+          }
+        }
+      }
+      // So far only the crystal without any housing
+      G4ThreeVector segmentPos;
+      G4RotationMatrix segmentRot3D;
+      segmentRot3D.set(0, 0, 0);
+  
+      G4IntersectionSolid* sGrapeSegment[10];
+      G4LogicalVolume* lGrapeSegment[10];
+  
+  
+      //Starting with a tube:
+      G4Tubs* sGrapeCrystalTube = new G4Tubs("sGrapeCrystalTube",0.0*mm,60.0*mm/2.0,20.0*mm/2.0,0*deg, 360*deg);
+      //Making the boxes, the intersections with the tube will correspond to the segments.
+      G4Box* sGrapeCrystalBox = new G4Box("sGrapeCrystalBox",20*mm/2.0,20*mm/2.0,20*mm/2.0);
+      //Making the nine crystals:
+      for(int i=0;i<9;i++)  {
+        sprintf(fTempname,"sGrapeSegment[%i]",i);
+        G4double xPos = ((i%3)-1)*20.0*mm;
+        G4double yPos = ((int)(i/3)-1)*20.0*mm;
+  
+        segmentPos = G4ThreeVector(xPos, yPos, 0.0);
+        sGrapeSegment[i] = new G4IntersectionSolid(fTempname,sGrapeCrystalTube,sGrapeCrystalBox,&segmentRot3D,segmentPos);
+        // Making a logic volume out og the nine segments:
+        sprintf(fTempname,"lGrapeSegment[%i]",i);
+        //lGrapeSegment[i] = new G4LogicalVolume(sGrapeSegment[i],fMaterialList->GetMaterial("Ge"),fTempname,0,0,0);
+        lGrapeSegment[i] = new G4LogicalVolume(sGrapeSegment[i],nist->FindOrBuildMaterial("G4_Ge"),fTempname,0,0,0);
+  
+      }
+      //_______________________________________________________________________________________________
+      //------------------------------
+      //Grape Dewar  
+      G4Tubs* sGrapeDewar = new G4Tubs("sGrapeDewar",0.0*mm,210.0*mm/2.0,280.0*mm/2.0,0.0*deg,360.0*deg);
+      //lGrapeDewar = new G4LogicalVolume(sGrapeDewar,fMaterialList->GetMaterial("Air"),"lGrapeDewar",0,0,0);
+      G4LogicalVolume* lGrapeDewar = new G4LogicalVolume(sGrapeDewar,nist->FindOrBuildMaterial("G4_Galactic"),"lGrapeDewar",0,0,0);
+      //------------------------------
+      //Grape AlBar  
+      G4Tubs* sGrapeAlBar = new G4Tubs("sGrapeAlBar",0.0*mm,35.0*mm/2.0,130.0*mm/2.0,0.0*deg,360.0*deg);
+      //lGrapeAlBar = new G4LogicalVolume(sGrapeAlBar,fMaterialList->GetMaterial("Air"),"lGrapeAlBar",0,0,0);
+      G4LogicalVolume* lGrapeAlBar = new G4LogicalVolume(sGrapeAlBar,nist->FindOrBuildMaterial("G4_Galactic"),"lGrapeAlBar",0,0,0);
+  
+      G4VisAttributes* visAttDewar = new G4VisAttributes(G4Colour(0.0,1.0,1.0));
+      G4VisAttributes* visAttAl    = new G4VisAttributes(G4Colour(0.8,0.8,0.8));
+      G4VisAttributes* visAttGe    = new G4VisAttributes(G4Colour(1.0,0.5,0.6));
+  
+      int i3=0;
+      for(i3=0;i3<3;i3++)  {
+        lGrapeSegment[i3]->SetVisAttributes(visAttGe);
+        lGrapeSegment[i3+3]->SetVisAttributes(visAttGe);
+        lGrapeSegment[i3+6]->SetVisAttributes(visAttGe);
+      }
+      lGrapeDewar->SetVisAttributes(visAttDewar);
+      lGrapeAlBar->SetVisAttributes(visAttAl);
+  
+  
+  
+  
+  
+  
+      float x,y,z,psi,theta,phi;
+      int id;
+      string nameList = "ABCDEFGHIJKLMNOPQR";
+  
+      FILE* fFileIn = fopen("/home/philipp/sim/grape/grape_geometry_in.txt","r");
+      FILE* fFileOut = fopen("/home/philipp/sim/grape/grape_geometry_out.txt","w");
+  
+      const Int_t NUMBEROFGRAPEDETECTORS=6;
+  
+      int i = 0;
+      while (!feof(fFileIn)&&i<NUMBEROFGRAPEDETECTORS)  {//Maximum 18 Detectors  
+        int fres = fscanf(fFileIn,"%f %f %f %f %f %f",&x,&y,&z,&psi,&theta,&phi);
+        if(fres>0){}
+  
+        //The first digit is for the array type, digits 2-4 are used for the detector number
+        //The last two digits are for the different physical materials of one detector
+        id =  200000 +(i+1)*100;
+        //The angle values for phi and theta are 90 degrees less than "expected" for a right-handed system
+        //due to the intrinsic orientation of the detector!
+        // OK the values are corrected in the Grape creator now!
+        // Also the theta angle is defined as 0 for antiparallel to the beam direction (crystal looking upstream) 
+        //and 180 parallel to the beam direction (crystal looking downstream)
+  
+        int grapeDet = (id-200000)/100-1;
+  
+        G4RotationMatrix Rot3D;
+        G4ThreeVector centerPos(x*cm,y*cm,z*cm); //Position of the center
+  
+        G4ThreeVector crystalPos;  //Position of the cylindars centers 
+  
+        Rot3D.set(0, 0, 0);
+        //Rot3D.rotateY(90.*degree); 
+        Rot3D.rotateX(psi*degree);
+        Rot3D.rotateY(theta*degree+90*degree);
+        Rot3D.rotateZ(phi*degree);
+  
+        //G4PVPlacement* pGrapeSegment[20][2][10];
+        //G4PVPlacement* pGrapeAlBar[20];
+        //G4PVPlacement* pGrapeDewar[20];
+  
+  
+        // The two crystals:
+        for(int iii=0;iii<2;iii++)  {
+          // All the segments:
+          for(int j=0;j<9;j++)  {
+            float  zShift = 0.;
+  
+            if(iii==0) zShift = -1.0*cm;
+            if(iii==1) zShift = +1.0*cm;
+  
+            crystalPos = centerPos + Rot3D(G4ThreeVector(0.,0.,zShift));
+  
+            sprintf(fTempname,"pGrapeSegment[%i][%i][%i]",grapeDet,iii,j);
+            //pGrapeSegment[grapeDet][iii][j] = new G4PVPlacement(G4Transform3D(Rot3D,crystalPos),
+            new G4PVPlacement(G4Transform3D(Rot3D,crystalPos),
+                                               lGrapeSegment[j],fTempname,logicWorld,false,(id+10*iii+j));
+  
+            //cout<<"id_start+10*iii+j = "<< (id_start+10*iii+j)<<endl;
+  
+            G4double xPos = ((j%3)-1)*20.0*mm;
+            G4double yPos = ((int)(j/3)-1)*20.0*mm;
+  
+            G4RotationMatrix segmentRotation;
+  
+            segmentPos = crystalPos + Rot3D(G4ThreeVector(xPos, yPos, 0));
+  
+            // Assigning the positions:
+            fPosX[grapeDet][iii][j] = segmentPos.getX();
+            fPosY[grapeDet][iii][j] = segmentPos.getY();
+            fPosZ[grapeDet][iii][j] = segmentPos.getZ();
+            //-----------------------------------------
+            //cout------------------------------------------------
+            cout << id+10*iii+j << " " << fPosX[grapeDet][iii][j]/cm
+                                << " " << fPosY[grapeDet][iii][j]/cm
+                                << " " << fPosZ[grapeDet][iii][j]/cm << " " << endl;
+            //----------------------------------------------------
+  
+            float dis_this = sqrt(fPosX[grapeDet][iii][j]/mm
+                                 *fPosX[grapeDet][iii][j]/mm
+                                + fPosY[grapeDet][iii][j]/mm
+                                 *fPosY[grapeDet][iii][j]/mm
+                                + fPosZ[grapeDet][iii][j]/mm
+                                 *fPosZ[grapeDet][iii][j]/mm);
+  
+            float thetaThis = acos(fPosZ[grapeDet][iii][j]/mm/dis_this);
+            float phiThis = acos(fPosX[grapeDet][iii][j]/mm/dis_this/sin(thetaThis));
+  
+            if(fPosY[grapeDet][iii][j]/mm < 0.0) phiThis = 2.0*3.14159-phiThis;
+            thetaThis = thetaThis/3.14159*180.0;
+            phiThis = phiThis/3.14159*180.0;
+  
+            if(abs(fPosY[grapeDet][iii][j]/mm)<1.0 && fPosX[grapeDet][iii][j]/mm>=0.0) phiThis = 0.0;
+            if(abs(fPosY[grapeDet][iii][j]/mm)<1.0 && fPosX[grapeDet][iii][j]/mm<0.0) phiThis = 180.0;
+  
+            fprintf(fFileOut,"%i %i %i %f %f %f \n",i , iii, j, thetaThis, phiThis, dis_this);
+          }
+        }
+        //Placing the dewar:
+  
+        G4ThreeVector dewarPos;
+        G4ThreeVector AlBarPos;
+        G4RotationMatrix dummyMatrix;
+        dummyMatrix.set(0, 0, 0);
+        dummyMatrix.rotateX(psi*degree);
+        dummyMatrix.rotateY(theta*degree);
+        dummyMatrix.rotateZ(phi*degree);
+        dewarPos = centerPos + dummyMatrix(G4ThreeVector(0.,0.,30*cm));
+        AlBarPos = centerPos + dummyMatrix(G4ThreeVector(0.,0.,9.5*cm));
+  
+        sprintf(fTempname,"pGrapeAlBar[%i]",grapeDet);
+        //pGrapeAlBar[grapeDet] = new G4PVPlacement(G4Transform3D(dummyMatrix,AlBarPos),
+        new G4PVPlacement(G4Transform3D(dummyMatrix,AlBarPos),
+                               lGrapeAlBar,fTempname,logicWorld,false,(id+31));
+  
+        sprintf(fTempname,"pGrapeDewar[%i]",grapeDet);
+        //pGrapeDewar[grapeDet] = new G4PVPlacement(G4Transform3D(dummyMatrix,dewarPos),
+        new G4PVPlacement(G4Transform3D(dummyMatrix,dewarPos),
+                               lGrapeDewar,fTempname,logicWorld,false,(id+30));
+        i++;
+      }
+      fclose(fFileOut);
+      fclose(fFileIn);
+
+
+    } // include grape
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //
     //always return the physical World

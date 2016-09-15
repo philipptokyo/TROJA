@@ -116,7 +116,11 @@ void PrimaryGeneratorAction::SetRootTreeInput(){
   fTree->SetBranchAddress("beamX", &fX0);
   fTree->SetBranchAddress("beamY", &fY0);
   fTree->SetBranchAddress("beamZ", &fZ0);
-
+  
+  fTree->SetBranchAddress("gammaMul", &fGammaMul);
+  fTree->SetBranchAddress("gammaTheta", fGammaTheta);
+  fTree->SetBranchAddress("gammaPhi", fGammaPhi);
+  fTree->SetBranchAddress("gammaE", fGammaE);
 }
 
 
@@ -216,6 +220,24 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   fParticleGun->GeneratePrimaryVertex(anEvent);
 
 
+
+  if(fGammaMul>0){
+
+    particle = particleTable->FindParticle(particleName="gamma");
+    fParticleGun->SetParticleDefinition(particle);
+    // position is the same
+
+    for(Int_t gg=0; gg<fGammaMul; gg++){
+
+      direction.setRThetaPhi(1.0, fGammaTheta[gg], fGammaPhi[gg]);
+      fParticleGun->SetParticleMomentumDirection(direction);
+      fParticleGun->SetParticleEnergy(fGammaE[gg]*MeV);
+
+      fParticleGun->GeneratePrimaryVertex(anEvent);
+
+
+    }
+  }
 
 
 

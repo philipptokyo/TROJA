@@ -9,5 +9,4 @@
 
 #define maxDetectors 50
 
-
 #endif
