@@ -175,7 +175,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
 
   if(fDetInfo->IncludeGrape()){
-  if( (parentID==0 && pdgCode==22) || (fDetInfo->detData.grapeEnergy>0 && parentID>0 && pdgCode<=22) ){ // gammas and it's secondaries
+  //if( (parentID==0 && pdgCode==22) || (fDetInfo->detData.grapeEnergy>0 && parentID>0 && pdgCode<=22) ){ // gammas and it's secondaries
     
     if(TMath::IsNaN(fDetInfo->detData.grapeEnergy)){
       fDetInfo->detData.grapeEnergy=0.0;
@@ -212,7 +212,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         }
 
 
-  } // cut on primary gammas
+  //} // cut on primary gammas
   } // IncludeGrape
   
      
