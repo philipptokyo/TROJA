@@ -220,7 +220,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   fParticleGun->GeneratePrimaryVertex(anEvent);
   //printf("Added a proton, id %d\n", particleId);
 
-
+  //printf("\n\nNew Event\n");
   if(fGammaMul>0){
 
     particle = particleTable->FindParticle(particleName="gamma");
@@ -234,7 +234,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       fParticleGun->SetParticleEnergy(fGammaE[gg]*MeV);
 
       fParticleGun->GeneratePrimaryVertex(anEvent);
-      //printf("Added a gamma\n");
+      //printf("Added a gamma with %f MeV - ", fGammaE[gg]*MeV);
 
     }
   }

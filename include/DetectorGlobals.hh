@@ -9,4 +9,8 @@
 
 #define maxDetectors 50
 
+#define grapeMaxDet 18
+#define grapeMaxCry 2
+#define grapeMaxSeg 9
+
 #endif

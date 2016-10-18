@@ -95,8 +95,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //     
   // World
   //
-  G4double world_sizeXY = 1000*mm;
-  G4double world_sizeZ  = 1000*mm;
+  G4double world_sizeXY = 2000*mm;
+  G4double world_sizeZ  = 2000*mm;
 //  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
   
@@ -146,7 +146,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fPE, "target_log");
     G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fTarget, "target_log");
 
-    new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0);
+    new G4PVPlacement(0, fTargetPos, logicTarget, "Target", logicWorld, false, 0, checkOverlaps);
 
     logicTarget->SetVisAttributes(new G4VisAttributes(G4Colour::Red()));
     
@@ -156,6 +156,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
     //----------- Silicon Strip and CsI Detectors -------------------
+
+    char tmpName[50];
 
 
     G4Material* fSilicon = nist->FindOrBuildMaterial("G4_Si"); 
@@ -189,8 +191,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
       rotMat[d] = new G4RotationMatrix();
 
-
-      char tmpName[50];
 
       //sprintf(tmpName, "box%02d", d);
       //box[d] = new G4Box(tmpName, size[d][0], size[d][1], size[d][2]);
@@ -278,9 +278,91 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     
 
 
-
-
     
+
+
+
+
+    if(fDetInfo->IncludeBeamPipe()){
+      
+      const G4int beamPipeSegments=3;
+      G4double sizeBeamPipe[beamPipeSegments][3]={{0.0}};
+      G4double posBeamPipe[beamPipeSegments][3]={{0.0}};
+      
+      sizeBeamPipe[0][0] = 150.0;
+      sizeBeamPipe[0][1] = 155.0;
+      sizeBeamPipe[0][2] = 300.0;
+      posBeamPipe[0][2] = -145.0;
+
+      sizeBeamPipe[1][0] = 75.0;
+      sizeBeamPipe[1][1] = sizeBeamPipe[0][1];
+      sizeBeamPipe[1][2] = 5.0;
+      posBeamPipe[1][2] = 7.5;
+      
+      sizeBeamPipe[2][0] = sizeBeamPipe[1][0];
+      sizeBeamPipe[2][1] = 85.0;
+      sizeBeamPipe[2][2] = 300.0;
+
+      posBeamPipe[2][2] = 160.0;
+
+
+      G4Tubs* sBeamPipeTubs[beamPipeSegments];
+      G4LogicalVolume* lBeamPipeTubs[beamPipeSegments];
+      
+//      G4ThreeVector vBeamPipe[beamPipeSegments];
+      G4RotationMatrix* rotBeamPipe[beamPipeSegments];
+      //G4VisAttributes* visAttBeamPipe = new G4VisAttributes(G4Colour(2.0,2.0,2.0));
+      
+      for(G4int b=0; b<beamPipeSegments; b++){
+
+        //printf("placing beam pipe to %lf %lf %lf\n", posBeamPipe[b][0], posBeamPipe[b][1], posBeamPipe[b][2]);
+
+        sBeamPipeTubs[b]= new G4Tubs(Form("sBeamPipeTubs%d", b), sizeBeamPipe[b][0]*mm, sizeBeamPipe[b][1]*mm, sizeBeamPipe[b][2]/2.0*mm, 0*deg, 360*deg);
+        lBeamPipeTubs[b] = new G4LogicalVolume(sBeamPipeTubs[b],nist->FindOrBuildMaterial("G4_Al"), Form("lBeamPipeTubs%d", b));
+        //lBeamPipeTubs[0]->SetVisAttributes(visAttBeamPipe);
+
+//        vBeamPipe[b].set(posBeamPipe[b][0], posBeamPipe[b][1], posBeamPipe[b][2]);
+        //rotBeamPipe[0].rotateX(90.0*deg);
+        
+        G4ThreeVector vBP(posBeamPipe[b][0], posBeamPipe[b][1], posBeamPipe[b][2]);
+        
+        //printf("beam pipe is at vector %lf %lf %lf\n", vBP.x(), vBP.y(), vBP.z());
+        
+        sprintf(tmpName, "pBeamPipeTubs%d", b);
+        new G4PVPlacement(rotBeamPipe[0], 
+//                          vBeamPipe[b],
+                          vBP,
+                          lBeamPipeTubs[b],
+                          tmpName,
+                          logicWorld, 
+                          false, 
+                          1, 
+                          checkOverlaps
+                          );
+
+      }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     if(fDetInfo->IncludeGrape()){
       char fTempname[100];
@@ -361,7 +443,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       FILE* fFileIn = fopen("/home/philipp/sim/troja/grape_geometry_in.txt","r");
       FILE* fFileOut = fopen("/home/philipp/sim/troja/grape_geometry_out.txt","w");
   
-      Int_t NUMBEROFGRAPEDETECTORS=18;
+      Int_t NUMBEROFGRAPEDETECTORS=fDetInfo->GetNumberOfGrapeDetectors();
   
       int i = 0;
       while (!feof(fFileIn)&&i<NUMBEROFGRAPEDETECTORS)  {//Maximum 18 Detectors  
@@ -409,7 +491,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
             sprintf(fTempname,"pGrapeSegment[%i][%i][%i]",grapeDet,iii,j);
             //pGrapeSegment[grapeDet][iii][j] = new G4PVPlacement(G4Transform3D(Rot3D,crystalPos),
             new G4PVPlacement(G4Transform3D(Rot3D,crystalPos),
-                                               lGrapeSegment[j],fTempname,logicWorld,false,(id+10*iii+j));
+                                               lGrapeSegment[j],fTempname,logicWorld,false,(id+10*iii+j), checkOverlaps);
   
             //cout<<"id_start+10*iii+j = "<< (id_start+10*iii+j)<<endl;
   
@@ -466,12 +548,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         sprintf(fTempname,"pGrapeAlBar[%i]",grapeDet);
         //pGrapeAlBar[grapeDet] = new G4PVPlacement(G4Transform3D(dummyMatrix,AlBarPos),
         new G4PVPlacement(G4Transform3D(dummyMatrix,AlBarPos),
-                               lGrapeAlBar,fTempname,logicWorld,false,(id+31));
+                               lGrapeAlBar,fTempname,logicWorld,false,(id+31), checkOverlaps);
   
         sprintf(fTempname,"pGrapeDewar[%i]",grapeDet);
         //pGrapeDewar[grapeDet] = new G4PVPlacement(G4Transform3D(dummyMatrix,dewarPos),
         new G4PVPlacement(G4Transform3D(dummyMatrix,dewarPos),
-                               lGrapeDewar,fTempname,logicWorld,false,(id+30));
+                               lGrapeDewar,fTempname,logicWorld,false,(id+30), checkOverlaps);
         i++;
       }
       fclose(fFileOut);

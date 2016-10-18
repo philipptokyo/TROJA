@@ -74,10 +74,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   fDetInfo->detData.eventNumber = eID;
 
-  G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-  G4int pdgCode = thisDef->GetPDGEncoding();
-  G4int parentID = step->GetTrack()->GetParentID();
-  //printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
   
   // ************************************************************************
   // *************************** Silicon SSD ********************************
@@ -177,14 +173,16 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   if(fDetInfo->IncludeGrape()){
   //if( (parentID==0 && pdgCode==22) || (fDetInfo->detData.grapeEnergy>0 && parentID>0 && pdgCode<=22) ){ // gammas and it's secondaries
     
-    if(TMath::IsNaN(fDetInfo->detData.grapeEnergy)){
-      fDetInfo->detData.grapeEnergy=0.0;
-    }
     G4Track * theTrack = step->GetTrack();
     int trackVolume = theTrack->GetVolume()->GetCopyNo();
     
-    if(trackVolume >=200100 && trackVolume <= 202000)
+    //if(trackVolume >=200100 && trackVolume <= 202000)
+    if(trackVolume >=200100 && trackVolume <= 202000 && edep>0.000)
         {
+          //if(TMath::IsNaN(fDetInfo->detData.grapeEnergy)){
+          //  fDetInfo->detData.grapeEnergy=0.0;
+          //}
+          
           //the copy number is 2xxxyz, with xxx=detector number(0-17),y=crystal(0-1),z=segment(0-8)
           // for all other material belonging to the detector, y>=20 
           // reminder of the variables:
@@ -206,7 +204,39 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
             //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
 
-            fDetInfo->detData.grapeEnergy += edep;
+            ////fDetInfo->detData.grapeEnergy += edep;
+            //if(fDetInfo->detData.grapeDet==-1){
+            //  fDetInfo->detData.grapeDet=det;
+            //  fDetInfo->detData.grapeCrystal=cry;
+            //  fDetInfo->detData.grapeSegment=seg;
+            //  fDetInfo->detData.grapeEnergy += edep;
+            //}else if(fDetInfo->detData.grapeDet==det){
+            //  fDetInfo->detData.grapeEnergy += edep;
+            //}
+
+            //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+            //G4int pdgCode = thisDef->GetPDGEncoding();
+            //G4int parentID = step->GetTrack()->GetParentID();
+            //printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
+            //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+            //printf("egam %f \n", fDetInfo->detData.grapeEnergy);
+
+            if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
+              fDetInfo->detData.grapeDetEnergy[det]=0.0;
+              fDetInfo->detData.grapeDetMul++;
+            }
+            if(TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){
+              fDetInfo->detData.grapeCryEnergy[det][cry]=0.0;
+              fDetInfo->detData.grapeCryMul[det]++;
+            }
+            if(TMath::IsNaN(fDetInfo->detData.grapeSegEnergy[det][cry][seg])){
+              fDetInfo->detData.grapeSegEnergy[det][cry][seg]=0.0;
+              fDetInfo->detData.grapeSegMul[det][cry]++;
+            }
+
+            fDetInfo->detData.grapeDetEnergy[det] += edep;
+            fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
+            fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
     
           }
         }
