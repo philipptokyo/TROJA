@@ -101,7 +101,11 @@ int main(int argc,char** argv)
 //  G4VModularPhysicsList* physicsList = new FTFP_BERT;
 //  G4VModularPhysicsList* physicsList = new PhysicsList();
   PhysicsList* physicsList = new PhysicsList();
-  physicsList->AddPhysicsList("emstandard_opt4");
+  physicsList->AddPhysicsList("emstandard_opt4"); // good for low energy ions
+  //physicsList->AddPhysicsList("emstandard_opt0");
+
+  //physicsList->SetCutForGamma(0.001*mm);
+
   physicsList->SetVerboseLevel(2);
   //physicsList->SetVerboseLevel(0);
   runManager->SetUserInitialization(physicsList);

@@ -148,7 +148,10 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   G4double edep = step->GetTotalEnergyDeposit()/MeV; 
   
-  //printf("\nEvent %d\n", eID);
+  //if(edep>0){
+  //  printf("\nEvent %d, edep %lf\n", eID, edep);
+  //}
+
   for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
       char tmpName[50];
       sprintf(tmpName, "logical%02d", d);
@@ -202,7 +205,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     //        fDetector->fGrapeArray->SetCrystalFlagTrue(det,cry,seg+1);  // The individual segments
     //        fDetector->fGrapeArray->AddCrystalEnergy(det,cry,seg+1,edep);
 
-            //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+            //printf("Grape: seg %d, cry %d, det %d, energy dep %f\n", seg, cry, det, edep);
 
             ////fDetInfo->detData.grapeEnergy += edep;
             //if(fDetInfo->detData.grapeDet==-1){
@@ -213,13 +216,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
             //}else if(fDetInfo->detData.grapeDet==det){
             //  fDetInfo->detData.grapeEnergy += edep;
             //}
-
-            //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-            //G4int pdgCode = thisDef->GetPDGEncoding();
-            //G4int parentID = step->GetTrack()->GetParentID();
-            //printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
-            //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
-            //printf("egam %f \n", fDetInfo->detData.grapeEnergy);
 
             if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
               fDetInfo->detData.grapeDetEnergy[det]=0.0;
@@ -237,6 +233,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
             fDetInfo->detData.grapeDetEnergy[det] += edep;
             fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
             fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
+
+            //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+            //G4int pdgCode = thisDef->GetPDGEncoding();
+            //G4int parentID = step->GetTrack()->GetParentID();
+            //printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
+            //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+            //printf("egam det %f \n", fDetInfo->detData.grapeDetEnergy[0]);
+            //printf("mul det %d, cry %d\n", fDetInfo->detData.grapeDetMul, fDetInfo->detData.grapeCryMul[0]);
     
           }
         }
