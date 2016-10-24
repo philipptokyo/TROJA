@@ -574,342 +574,323 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
     if(fDetInfo->IncludeGrape()){
 
-       G4Material *Al  = G4NistManager::Instance()->FindOrBuildMaterial("G4_Al");
-       G4Material *Cu  = G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
-       G4Material *G4Ge  = G4NistManager::Instance()->FindOrBuildMaterial("G4_Ge");
-    //   G4Material *In  = G4NistManager::Instance()->FindOrBuildMaterial("G4_In");
-       G4Material *Vacuum = 
-          G4NistManager::Instance()->FindOrBuildMaterial("G4_Galactic");
-       G4Isotope *Ge70 = new G4Isotope("Ge70",32,38,69.9242504*g/mole);
-       G4Isotope *Ge72 = new G4Isotope("Ge72",32,40,71.9220762*g/mole);
-       G4Isotope *Ge73 = new G4Isotope("Ge73",32,41,72.9234594*g/mole);
-       G4Isotope *Ge74 = new G4Isotope("Ge74",32,42,73.9211782*g/mole);
-       G4Isotope *Ge76 = new G4Isotope("Ge76",32,44,75.9214027*g/mole);
-       G4Element *elGe = new G4Element("elGe","elGe",5);
-       elGe->AddIsotope(Ge70,20.84*perCent);
-       elGe->AddIsotope(Ge72,27.54*perCent);
-       elGe->AddIsotope(Ge73, 7.73*perCent);
-       elGe->AddIsotope(Ge74,36.28*perCent);
-       elGe->AddIsotope(Ge76, 7.61*perCent);
-       G4Material *Ge = new G4Material("Ge",5.323*g/cm3,1);
-       Ge->AddElement(elGe,1.);
-    
-    
-       G4cout << "Ge:" << Ge->GetRadlen()/cm << G4endl;
-       G4cout << Ge->GetIonisation()->GetMeanExcitationEnergy() << G4endl;
-       G4cout << "G4Ge:" << G4Ge->GetRadlen()/cm << G4endl;
-       G4cout << "Ionisation" << G4endl;
-       G4cout << "Al: " << Al->GetIonisation()->GetMeanExcitationEnergy()/eV << G4endl;
-       G4cout << "Cu: " << Cu->GetIonisation()->GetMeanExcitationEnergy()/eV << G4endl;
-    
-       // hexagonal hausing
-       G4VSolid *sHausingHexBase;
-       {
-          const G4int nz = 2;
-          const G4int nss = 6;
-          G4double z[nz]   = {-32.5*mm, 32.5*mm};
-          G4double rin[nz] = {0.*mm, 0.*mm};
-          G4double rout[nz] = {50.*mm, 50.*mm};
-          sHausingHexBase = new G4Polyhedra("sHausingHexBase", 30.*deg, 360.*deg,
-                                         nss, nz, z, rin, rout);
-       }
-       // trd hausing
-       G4VSolid *sHausingTrd =
-          new G4Trd("sHausingTrd",28.*mm,28.*mm,
-                    50.*2/sqrt(3.)*mm, 50.*2/sqrt(3.)*40./100.,30.*mm);
-       // hausing hex 
-       G4RotationMatrix rmY90;
-       rmY90.rotateY(90.*deg);
-       G4VSolid *sHausingHex =
-          new G4UnionSolid("sHausingHex",sHausingHexBase,sHausingTrd,
-                           G4Transform3D(rmY90,G4ThreeVector(30.*mm,0.,0.)));
-       // hausing pre-amp.
-       G4VSolid *sPreAmpHausing;
-       {
-          const G4int nz = 15;
-          G4double z[nz] = 
-             { 50.*mm, 60.*mm, 60.*mm, 62.*mm, 62.*mm,
-               100.*mm, 150.*mm, 150.*mm, 290.*mm, 290.*mm, 
-               334.*mm,334.*mm,340.*mm,340.*mm,607.*mm };
-          G4double rin[nz] = 
-             { 0.*mm,0.*mm,0.*mm,0.*mm,0.*mm,
-               0.*mm,0.*mm,0.*mm,0.*mm,0.*mm,
-               0.*mm,0.*mm,0.*mm,0.*mm,0.*mm };
-          G4double rout[nz] = 
-             { 20.*mm, 20.*mm, 23.09*mm, 23.09*mm, 20.*mm,
-               20.*mm, 50.*mm, 70.*mm, 70.*mm, 27.5*mm, 
-               27.5*mm, 30.*mm, 30.*mm, 111.*mm, 111.*mm };
-          sPreAmpHausing = new G4Polycone("sPreAmpHausing",0.*deg, 360.*deg,
-                                          nz, z, rin, rout);
-       }
-       G4VSolid *sHausing =
-          new G4UnionSolid("sHausing",sHausingHex,sPreAmpHausing,
-                           G4Transform3D(rmY90,G4ThreeVector()));
-    
-       // vacuum
-       G4VSolid *sHeadVacuumBase;
-       {
-          const G4int nz = 10 ;
-          G4double z[nz] = 
-             { -31.5*mm, -26.5*mm, -26.5*mm, -21.5*mm, -21.5*mm,
-               21.5*mm, 21.5*mm, 26.5*mm,26.5*mm,31.5*mm };
-          G4double rin[nz] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. };
-          G4double rout[nz] = 
-             { 44.5*mm, 44.5*mm, 45.5*mm, 45.5*mm, 48.5*mm,
-               48.5*mm, 45.5*mm, 45.5*mm, 44.5*mm, 44.5*mm };
-          sHeadVacuumBase = new G4Polycone("sHeadVacuumBase",0.*deg, 360.*deg,
-                                       nz, z, rin, rout);
-       }
-       G4VSolid *sHeadVacuumMid;
-       {
-          const G4int nz = 7;
-          G4double z[nz] = { 0.*mm, 100.*mm, 150.*mm, 150.*mm, 345.*mm, 
-                             345.*mm, 602.*mm};
-          G4double rin[nz] = {0., 0., 0., 0., 0., 0., 0.,};
-          G4double rout[nz] = { 17.*mm, 17.*mm, 46.25*mm, 17.*mm, 17.*mm,
-                                106.*mm, 106.*mm};
-          sHeadVacuumMid = new G4Polycone("sHeadVacuumMid",0.*deg, 360.*deg,
-                                          nz, z, rin, rout);
-       }
-       G4VSolid *sHeadVacuum =
-          new G4UnionSolid("sHeadVacuum",sHeadVacuumBase, sHeadVacuumMid,
-                           G4Transform3D(rmY90,G4ThreeVector()));
-       G4VSolid *sPreAmpVacuum;
-       {
-          const G4int nz = 10;
-          G4double z[nz] =
-             { 157.*mm, 158.*mm, 158.*mm, 166.*mm, 166.*mm,
-               245.*mm, 245.*mm, 252.*mm, 252.*mm, 285.*mm };
-          G4double rin[nz] = 
-             { 14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm,
-               14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm };
-          //      G4double rin[nz] = 
-          //         { 14.5*mm, 14.5*mm, 50.*mm, 50.*mm, 14.5*mm,
-          //           14.5*mm, 50.*mm, 50.*mm, 14.5*mm, 14.5*mm };
-          G4double rout[nz] =
-             { 68.*mm, 68.*mm, 68.*mm, 68.*mm, 68.*mm, 
-               68.*mm, 68.*mm, 68.*mm, 65.*mm, 65.*mm } ;
-          sPreAmpVacuum = 
-             new G4Polycone("sPreAmpVacuum",0.*deg,360.*deg,nz,z,rin,rout);
-       }
-    
-       G4VSolid *sDewarColor = new G4Tubs("sDewarColor",106.*mm,111.*mm,133.5*mm,
+      G4Material *Al  = G4NistManager::Instance()->FindOrBuildMaterial("G4_Al");
+      G4Material *Cu  = G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
+      G4Material *G4Ge  = G4NistManager::Instance()->FindOrBuildMaterial("G4_Ge");
+      //G4Material *In  = G4NistManager::Instance()->FindOrBuildMaterial("G4_In");
+      G4Material *Vacuum = 
+         G4NistManager::Instance()->FindOrBuildMaterial("G4_Galactic");
+      
+      G4Isotope *Ge70 = new G4Isotope("Ge70",32,38,69.9242504*g/mole);
+      G4Isotope *Ge72 = new G4Isotope("Ge72",32,40,71.9220762*g/mole);
+      G4Isotope *Ge73 = new G4Isotope("Ge73",32,41,72.9234594*g/mole);
+      G4Isotope *Ge74 = new G4Isotope("Ge74",32,42,73.9211782*g/mole);
+      G4Isotope *Ge76 = new G4Isotope("Ge76",32,44,75.9214027*g/mole);
+      G4Element *elGe = new G4Element("elGe","elGe",5);
+      elGe->AddIsotope(Ge70,20.84*perCent);
+      elGe->AddIsotope(Ge72,27.54*perCent);
+      elGe->AddIsotope(Ge73, 7.73*perCent);
+      elGe->AddIsotope(Ge74,36.28*perCent);
+      elGe->AddIsotope(Ge76, 7.61*perCent);
+      G4Material *Ge = new G4Material("Ge",5.323*g/cm3,1);
+      Ge->AddElement(elGe,1.);
+   
+   
+      G4cout << "Ge:" << Ge->GetRadlen()/cm << G4endl;
+      G4cout << Ge->GetIonisation()->GetMeanExcitationEnergy() << G4endl;
+      G4cout << "G4Ge:" << G4Ge->GetRadlen()/cm << G4endl;
+      G4cout << "Ionisation" << G4endl;
+      G4cout << "Al: " << Al->GetIonisation()->GetMeanExcitationEnergy()/eV << G4endl;
+      G4cout << "Cu: " << Cu->GetIonisation()->GetMeanExcitationEnergy()/eV << G4endl;
+   
+      // hexagonal hausing
+      G4VSolid *sHausingHexBase;
+      {
+        const G4int nz = 2;
+        const G4int nss = 6;
+        G4double z[nz]   = {-32.5*mm, 32.5*mm};
+        G4double rin[nz] = {0.*mm, 0.*mm};
+        G4double rout[nz] = {50.*mm, 50.*mm};
+        sHausingHexBase = new G4Polyhedra("sHausingHexBase", 30.*deg, 360.*deg,
+                                       nss, nz, z, rin, rout);
+      }
+      // trd hausing
+      G4VSolid *sHausingTrd =
+         new G4Trd("sHausingTrd",28.*mm,28.*mm,
+                   50.*2/sqrt(3.)*mm, 50.*2/sqrt(3.)*40./100.,30.*mm);
+      // hausing hex 
+      G4RotationMatrix rmY90;
+      rmY90.rotateY(90.*deg);
+      G4VSolid *sHausingHex =
+         new G4UnionSolid("sHausingHex",sHausingHexBase,sHausingTrd,
+                          G4Transform3D(rmY90,G4ThreeVector(30.*mm,0.,0.)));
+      // hausing pre-amp.
+      G4VSolid *sPreAmpHausing;
+      {
+        const G4int nz = 15;
+        G4double z[nz] = 
+           { 50.*mm, 60.*mm, 60.*mm, 62.*mm, 62.*mm,
+             100.*mm, 150.*mm, 150.*mm, 290.*mm, 290.*mm, 
+             334.*mm,334.*mm,340.*mm,340.*mm,607.*mm };
+        G4double rin[nz] = 
+           { 0.*mm,0.*mm,0.*mm,0.*mm,0.*mm,
+             0.*mm,0.*mm,0.*mm,0.*mm,0.*mm,
+             0.*mm,0.*mm,0.*mm,0.*mm,0.*mm };
+        G4double rout[nz] = 
+           { 20.*mm, 20.*mm, 23.09*mm, 23.09*mm, 20.*mm,
+             20.*mm, 50.*mm, 70.*mm, 70.*mm, 27.5*mm, 
+             27.5*mm, 30.*mm, 30.*mm, 111.*mm, 111.*mm };
+        sPreAmpHausing = new G4Polycone("sPreAmpHausing",0.*deg, 360.*deg,
+                                        nz, z, rin, rout);
+      }
+      G4VSolid *sHausing =
+         new G4UnionSolid("sHausing",sHausingHex,sPreAmpHausing,
+                          G4Transform3D(rmY90,G4ThreeVector()));
+   
+      // vacuum
+      G4VSolid *sHeadVacuumBase;
+      {
+        const G4int nz = 10 ;
+        G4double z[nz] = 
+           { -31.5*mm, -26.5*mm, -26.5*mm, -21.5*mm, -21.5*mm,
+             21.5*mm, 21.5*mm, 26.5*mm,26.5*mm,31.5*mm };
+        G4double rin[nz] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. };
+        G4double rout[nz] = 
+           { 44.5*mm, 44.5*mm, 45.5*mm, 45.5*mm, 48.5*mm,
+             48.5*mm, 45.5*mm, 45.5*mm, 44.5*mm, 44.5*mm };
+        sHeadVacuumBase = new G4Polycone("sHeadVacuumBase",0.*deg, 360.*deg,
+                                     nz, z, rin, rout);
+      }
+      G4VSolid *sHeadVacuumMid;
+      {
+        const G4int nz = 7;
+        G4double z[nz] = { 0.*mm, 100.*mm, 150.*mm, 150.*mm, 345.*mm, 
+                           345.*mm, 602.*mm};
+        G4double rin[nz] = {0., 0., 0., 0., 0., 0., 0.,};
+        G4double rout[nz] = { 17.*mm, 17.*mm, 46.25*mm, 17.*mm, 17.*mm,
+                              106.*mm, 106.*mm};
+        sHeadVacuumMid = new G4Polycone("sHeadVacuumMid",0.*deg, 360.*deg,
+                                        nz, z, rin, rout);
+      }
+      G4VSolid *sHeadVacuum =
+        new G4UnionSolid("sHeadVacuum",sHeadVacuumBase, sHeadVacuumMid,
+                         G4Transform3D(rmY90,G4ThreeVector()));
+      G4VSolid *sPreAmpVacuum;
+      {
+        const G4int nz = 10;
+        G4double z[nz] =
+           { 157.*mm, 158.*mm, 158.*mm, 166.*mm, 166.*mm,
+             245.*mm, 245.*mm, 252.*mm, 252.*mm, 285.*mm };
+        G4double rin[nz] = 
+           { 14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm,
+             14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm, 14.5*mm };
+        //      G4double rin[nz] = 
+        //         { 14.5*mm, 14.5*mm, 50.*mm, 50.*mm, 14.5*mm,
+        //           14.5*mm, 50.*mm, 50.*mm, 14.5*mm, 14.5*mm };
+        G4double rout[nz] =
+           { 68.*mm, 68.*mm, 68.*mm, 68.*mm, 68.*mm, 
+             68.*mm, 68.*mm, 68.*mm, 65.*mm, 65.*mm } ;
+        sPreAmpVacuum = 
+           new G4Polycone("sPreAmpVacuum",0.*deg,360.*deg,nz,z,rin,rout);
+      }
+   
+      G4VSolid *sDewarColor = new G4Tubs("sDewarColor",106.*mm,111.*mm,133.5*mm,
+                                        0.*deg,360.*deg);
+      
+      // inner dewar
+      G4VSolid *sInnerDewar = new G4Tubs("sInnerDewar",0.,75.*mm,105.*mm,
                                          0.*deg,360.*deg);
-       
-       // inner dewar
-       G4VSolid *sInnerDewar = new G4Tubs("sInnerDewar",0.,75.*mm,105.*mm,
-                                          0.*deg,360.*deg);
-       // liquid or vacuum
-       G4VSolid *sLiquid = new G4Tubs("sLiquid",0.,70.*mm,100.*mm,0.*deg,360.*deg);
-       
-       // cold finger (Cu
-       G4VSolid *sColdFinger;
-       {
-          const G4int nz=2;
-          G4double z[nz] = { 50.*mm, 368.5*mm };
-          G4double rin[nz] = { 0., 0. };
-          G4double rout[nz] = { 9.*mm, 9.*mm };
-          sColdFinger = new G4Polycone("sColdFinger",0.*deg,360.*deg,
-                                       nz,z,rin,rout);
-       }
-    
-       // cold case
-       G4VSolid *sColdCase = new G4Tubs("sColdCase",35.*mm,40.*mm,20.*mm,
-                                        0.*deg,360.*deg);
-    
-       // Ge Grystal
-       G4VSolid *sGeCrystal = new G4Tubs("sGeCrystal",0.*mm,35.*mm,20.*mm,
-                                         0.*deg, 360.*deg);
-       // Ge segment
-       G4double rmaxSD = 32.*mm;
-       G4VSolid *sGeSensitive = new G4Tubs("sGeCrystal",0.*mm,rmaxSD,20.*mm,
-                                         0.*deg, 360.*deg);
-    
-       // Indium shield
-       G4VSolid *sInShield = new G4Tubs("sInShield",32.*mm, 40.*mm,0.5*mm,
-                                        0.*deg,360.*deg);
-                                                   
-          
-       // logical volumes
-       G4LogicalVolume *lHausing =
-          new G4LogicalVolume(sHausing,Al,"lHausing",0,0,0);
-       G4LogicalVolume *lHeadVacuum = 
-          new G4LogicalVolume(sHeadVacuum,Vacuum,"lHeadVacuum",0,0,0);
-       G4LogicalVolume *lPreAmpVacuum =
-          new G4LogicalVolume(sPreAmpVacuum,Vacuum,"lPreAmpVacuum",0,0,0);
-       G4LogicalVolume *lInnerDewar =
-          new G4LogicalVolume(sInnerDewar,Al,"lInnerDewar",0,0,0);
-       G4LogicalVolume *lDewarColor =
-          new G4LogicalVolume(sDewarColor,Al,"lDewarColor",0,0,0);
-       G4LogicalVolume *lLiquid =
-          new G4LogicalVolume(sLiquid,Vacuum,"lLiquid",0,0,0);
-       G4LogicalVolume *lColdFinger =
-          new G4LogicalVolume(sColdFinger,Cu,"lColdFinger",0,0,0);
-       G4LogicalVolume *lColdCase =
-          new G4LogicalVolume(sColdCase,Al,"lColdCase",0,0,0);
-       G4LogicalVolume *lGeCrystal =
-          new G4LogicalVolume(sGeCrystal,Ge,"lGeCrystal",0,0,0);
-    //    G4LogicalVolume *lInShield =
-    //       new G4LogicalVolume(sInShield,In,"lInShield",0,0,0);
-       // Segment location
-       G4double offs = 20.*mm + (rmaxSD-30.*mm)/2.;
-       G4ThreeVector *segPos = new G4ThreeVector[18];
-       segPos[0]  = G4ThreeVector( offs*mm,-offs*mm,-10.*mm);
-       segPos[1]  = G4ThreeVector(  0.0*mm,-offs*mm,-10.*mm);
-       segPos[2]  = G4ThreeVector(-offs*mm,-offs*mm,-10.*mm);
-       segPos[3]  = G4ThreeVector( offs*mm,  0.0*mm,-10.*mm);
-       segPos[4]  = G4ThreeVector(  0.0*mm,  0.0*mm,-10.*mm);
-       segPos[5]  = G4ThreeVector(-offs*mm,  0.0*mm,-10.*mm);
-       segPos[6]  = G4ThreeVector( offs*mm, offs*mm,-10.*mm);
-       segPos[7]  = G4ThreeVector(  0.0*mm, offs*mm,-10.*mm);
-       segPos[8]  = G4ThreeVector(-offs*mm, offs*mm,-10.*mm);
-       segPos[9]  = G4ThreeVector( offs*mm, offs*mm, 10.*mm);
-       segPos[10] = G4ThreeVector(  0.0*mm, offs*mm, 10.*mm);
-       segPos[11] = G4ThreeVector(-offs*mm, offs*mm, 10.*mm);
-       segPos[12] = G4ThreeVector( offs*mm,  0.0*mm, 10.*mm);
-       segPos[13] = G4ThreeVector(  0.0*mm,  0.0*mm, 10.*mm);
-       segPos[14] = G4ThreeVector(-offs*mm,  0.0*mm, 10.*mm);
-       segPos[15] = G4ThreeVector( offs*mm,-offs*mm, 10.*mm);
-       segPos[16] = G4ThreeVector(  0.0*mm,-offs*mm, 10.*mm);
-       segPos[17] = G4ThreeVector(-offs*mm,-offs*mm, 10.*mm);
-       G4double longLength = 10.*mm + (rmaxSD - 30.*mm)/2.;
-       G4double defaultLength = 10.*mm;
-       for (G4int i=0; i<18; i++) {
-          G4VSolid *sSegBox;
-          switch (i%9) {
-          case 0:
-          case 2:
-          case 6:
-          case 8:
-             sSegBox = new G4Box("sSegBox",longLength,longLength,defaultLength);
-             break;
-          case 1:
-          case 7:
-             sSegBox = new G4Box("sSegBox",defaultLength,longLength,defaultLength);
-             break;
-          case 3:
-          case 5:
-             sSegBox = new G4Box("sSegBox",longLength,defaultLength,defaultLength);
-             break;
-          default:
-             sSegBox = new G4Box("sSegBox",
-                                 defaultLength,defaultLength,defaultLength);
-          }
-    
-          char sName[20],lName[20],pName[20];
-          sprintf(sName,"sSeg%02d",(i<9?i+1:i+2));
-          sprintf(lName,"lSeg%02d",(i<9?i+1:i+2));
-          sprintf(pName,"pSeg%02d",(i<9?i+1:i+2));
-          G4VSolid *sSeg = 
-             new G4IntersectionSolid(sName,sGeSensitive,sSegBox,0,segPos[i]);
-          G4LogicalVolume *lSeg =new G4LogicalVolume(sSeg,Ge,lName,0,0,0);
-          //lSeg->SetSensitiveDetector(fGRAPESD);
-          new G4PVPlacement(0,G4ThreeVector(),lSeg,pName,
-                            lGeCrystal,true,(i<9?i+1:i+2));
-       }
-    //   G4LogicalVolume *lGeSensitive =
-    //      new G4LogicalVolume(sGeSensitive,Ge,"lGeSensitive",0,0,0);
-    //   new G4PVPlacement(G4Transform3D(),lGeSensitive,"GeSensitive",lGeCrystal,
-    //                     true,0);
-    //   lGeSensitive->SetSensitiveDetector(fGRAPESD);
-    
-       // visualize
-       lDewarColor->SetVisAttributes(new G4VisAttributes(G4Colour(0.71,0.93,0.71)));
-    
-       // placements
-       new G4PVPlacement(0,G4ThreeVector(),lLiquid,"Liquid",lInnerDewar,false,0);
-       new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
-                         lInnerDewar,"InnerDewar",lHeadVacuum,false,0);
-       new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
-                         lHeadVacuum,false,0);
-       new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
-                         lHeadVacuum,false,0);
-       new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
-                         lColdFinger,"ColdFinger",lHeadVacuum,false,0);
-       new G4PVPlacement(0,G4ThreeVector(),lHeadVacuum,"HeadVacuum",
-                         lHausing,false,0);
-       new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
-                         lPreAmpVacuum,"PreAmpVacuum",lHausing,false,0);
-       new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
-                         lDewarColor,"DewarColor",lHausing,false,0);
-       //   new G4PVPlacement(0,G4ThreeVector(0.,0.,-20.5*mm),lInShield,
-       //                     "InShield",lHausing,false,0);
-       ifstream fin;
-       fin.open("GeConfig.dat");
-       if (!fin) {
-          G4cerr << "*** Fatal Error: Cannot open GeConfig.dat ***" << G4endl;
-          exit(0);
-          return 0;
-       }
-       G4double Rc, Tc, Pc, Td, Pd;
-       G4int    id;
-       G4VPhysicalVolume *aDet;
-       G4int nGrape = 0;
-       while (fin >> id >> Rc >> Tc >> Pc >> Td >> Pd ) {
-          if (fin.eof()) break;
-          cout << Pc << " " << Pd << G4endl;
-          Rc *= mm;
-          Tc *= deg;
-          Pc *= deg;
-          Td *= deg;
-          Pd *= deg;
-          //      G4ThreeVector    offset(4.24105,-0.645,-4.8061);
-    //      G4ThreeVector    offset(0.8190,4.9754, -5.590);
-    
-          G4ThreeVector    ta;
-          G4RotationMatrix rm;
-          ta[0] = Rc * sin(Tc) * cos(Pc);
-          ta[1] = Rc * sin(Tc) * sin(Pc);
-          ta[2] = Rc * cos(Tc);
-          rm.rotateY(Td);
-          rm.rotateZ(Pc+Pd);
-          G4cout << ta << G4endl;
-          aDet = new G4PVPlacement(G4Transform3D(rm,ta),
-                                   lHausing,"Hausing",logicWorld,false,id);
-          nGrape++;
-       }
-       fin.close();
-       //fGrapeGeometry = new TArtParameterD<2>("GrapeGeometry",
-       //                                        "GRAPE Geometry",
-       //                                     gExtent[nGrape][6]);
-    //TArtPrmFileCSV prmfile("GeConfig.dat");
-    //fGrapeGeometry->Load(prmfile);
-       //return aDet;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      // liquid or vacuum
+      G4VSolid *sLiquid = new G4Tubs("sLiquid",0.,70.*mm,100.*mm,0.*deg,360.*deg);
+      
+      // cold finger (Cu
+      G4VSolid *sColdFinger;
+      {
+         const G4int nz=2;
+         G4double z[nz] = { 50.*mm, 368.5*mm };
+         G4double rin[nz] = { 0., 0. };
+         G4double rout[nz] = { 9.*mm, 9.*mm };
+         sColdFinger = new G4Polycone("sColdFinger",0.*deg,360.*deg,
+                                      nz,z,rin,rout);
+      }
+   
+      // cold case
+      G4VSolid *sColdCase = new G4Tubs("sColdCase",35.*mm,40.*mm,20.*mm,
+                                       0.*deg,360.*deg);
+   
+      // Ge Grystal
+      G4VSolid *sGeCrystal = new G4Tubs("sGeCrystal",0.*mm,35.*mm,20.*mm,
+                                        0.*deg, 360.*deg);
+      // Ge segment
+      G4double rmaxSD = 32.*mm;
+      G4VSolid *sGeSensitive = new G4Tubs("sGeCrystal",0.*mm,rmaxSD,20.*mm,
+                                        0.*deg, 360.*deg);
+      // cathode? 
+      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm,35.*mm,1.*mm,
+                                        0.*deg, 360.*deg);
+   
+      //// Indium shield
+      //G4VSolid *sInShield = new G4Tubs("sInShield",32.*mm, 40.*mm,0.5*mm,
+      //                                 0.*deg,360.*deg);
+                                                  
+         
+      // logical volumes
+      G4LogicalVolume *lHausing =
+         new G4LogicalVolume(sHausing,Al,"lHausing",0,0,0);
+      G4LogicalVolume *lHeadVacuum = 
+         new G4LogicalVolume(sHeadVacuum,Vacuum,"lHeadVacuum",0,0,0);
+      G4LogicalVolume *lPreAmpVacuum =
+         new G4LogicalVolume(sPreAmpVacuum,Vacuum,"lPreAmpVacuum",0,0,0);
+      G4LogicalVolume *lInnerDewar =
+         new G4LogicalVolume(sInnerDewar,Al,"lInnerDewar",0,0,0);
+      G4LogicalVolume *lDewarColor =
+         new G4LogicalVolume(sDewarColor,Al,"lDewarColor",0,0,0);
+      G4LogicalVolume *lLiquid =
+         new G4LogicalVolume(sLiquid,Vacuum,"lLiquid",0,0,0);
+      G4LogicalVolume *lColdFinger =
+         new G4LogicalVolume(sColdFinger,Cu,"lColdFinger",0,0,0);
+      G4LogicalVolume *lColdCase =
+         new G4LogicalVolume(sColdCase,Al,"lColdCase",0,0,0);
+      G4LogicalVolume *lGeCrystal =
+         new G4LogicalVolume(sGeCrystal,Ge,"lGeCrystal",0,0,0);
+      G4LogicalVolume *lGeCathode =
+         new G4LogicalVolume(sGeCathode,Al,"lGeCathode",0,0,0);
+      //G4LogicalVolume *lInShield =
+      //   new G4LogicalVolume(sInShield,In,"lInShield",0,0,0);
+      
+      // Segment location
+      G4double offs = 20.*mm + (rmaxSD-30.*mm)/2.;
+      G4ThreeVector *segPos = new G4ThreeVector[18];
+      segPos[0]  = G4ThreeVector( offs*mm,-offs*mm,-12.50*mm);
+      segPos[1]  = G4ThreeVector(  0.0*mm,-offs*mm,-12.50*mm);
+      segPos[2]  = G4ThreeVector(-offs*mm,-offs*mm,-12.50*mm);
+      segPos[3]  = G4ThreeVector( offs*mm,  0.0*mm,-12.50*mm);
+      segPos[4]  = G4ThreeVector(  0.0*mm,  0.0*mm,-12.50*mm);
+      segPos[5]  = G4ThreeVector(-offs*mm,  0.0*mm,-12.50*mm);
+      segPos[6]  = G4ThreeVector( offs*mm, offs*mm,-12.50*mm);
+      segPos[7]  = G4ThreeVector(  0.0*mm, offs*mm,-12.50*mm);
+      segPos[8]  = G4ThreeVector(-offs*mm, offs*mm,-12.50*mm);
+      segPos[9]  = G4ThreeVector( offs*mm, offs*mm, 12.50*mm);
+      segPos[10] = G4ThreeVector(  0.0*mm, offs*mm, 12.50*mm);
+      segPos[11] = G4ThreeVector(-offs*mm, offs*mm, 12.50*mm);
+      segPos[12] = G4ThreeVector( offs*mm,  0.0*mm, 12.50*mm);
+      segPos[13] = G4ThreeVector(  0.0*mm,  0.0*mm, 12.50*mm);
+      segPos[14] = G4ThreeVector(-offs*mm,  0.0*mm, 12.50*mm);
+      segPos[15] = G4ThreeVector( offs*mm,-offs*mm, 12.50*mm);
+      segPos[16] = G4ThreeVector(  0.0*mm,-offs*mm, 12.50*mm);
+      segPos[17] = G4ThreeVector(-offs*mm,-offs*mm, 12.50*mm);
+      G4double longLength = 10.*mm + (rmaxSD - 30.*mm)/2.;
+      G4double defaultLength = 10.*mm;
+      for (G4int i=0; i<18; i++) {
+        G4VSolid *sSegBox;
+        switch (i%9) {
+        case 0:
+        case 2:
+        case 6:
+        case 8:
+          sSegBox = new G4Box("sSegBox",longLength,longLength,defaultLength);
+          break;
+        case 1:
+        case 7:
+          sSegBox = new G4Box("sSegBox",defaultLength,longLength,defaultLength);
+          break;
+        case 3:
+        case 5:
+          sSegBox = new G4Box("sSegBox",longLength,defaultLength,defaultLength);
+          break;
+        default:
+          sSegBox = new G4Box("sSegBox",defaultLength,defaultLength,defaultLength);
+        }
+   
+        char sName[20],lName[20],pName[20];
+        sprintf(sName,"sSeg%02d",(i<9?i+1:i+2));
+        sprintf(lName,"lSeg%02d",(i<9?i+1:i+2));
+        sprintf(pName,"pSeg%02d",(i<9?i+1:i+2));
+        G4VSolid *sSeg = 
+           new G4IntersectionSolid(sName,sGeSensitive,sSegBox,0,segPos[i]);
+        G4LogicalVolume *lSeg =new G4LogicalVolume(sSeg,Ge,lName,0,0,0);
+        //lSeg->SetSensitiveDetector(fGRAPESD);
+        
+        new G4PVPlacement(0,G4ThreeVector(),lSeg,pName,
+                          lGeCrystal,true,(i<9?i+1:i+2), checkOverlaps);
+                          //logicWorld,true,(i<9?i+1:i+2), checkOverlaps);
+      }
+      new G4PVPlacement(0,G4ThreeVector(0,0,0),lGeCathode, "pCathode",
+                        lGeCrystal,false,0, checkOverlaps);
+                        //logicWorld,false,0, checkOverlaps);
+      //   G4LogicalVolume *lGeSensitive =
+      //      new G4LogicalVolume(sGeSensitive,Ge,"lGeSensitive",0,0,0);
+      //   new G4PVPlacement(G4Transform3D(),lGeSensitive,"GeSensitive",lGeCrystal,
+      //                     true,0);
+      //   lGeSensitive->SetSensitiveDetector(fGRAPESD);
+   
+      // visualize
+      lDewarColor->SetVisAttributes(new G4VisAttributes(G4Colour(0.71,0.93,0.71)));
+   
+      // placements
+      new G4PVPlacement(0,G4ThreeVector(),lLiquid,"Liquid",lInnerDewar,false,0, checkOverlaps);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
+                        lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps);
+      new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
+                        lHeadVacuum,false,0);
+      new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
+                        lHeadVacuum,false,0, checkOverlaps);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
+                        lColdFinger,"ColdFinger",lHeadVacuum,false,0, checkOverlaps);
+      new G4PVPlacement(0,G4ThreeVector(),lHeadVacuum,"HeadVacuum",
+                        lHausing,false,0, checkOverlaps);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
+                        lPreAmpVacuum,"PreAmpVacuum",lHausing,false,0);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
+                        lDewarColor,"DewarColor",lHausing,false,0, checkOverlaps);
+      //   new G4PVPlacement(0,G4ThreeVector(0.,0.,-20.5*mm),lInShield,
+      //                     "InShield",lHausing,false,0, checkOverlaps);
+      ifstream fin;
+      fin.open("GeConfig.dat");
+      if (!fin) {
+        G4cerr << "*** Fatal Error: Cannot open GeConfig.dat ***" << G4endl;
+        exit(0);
+        return 0;
+      }
+      G4double Rc, Tc, Pc, Td, Pd;
+      G4int    id;
+      //G4VPhysicalVolume *aDet;
+      G4int nGrape = 0;
+      while (fin >> id >> Rc >> Tc >> Pc >> Td >> Pd ) {
+        if (fin.eof()) break;
+        cout << "Phi center " << Pc << ", phi detector " << Pd << G4endl;
+        Rc *= mm;
+        Tc *= deg;
+        Pc *= deg;
+        Td *= deg;
+        Pd *= deg;
+        // G4ThreeVector    offset(4.24105,-0.645,-4.8061);
+        // G4ThreeVector    offset(0.8190,4.9754, -5.590);
+   
+        G4ThreeVector    ta;
+        G4RotationMatrix rm;
+        ta[0] = Rc * sin(Tc) * cos(Pc);
+        ta[1] = Rc * sin(Tc) * sin(Pc);
+        ta[2] = Rc * cos(Tc);
+        rm.rotateY(Td);
+        rm.rotateZ(Pc+Pd);
+        G4cout << "Vector to center " << ta << G4endl;
+        //aDet = new G4PVPlacement(G4Transform3D(rm,ta),
+        new G4PVPlacement(G4Transform3D(rm,ta),
+                         lHausing,"Hausing",logicWorld,false,id, checkOverlaps);
+        nGrape++;
+      }
+      fin.close();
+      //fGrapeGeometry = new TArtParameterD<2>("GrapeGeometry",
+      //                                        "GRAPE Geometry",
+      //                                     gExtent[nGrape][6]);
+      //TArtPrmFileCSV prmfile("GeConfig.dat");
+      //fGrapeGeometry->Load(prmfile);
+      //return aDet;
 
 
 
     }
-
-
-
-
-
-
-
 
 
 
