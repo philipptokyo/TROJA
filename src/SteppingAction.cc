@@ -322,58 +322,56 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
      
     string materialname = volume->GetName();
     size_t contains = materialname.find("lSeg");
-    //if(detectorID>-1){
+    
     if( ((Int_t)contains > -1) && (edep>0.000)){
       //printf("trackVolume %d in volume %s, found 'lSeg' at %d, edep, %f, det %d, cry %d, seg %d\n", trackVolume, volume->GetName().c_str(), (Int_t)contains, edep, det, cry, seg);
  
             
-    //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-    //G4int pdgCode = thisDef->GetPDGEncoding();
-    //G4int parentID = step->GetTrack()->GetParentID();
-    
-    //Bool_t newCrystal=false;
-    //if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
-    
-    //if(newCrystal && parentID>0 && TMath::Abs(pdgCode)==11){
-    //}else{
-    
-    if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
-      fDetInfo->detData.grapeDetEnergy[det]=0.0;
-      fDetInfo->detData.grapeDetMul++;
-    }
-    if(TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){
-      fDetInfo->detData.grapeCryEnergy[det][cry]=0.0;
-      fDetInfo->detData.grapeCryMul[det]++;
-    }
-    if(TMath::IsNaN(fDetInfo->detData.grapeSegEnergy[det][cry][seg])){
-      fDetInfo->detData.grapeSegEnergy[det][cry][seg]=0.0;
-      fDetInfo->detData.grapeSegMul[det][cry]++;
-    }
-    
-    fDetInfo->detData.grapeDetEnergy[det] += edep;
-    fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
-    fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
-    
-    ////G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-    ////G4int pdgCode = thisDef->GetPDGEncoding();
-    ////G4int parentID = step->GetTrack()->GetParentID();
-    
-    ////if(fDetInfo->detData.grapeDetEnergy[0]>1.0 && fDetInfo->detData.grapeCryMul[det]>1) {
-    //if((eID==792148) || (eID==1093236) || (eID==2979399) || (eID==3404225) || (eID==5234192) || (eID==9274354) || (eID==9345518)  ) {
-    //  printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
-    //  printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
-    //  printf("egam det %f \n", fDetInfo->detData.grapeDetEnergy[0]);
-    //  printf("mul det %d, cry %d\n", fDetInfo->detData.grapeDetMul, fDetInfo->detData.grapeCryMul[0]);
-    //}
-    
-    
-    //}
+      G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+      G4int pdgCode = thisDef->GetPDGEncoding();
+      G4int parentID = step->GetTrack()->GetParentID();
+      
+      Bool_t newCrystal=false;
+      if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
+      
+      if( !( (newCrystal && parentID>0) && (TMath::Abs(pdgCode)==11) ) ){
+      
+        if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
+          fDetInfo->detData.grapeDetEnergy[det]=0.0;
+          fDetInfo->detData.grapeDetMul++;
+        }
+        if(TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){
+          fDetInfo->detData.grapeCryEnergy[det][cry]=0.0;
+          fDetInfo->detData.grapeCryMul[det]++;
+        }
+        if(TMath::IsNaN(fDetInfo->detData.grapeSegEnergy[det][cry][seg])){
+          fDetInfo->detData.grapeSegEnergy[det][cry][seg]=0.0;
+          fDetInfo->detData.grapeSegMul[det][cry]++;
+        }
+        
+        fDetInfo->detData.grapeDetEnergy[det] += edep;
+        fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
+        fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
+        
+        ////G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+        ////G4int pdgCode = thisDef->GetPDGEncoding();
+        ////G4int parentID = step->GetTrack()->GetParentID();
+        
+        ////if(fDetInfo->detData.grapeDetEnergy[0]>1.0 && fDetInfo->detData.grapeCryMul[det]>1) {
+        //if((eID==792148) || (eID==1093236) || (eID==2979399) || (eID==3404225) || (eID==5234192) || (eID==9274354) || (eID==9345518)  ) {
+        //  printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
+        //  printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+        //  printf("egam det %f \n", fDetInfo->detData.grapeDetEnergy[0]);
+        //  printf("mul det %d, cry %d\n", fDetInfo->detData.grapeDetMul, fDetInfo->detData.grapeCryMul[0]);
+        //}
+      
+      
+      }
 
 
 
     }
 
-  //} // cut on primary gammas
   } // IncludeGrape
   
      

@@ -104,8 +104,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
   G4double world_sizeXY = 2000*mm;
   G4double world_sizeZ  = 2000*mm;
-//  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
-  G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
+  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+//  G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
   
   G4Box* solidWorld =    
     new G4Box("World",                       //its name
@@ -350,22 +350,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -726,7 +710,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       G4VSolid *sGeSensitive = new G4Tubs("sGeCrystal",0.*mm,rmaxSD,20.*mm,
                                         0.*deg, 360.*deg);
       // cathode? 
-      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm,35.*mm,1.*mm,
+      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm,35.*mm,4.*mm,
                                         0.*deg, 360.*deg);
    
       //// Indium shield
