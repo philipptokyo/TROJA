@@ -710,7 +710,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       G4VSolid *sGeSensitive = new G4Tubs("sGeCrystal",0.*mm,rmaxSD,20.*mm,
                                         0.*deg, 360.*deg);
       // cathode? 
-      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm,35.*mm,4.*mm,
+      // todo: what is the material and thickness of the cathode?
+      // is there other material between the crystals?
+      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm,35.*mm,0.01*mm,
                                         0.*deg, 360.*deg);
    
       //// Indium shield
