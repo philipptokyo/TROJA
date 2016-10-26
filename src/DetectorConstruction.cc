@@ -819,6 +819,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                         lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps);
       new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
                         lHeadVacuum,false,0);
+                        //logicWorld,false,0);
       new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
                         lHeadVacuum,false,0, checkOverlaps);
       new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
@@ -832,7 +833,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       //   new G4PVPlacement(0,G4ThreeVector(0.,0.,-20.5*mm),lInShield,
       //                     "InShield",lHausing,false,0, checkOverlaps);
       ifstream fin;
-      fin.open("GeConfig.dat");
+      fin.open("/home/philipp/sim/troja/GeConfig.dat");
       if (!fin) {
         G4cerr << "*** Fatal Error: Cannot open GeConfig.dat ***" << G4endl;
         exit(0);

@@ -317,6 +317,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       seg-=10;
     }else{
       cry=0;
+      seg-=1; // start counting from 0
     }
     //id = segmentID + detectorID * 20;
      
@@ -327,14 +328,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       //printf("trackVolume %d in volume %s, found 'lSeg' at %d, edep, %f, det %d, cry %d, seg %d\n", trackVolume, volume->GetName().c_str(), (Int_t)contains, edep, det, cry, seg);
  
             
-      G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-      G4int pdgCode = thisDef->GetPDGEncoding();
-      G4int parentID = step->GetTrack()->GetParentID();
-      
-      Bool_t newCrystal=false;
-      if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
-      
-      if( !( (newCrystal && parentID>0) && (TMath::Abs(pdgCode)==11) ) ){
+      //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+      //G4int pdgCode = thisDef->GetPDGEncoding();
+      //G4int parentID = step->GetTrack()->GetParentID();
+      //
+      //Bool_t newCrystal=false;
+      //if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
+      //
+      //if( !( (newCrystal && parentID>0) && (TMath::Abs(pdgCode)==11) ) ){
       
         if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
           fDetInfo->detData.grapeDetEnergy[det]=0.0;
@@ -349,9 +350,18 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
           fDetInfo->detData.grapeSegMul[det][cry]++;
         }
         
-        fDetInfo->detData.grapeDetEnergy[det] += edep;
-        fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
+        //fDetInfo->detData.grapeDetEnergy[det] += edep;
+        //fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
         fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
+
+        //if(fDetInfo->detData.grapeSegEnergy[det][cry][seg]>0.1){
+        //  for(Int_t c=0; c<2; c++){
+        //  for(Int_t s=0; s<9; s++){
+        //    
+
+        //  }
+        //  }
+        //}
         
         ////G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
         ////G4int pdgCode = thisDef->GetPDGEncoding();
@@ -366,7 +376,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         //}
       
       
-      }
+      //}
 
 
 

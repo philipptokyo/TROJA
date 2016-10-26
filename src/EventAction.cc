@@ -105,6 +105,80 @@ void EventAction::EndOfEventAction(const G4Event* event)
   for(G4int d=0; d<maxDetectors; d++){
     detInfo->detData.energy[d] = detInfo->SmearEnergy(d, detInfo->detData.energyNotSmeared[d]);
   }
+  
+
+
+
+
+
+  //Bool_t printRes=false;
+  //if(detInfo->detData.grapeDetMul>0){
+  //  printf("\nHave before cuts:\n");
+  //  for(Int_t d=0; d<1; d++){
+  //    printf("Det mul %d, energy %f, ", detInfo->detData.grapeDetMul, detInfo->detData.grapeDetEnergy[d]);  
+  //    printf("Cry mul %d:\n", detInfo->detData.grapeCryMul[d]);
+  //    for(Int_t c=0; c<2; c++){
+  //      printf("Cry energy %f, seg mul %d: \n", detInfo->detData.grapeCryEnergy[d][c], detInfo->detData.grapeSegMul[d][c]);
+  //      for(Int_t s=0; s<9; s++){
+  //        printf("seg %d en %f, ", s, detInfo->detData.grapeSegEnergy[d][c][s]);
+  //      }
+  //      printf("\n");
+  //    }
+  //  }
+  //  printRes=true;
+  //}
+
+
+  for(Int_t d=0; d<1; d++){
+    if(detInfo->detData.grapeDetMul>0){
+      Double_t sumEnDet=0.0;
+      for(Int_t c=0; c<2; c++){
+        if(detInfo->detData.grapeCryMul[d]>0){
+          Double_t sumEnCry=0.0;
+          for(Int_t s=0; s<9; s++){
+            if(detInfo->detData.grapeSegEnergy[d][c][s]>0.1){
+              sumEnCry+=detInfo->detData.grapeSegEnergy[d][c][s];
+            }else{
+              if(!TMath::IsNaN(detInfo->detData.grapeSegEnergy[d][c][s])){
+                detInfo->detData.grapeSegEnergy[d][c][s]=0.0;
+                detInfo->detData.grapeSegMul[d][c]--;
+              }
+            }
+          }
+          if(sumEnCry>0.0){
+            detInfo->detData.grapeCryEnergy[d][c]=sumEnCry;
+            sumEnDet+=sumEnCry;
+          }else{
+            if(!TMath::IsNaN(detInfo->detData.grapeCryEnergy[d][c])){
+              detInfo->detData.grapeCryMul[d]--;
+            }
+          }
+        }
+      }
+      if(sumEnDet>0.0){
+        detInfo->detData.grapeDetEnergy[d]=sumEnDet;
+      }else{
+        if(!TMath::IsNaN(detInfo->detData.grapeDetEnergy[d])){
+          detInfo->detData.grapeDetMul--;
+        }
+      }
+    }
+  }
+
+  //if(printRes){
+  //  printf("Have after cuts:\n");
+  //  for(Int_t d=0; d<1; d++){
+  //    printf("Det mul %d, energy %f, ", detInfo->detData.grapeDetMul, detInfo->detData.grapeDetEnergy[d]);  
+  //    printf("Cry mul %d:\n", detInfo->detData.grapeCryMul[d]);
+  //    for(Int_t c=0; c<2; c++){
+  //      printf("Cry energy %f, seg mul %d: \n", detInfo->detData.grapeCryEnergy[d][c], detInfo->detData.grapeSegMul[d][c]);
+  //      for(Int_t s=0; s<9; s++){
+  //        printf("seg %d en %f, ", s, detInfo->detData.grapeSegEnergy[d][c][s]);
+  //      }
+  //      printf("\n");
+  //    }
+  //  }
+  //}
 
   outTree->Fill();
 
