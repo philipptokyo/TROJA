@@ -169,6 +169,7 @@ int main(int argc,char** argv)
     
   }
   else {
+    argc=1;
     // interactive mode : define UI session
 #ifdef G4UI_USE
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);

@@ -128,6 +128,20 @@ void EventAction::EndOfEventAction(const G4Event* event)
   //  printRes=true;
   //}
 
+  Double_t threshold[18][2][9]={{{0.0}}};
+
+  Double_t th0[9]={0.084, 0.092, 0.090, 
+                   0.091, 0.090, 0.092, 
+                   0.092, 0.087, 0.092};
+  Double_t th1[9]={0.064, 0.068, 0.063,
+                   0.070, 0.062, 0.068,
+                   0.069, 0.065, 0.066};
+
+  for(Int_t s=0; s<9; s++){
+    threshold[0][0][s]=th0[s];
+    threshold[0][1][s]=th1[s];
+  }
+
 
   for(Int_t d=0; d<1; d++){
     if(detInfo->detData.grapeDetMul>0){
@@ -136,7 +150,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
         if(detInfo->detData.grapeCryMul[d]>0){
           Double_t sumEnCry=0.0;
           for(Int_t s=0; s<9; s++){
-            if(detInfo->detData.grapeSegEnergy[d][c][s]>0.1){
+            if(detInfo->detData.grapeSegEnergy[d][c][s]>threshold[d][c][s]){ // apply threshold
               sumEnCry+=detInfo->detData.grapeSegEnergy[d][c][s];
             }else{
               if(!TMath::IsNaN(detInfo->detData.grapeSegEnergy[d][c][s])){
