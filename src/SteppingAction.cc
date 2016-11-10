@@ -152,17 +152,21 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   //  printf("\nEvent %d, edep %lf\n", eID, edep);
   //}
 
+  char tmpName[50];
   for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
-      char tmpName[50];
-      sprintf(tmpName, "logical%02d", d);
-      //printf("looking for %s\n", tmpName);
-      if(std::strcmp(volume->GetName(), tmpName)==0){
-        fDetInfo->detData.energyNotSmeared[d] += edep;
-        fDetInfo->detData.haveHit[d] = 1;
-        fDetInfo->detData.haveHitID[d] = d; // aux
-        //printf("EnergyDeposit in %s is %f\n", tmpName, edep);
-      }
+    sprintf(tmpName, "logical%02d", d);
+    //printf("looking for %s\n", tmpName);
+    if(std::strcmp(volume->GetName(), tmpName)==0){
+      fDetInfo->detData.energyNotSmeared[d] += edep;
+      fDetInfo->detData.haveHit[d] = 1;
+      fDetInfo->detData.haveHitID[d] = d; // aux
+      //printf("EnergyDeposit in %s is %f\n", tmpName, edep);
+    }
 
+  }
+
+  if(std::strcmp(volume->GetName(), "target_log")==0){
+    fDetInfo->detData.targetEnergyLoss += edep;
   }
   
   
@@ -310,11 +314,12 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     //  localPosition  = (localPreStepPosition + localPostStepPosition)/2.;
     //}      
     
-    det = preStepTouchable->GetReplicaNumber(3);
+    //det = preStepTouchable->GetReplicaNumber(3);
+    det = preStepTouchable->GetReplicaNumber(1);
     seg = preStepTouchable->GetReplicaNumber(0);
     if(seg>9){
       cry=1;
-      seg-=10;
+      seg-=11;
     }else{
       cry=0;
       seg-=1; // start counting from 0
@@ -322,20 +327,26 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     //id = segmentID + detectorID * 20;
      
     string materialname = volume->GetName();
+    //if(materialname=="World") cout << endl;
+    //cout << materialname << endl;
     size_t contains = materialname.find("lSeg");
     
     if( ((Int_t)contains > -1) && (edep>0.000)){
-      //printf("trackVolume %d in volume %s, found 'lSeg' at %d, edep, %f, det %d, cry %d, seg %d\n", trackVolume, volume->GetName().c_str(), (Int_t)contains, edep, det, cry, seg);
+    //if( ((Int_t)contains > -1) && (edep>0.15)){ // step limit 
+      
+      //printf("\npreStepTouchable->GetReplicaNumber %d %d %d %d\n", preStepTouchable->GetReplicaNumber(0), preStepTouchable->GetReplicaNumber(1), preStepTouchable->GetReplicaNumber(2), preStepTouchable->GetReplicaNumber(3));
+      //printf("track in volume %s, edep, %f, det %d, cry %d, seg %d\n", volume->GetName().c_str(), edep, det, cry, seg);
  
             
-      //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-      //G4int pdgCode = thisDef->GetPDGEncoding();
-      //G4int parentID = step->GetTrack()->GetParentID();
-      //
-      //Bool_t newCrystal=false;
-      //if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
-      //
-      //if( !( (newCrystal && parentID>0) && (TMath::Abs(pdgCode)==11) ) ){
+      G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+      G4int pdgCode = thisDef->GetPDGEncoding();
+      G4int parentID = step->GetTrack()->GetParentID();
+      
+      Bool_t newCrystal=false;
+      if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
+      
+      //if( !( (newCrystal && parentID>0) && (TMath::Abs(pdgCode)==11) ) ){ // exclude e- going from one crystal to the other
+      if( !( (newCrystal && parentID==1) && (TMath::Abs(pdgCode)==11) ) ){ // exclude e- going from one crystal to the other
       
         if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
           fDetInfo->detData.grapeDetEnergy[det]=0.0;
@@ -363,20 +374,19 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         //  }
         //}
         
-        ////G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
-        ////G4int pdgCode = thisDef->GetPDGEncoding();
-        ////G4int parentID = step->GetTrack()->GetParentID();
-        
+        //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+        //G4int pdgCode = thisDef->GetPDGEncoding();
+        //G4int parentID = step->GetTrack()->GetParentID();
+        //
         ////if(fDetInfo->detData.grapeDetEnergy[0]>1.0 && fDetInfo->detData.grapeCryMul[det]>1) {
-        //if((eID==792148) || (eID==1093236) || (eID==2979399) || (eID==3404225) || (eID==5234192) || (eID==9274354) || (eID==9345518)  ) {
         //  printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
-        //  printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+        //  //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
         //  printf("egam det %f \n", fDetInfo->detData.grapeDetEnergy[0]);
         //  printf("mul det %d, cry %d\n", fDetInfo->detData.grapeDetMul, fDetInfo->detData.grapeCryMul[0]);
-        //}
+        ////}
       
       
-      //}
+      }
 
 
 

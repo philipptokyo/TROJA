@@ -19,6 +19,7 @@
 #include "DetectorGlobals.hh"
 
 #include "TMath.h"
+//#include "TRandom3.h"
 
 using namespace G4Root;
 
@@ -42,6 +43,11 @@ EventAction::EventAction()
   fPrintModulo(100000)
 { 
   fgInstance = this;
+
+  fRandomizer = new TRandom3();
+  fRandomizer->SetSeed(0);
+
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -143,13 +149,15 @@ void EventAction::EndOfEventAction(const G4Event* event)
   }
 
 
-  for(Int_t d=0; d<1; d++){
+  for(Int_t d=0; d<18; d++){
     if(detInfo->detData.grapeDetMul>0){
       Double_t sumEnDet=0.0;
       for(Int_t c=0; c<2; c++){
         if(detInfo->detData.grapeCryMul[d]>0){
           Double_t sumEnCry=0.0;
           for(Int_t s=0; s<9; s++){
+            detInfo->detData.grapeSegEnergy[d][c][s] = fRandomizer->Gaus(detInfo->detData.grapeSegEnergy[d][c][s], 0.0); // no
+            //detInfo->detData.grapeSegEnergy[d][c][s] = fRandomizer->Gaus(detInfo->detData.grapeSegEnergy[d][c][s], 0.002); // 2 keV
             if(detInfo->detData.grapeSegEnergy[d][c][s]>threshold[d][c][s]){ // apply threshold
               sumEnCry+=detInfo->detData.grapeSegEnergy[d][c][s];
             }else{

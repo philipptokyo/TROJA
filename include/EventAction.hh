@@ -9,6 +9,7 @@
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
+#include "TRandom3.h"
 
 class SteppingAction;
 
@@ -34,6 +35,7 @@ class EventAction : public G4UserEventAction
     static EventAction* fgInstance;  
 
     G4int     fPrintModulo;
+    TRandom3 *fRandomizer;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

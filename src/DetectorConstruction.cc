@@ -104,8 +104,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
   G4double world_sizeXY = 2000*mm;
   G4double world_sizeZ  = 2000*mm;
-  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
-//  G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
+  //G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
   
   G4Box* solidWorld =    
     new G4Box("World",                       //its name
@@ -128,15 +128,34 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
  
   
 
-                    
+  
+  G4Material* fTarget;
+    
+  G4Element* C = new G4Element("Carbon", "C", 6., 12.01*g/mole);
+  G4Element* D = new G4Element("Deuterium", "D", 1., 2.01*g/mole);
+  G4Material* fCD2 = new G4Material("CD2", 0.88*g/cm3, 2);
+  fCD2->AddElement(C, .333);
+  fCD2->AddElement(D, .667);
 
-  //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
-  //G4Material* fIron    = nist->FindOrBuildMaterial("G4_Fe");
-  //G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
-  //G4Material* fPE    = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
-  G4Material* fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
+  printf("Building %s target\n", fDetInfo->GetTargetMaterial().c_str());
+  
+  if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
 
+    fTarget = fCD2;
 
+  }else{
+
+    //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
+    //G4Material* fIron    = nist->FindOrBuildMaterial("G4_Fe");
+    //G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
+    //G4Material* fPE    = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+    //G4Material* fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
+    
+    fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
+
+  }
+  
+  G4Material* fCarbon    = nist->FindOrBuildMaterial("G4_C");
 
   //------------------- Target-----------------------------
   
@@ -148,6 +167,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //G4Box* solidTarget = new G4Box("tgt_box", 60*0.5*mm, 60*0.5*mm, 0.00100*2.65*mm);  //5.3um
   //G4Box* solidTarget = new G4Box("tgt_box", 60*0.5*mm, 60*0.5*mm, 0.00100*0.1*0.5*mm);  //0.1um
   G4Box* solidTarget = new G4Box("tgt_box", fDetInfo->GetTargetSize(0)*0.5*mm, fDetInfo->GetTargetSize(1)*0.5*mm, fDetInfo->GetTargetSize(2)*0.5*mm); 
+
+  printf("Target material is %s\n", fTarget->GetName().c_str());
 
     //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fCarbon, "target_log");
     //G4LogicalVolume* logicTarget = new G4LogicalVolume(solidTarget, fPE, "target_log");
@@ -321,11 +342,17 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       //G4VisAttributes* visAttBeamPipe = new G4VisAttributes(G4Colour(2.0,2.0,2.0));
       
       for(G4int b=0; b<beamPipeSegments; b++){
+      //for(G4int b=0; b<1; b++){
+        
+        rotBeamPipe[b] = new G4RotationMatrix();
 
         //printf("placing beam pipe to %lf %lf %lf\n", posBeamPipe[b][0], posBeamPipe[b][1], posBeamPipe[b][2]);
 
-        sBeamPipeTubs[b]= new G4Tubs(Form("sBeamPipeTubs%d", b), sizeBeamPipe[b][0]*mm, sizeBeamPipe[b][1]*mm, sizeBeamPipe[b][2]/2.0*mm, 0*deg, 360*deg);
-        lBeamPipeTubs[b] = new G4LogicalVolume(sBeamPipeTubs[b],nist->FindOrBuildMaterial("G4_Al"), Form("lBeamPipeTubs%d", b));
+        sprintf(tmpName, "sBeamPipeTubs%d", b);
+        sBeamPipeTubs[b]= new G4Tubs(tmpName, sizeBeamPipe[b][0]*mm, sizeBeamPipe[b][1]*mm, sizeBeamPipe[b][2]/2.0*mm, 0*deg, 360*deg);
+        
+        sprintf(tmpName, "lBeamPipeTubs%d", b);
+        lBeamPipeTubs[b] = new G4LogicalVolume(sBeamPipeTubs[b],nist->FindOrBuildMaterial("G4_Al"), tmpName);
         //lBeamPipeTubs[0]->SetVisAttributes(visAttBeamPipe);
 
 //        vBeamPipe[b].set(posBeamPipe[b][0], posBeamPipe[b][1], posBeamPipe[b][2]);
@@ -343,7 +370,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                           tmpName,
                           logicWorld, 
                           false, 
-                          1, 
+                          0, 
                           checkOverlaps
                           );
 
@@ -588,16 +615,28 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       G4cout << "Cu: " << Cu->GetIonisation()->GetMeanExcitationEnergy()/eV << G4endl;
    
       // hexagonal hausing
-      G4VSolid *sHausingHexBase;
+      G4VSolid *sHausingHexBase1; // outer
       {
         const G4int nz = 2;
         const G4int nss = 6;
         G4double z[nz]   = {-32.5*mm, 32.5*mm};
         G4double rin[nz] = {0.*mm, 0.*mm};
         G4double rout[nz] = {50.*mm, 50.*mm};
-        sHausingHexBase = new G4Polyhedra("sHausingHexBase", 30.*deg, 360.*deg,
+        sHausingHexBase1 = new G4Polyhedra("sHausingHexBase1", 30.*deg, 360.*deg,
                                        nss, nz, z, rin, rout);
       }
+      G4VSolid *sHausingHexBase2; // inner, -2 mm???
+      {
+        const G4int nz = 2;
+        const G4int nss = 6;
+        G4double z[nz]   = {-30.5*mm, 30.5*mm};
+        G4double rin[nz] = {0.*mm, 0.*mm};
+        G4double rout[nz] = {48.*mm, 48.*mm};
+        sHausingHexBase2 = new G4Polyhedra("sHausingHexBase2", 30.*deg, 360.*deg,
+                                       nss, nz, z, rin, rout);
+      }
+      G4VSolid *sHausingHexBase = new G4SubtractionSolid("sHausingHexBase", sHausingHexBase1, sHausingHexBase2);
+
       // trd hausing
       G4VSolid *sHausingTrd =
          new G4Trd("sHausingTrd",28.*mm,28.*mm,
@@ -629,6 +668,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       }
       G4VSolid *sHausing =
          new G4UnionSolid("sHausing",sHausingHex,sPreAmpHausing,
+//         new G4UnionSolid("sHausing",sHausingHexBase,sPreAmpHausing,
+//         new G4UnionSolid("sHausing",sHausingTrd,sPreAmpHausing,
                           G4Transform3D(rmY90,G4ThreeVector()));
    
       // vacuum
@@ -703,16 +744,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                                        0.*deg,360.*deg);
    
       // Ge Grystal
-      G4VSolid *sGeCrystal = new G4Tubs("sGeCrystal",0.*mm,35.*mm,20.*mm,
+      G4VSolid *sGeCrystal = new G4Tubs("sGeCrystal",0.*mm,35.*mm,23.*mm,
                                         0.*deg, 360.*deg);
       // Ge segment
+      //G4double rmaxSD = 32.*mm; // orig
       G4double rmaxSD = 32.*mm;
+      //G4VSolid *sGeSensitive = new G4Tubs("sGeCrystal",0.*mm,rmaxSD,20.*mm, // orig
       G4VSolid *sGeSensitive = new G4Tubs("sGeCrystal",0.*mm,rmaxSD,20.*mm,
                                         0.*deg, 360.*deg);
       // cathode? 
       // todo: what is the material and thickness of the cathode?
       // is there other material between the crystals?
-      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm,35.*mm,0.01*mm,
+      G4VSolid *sGeCathode = new G4Tubs("sGeCathode",0.*mm, rmaxSD,0.1*mm,
                                         0.*deg, 360.*deg);
    
       //// Indium shield
@@ -722,9 +765,16 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
          
       // logical volumes
       G4LogicalVolume *lHausing =
-         new G4LogicalVolume(sHausing,Al,"lHausing",0,0,0);
-      G4LogicalVolume *lHeadVacuum = 
-         new G4LogicalVolume(sHeadVacuum,Vacuum,"lHeadVacuum",0,0,0);
+//         new G4LogicalVolume(sHausing,Al,"lHausing",0,0,0);
+         new G4LogicalVolume(sHausingHexBase1,Al,"lHausing",0,0,0);
+      
+      G4VisAttributes *hausingVisAtt = new G4VisAttributes();
+      hausingVisAtt->SetForceWireframe(true);
+      lHausing->SetVisAttributes(hausingVisAtt);
+
+//      G4LogicalVolume *lHeadVacuum = 
+//         new G4LogicalVolume(sHeadVacuum,Vacuum,"lHeadVacuum",0,0,0);
+//      lHeadVacuum->SetVisAttributes(hausingVisAtt);
       G4LogicalVolume *lPreAmpVacuum =
          new G4LogicalVolume(sPreAmpVacuum,Vacuum,"lPreAmpVacuum",0,0,0);
       G4LogicalVolume *lInnerDewar =
@@ -737,12 +787,20 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
          new G4LogicalVolume(sColdFinger,Cu,"lColdFinger",0,0,0);
       G4LogicalVolume *lColdCase =
          new G4LogicalVolume(sColdCase,Al,"lColdCase",0,0,0);
+      lColdCase->SetVisAttributes(hausingVisAtt);
+
       G4LogicalVolume *lGeCrystal =
-         new G4LogicalVolume(sGeCrystal,Ge,"lGeCrystal",0,0,0);
+         //new G4LogicalVolume(sGeCrystal,Ge,"lGeCrystal",0,0,0);
+         new G4LogicalVolume(sGeCrystal,Vacuum,"lGeCrystal",0,0,0);
+      lGeCrystal->SetVisAttributes(hausingVisAtt);
       G4LogicalVolume *lGeCathode =
-         new G4LogicalVolume(sGeCathode,Al,"lGeCathode",0,0,0);
+         new G4LogicalVolume(sGeCathode,fCarbon,"lGeCathode",0,0,0);
       //G4LogicalVolume *lInShield =
       //   new G4LogicalVolume(sInShield,In,"lInShield",0,0,0);
+      new G4PVPlacement(0,G4ThreeVector(0,0,0),lGeCathode, "pCathode",
+                        lGeCrystal,false,0, checkOverlaps);
+                        //logicWorld,false,0, checkOverlaps);
+                        //lHausing,false,0, checkOverlaps);
       
       // Segment location
       G4double offs = 20.*mm + (rmaxSD-30.*mm)/2.;
@@ -788,6 +846,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
           sSegBox = new G4Box("sSegBox",defaultLength,defaultLength,defaultLength);
         }
    
+        //if(i%2==0){
         char sName[20],lName[20],pName[20];
         sprintf(sName,"sSeg%02d",(i<9?i+1:i+2));
         sprintf(lName,"lSeg%02d",(i<9?i+1:i+2));
@@ -796,14 +855,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
            new G4IntersectionSolid(sName,sGeSensitive,sSegBox,0,segPos[i]);
         G4LogicalVolume *lSeg =new G4LogicalVolume(sSeg,Ge,lName,0,0,0);
         //lSeg->SetSensitiveDetector(fGRAPESD);
-        
         new G4PVPlacement(0,G4ThreeVector(),lSeg,pName,
                           lGeCrystal,true,(i<9?i+1:i+2), checkOverlaps);
                           //logicWorld,true,(i<9?i+1:i+2), checkOverlaps);
+                          //lHausing,true,(i<9?i+1:i+2), checkOverlaps);
+        //}
       }
-      new G4PVPlacement(0,G4ThreeVector(0,0,0),lGeCathode, "pCathode",
-                        lGeCrystal,false,0, checkOverlaps);
-                        //logicWorld,false,0, checkOverlaps);
       //   G4LogicalVolume *lGeSensitive =
       //      new G4LogicalVolume(sGeSensitive,Ge,"lGeSensitive",0,0,0);
       //   new G4PVPlacement(G4Transform3D(),lGeSensitive,"GeSensitive",lGeCrystal,
@@ -811,25 +868,29 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       //   lGeSensitive->SetSensitiveDetector(fGRAPESD);
    
       // visualize
-      lDewarColor->SetVisAttributes(new G4VisAttributes(G4Colour(0.71,0.93,0.71)));
+//      lDewarColor->SetVisAttributes(new G4VisAttributes(G4Colour(0.71,0.93,0.71)));
    
       // placements
-      new G4PVPlacement(0,G4ThreeVector(),lLiquid,"Liquid",lInnerDewar,false,0, checkOverlaps);
-      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
-                        lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps);
+//      new G4PVPlacement(0,G4ThreeVector(),lLiquid,"Liquid",lInnerDewar,false,0, checkOverlaps);
+//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
+//                        //lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps); // orig
+//                        lInnerDewar,"InnerDewar",lHausing,false,0, checkOverlaps);
       new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
-                        lHeadVacuum,false,0);
-                        //logicWorld,false,0);
-      new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
-                        lHeadVacuum,false,0, checkOverlaps);
-      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
-                        lColdFinger,"ColdFinger",lHeadVacuum,false,0, checkOverlaps);
-      new G4PVPlacement(0,G4ThreeVector(),lHeadVacuum,"HeadVacuum",
-                        lHausing,false,0, checkOverlaps);
-      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
-                        lPreAmpVacuum,"PreAmpVacuum",lHausing,false,0);
-      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
-                        lDewarColor,"DewarColor",lHausing,false,0, checkOverlaps);
+                        //lHeadVacuum,false,0); // orig
+                        lHausing,false,0,checkOverlaps);
+                        //logicWorld,false,0,checkOverlaps);
+//      new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
+//                        //lHeadVacuum,false,0, checkOverlaps); // orig
+//                        lHausing,false,0, checkOverlaps);
+//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
+//                        //lColdFinger,"ColdFinger",lHeadVacuum,false,0, checkOverlaps); // orig
+//                        lColdFinger,"ColdFinger",lHausing,false,0, checkOverlaps);
+////      new G4PVPlacement(0,G4ThreeVector(),lHeadVacuum,"HeadVacuum",
+////                        lHausing,false,0, checkOverlaps);
+//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
+//                        lPreAmpVacuum,"PreAmpVacuum",lHausing,false,0);
+//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
+//                        lDewarColor,"DewarColor",lHausing,false,0, checkOverlaps);
       //   new G4PVPlacement(0,G4ThreeVector(0.,0.,-20.5*mm),lInShield,
       //                     "InShield",lHausing,false,0, checkOverlaps);
       ifstream fin;

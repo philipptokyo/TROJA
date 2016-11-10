@@ -75,6 +75,8 @@ typedef struct _dat
   //Int_t grapeCrystal;
   //Int_t grapeSegment;
 
+  Double_t targetEnergyLoss; // for debugging only
+
 } dat;
 
 

@@ -98,6 +98,8 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   sprintf(tmpName, "grapeSegEnergy[%d][%d][%d]/D", grapeMaxDet, grapeMaxCry, grapeMaxSeg);
   fOutTree->Branch("grapeSegEnergy", (fDetInfo->detData.grapeSegEnergy), tmpName); // ID of the detector with the first interaction point
 
+  fOutTree->Branch("targetEnergyLoss", &(fDetInfo->detData.targetEnergyLoss), "targetEnergyLoss/D"); 
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

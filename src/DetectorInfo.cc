@@ -120,6 +120,8 @@ void DetectorInfo::ResetData()
   //detData.grapeCrystal=-1;
   //detData.grapeSegment=-1;
 
+  detData.targetEnergyLoss=0.0;
+
 }
 
 
