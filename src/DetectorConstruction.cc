@@ -313,14 +313,20 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
     if(fDetInfo->IncludeBeamPipe()){
       
-      const G4int beamPipeSegments=3;
+      const G4int beamPipeSegments=1;
+      //const G4int beamPipeSegments=3;
       G4double sizeBeamPipe[beamPipeSegments][3]={{0.0}};
       G4double posBeamPipe[beamPipeSegments][3]={{0.0}};
       
       sizeBeamPipe[0][0] = 150.0;
-      sizeBeamPipe[0][1] = 155.0;
-      sizeBeamPipe[0][2] = 300.0;
+      sizeBeamPipe[0][1] = 160.0;
+      sizeBeamPipe[0][2] = 600.0;
       posBeamPipe[0][2] = -145.0;
+
+      //sizeBeamPipe[0][0] = 150.0;
+      //sizeBeamPipe[0][1] = 155.0;
+      //sizeBeamPipe[0][2] = 300.0;
+      //posBeamPipe[0][2] = -145.0;
 
       sizeBeamPipe[1][0] = 75.0;
       sizeBeamPipe[1][1] = sizeBeamPipe[0][1];
@@ -339,7 +345,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       
 //      G4ThreeVector vBeamPipe[beamPipeSegments];
       G4RotationMatrix* rotBeamPipe[beamPipeSegments];
-      //G4VisAttributes* visAttBeamPipe = new G4VisAttributes(G4Colour(2.0,2.0,2.0));
+      G4VisAttributes* visAttBeamPipe = new G4VisAttributes(G4Colour(2.0,2.0,2.0));
       
       for(G4int b=0; b<beamPipeSegments; b++){
       //for(G4int b=0; b<1; b++){
@@ -353,7 +359,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         
         sprintf(tmpName, "lBeamPipeTubs%d", b);
         lBeamPipeTubs[b] = new G4LogicalVolume(sBeamPipeTubs[b],nist->FindOrBuildMaterial("G4_Al"), tmpName);
-        //lBeamPipeTubs[0]->SetVisAttributes(visAttBeamPipe);
+        lBeamPipeTubs[0]->SetVisAttributes(visAttBeamPipe);
 
 //        vBeamPipe[b].set(posBeamPipe[b][0], posBeamPipe[b][1], posBeamPipe[b][2]);
         //rotBeamPipe[0].rotateX(90.0*deg);
@@ -625,17 +631,17 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         sHausingHexBase1 = new G4Polyhedra("sHausingHexBase1", 30.*deg, 360.*deg,
                                        nss, nz, z, rin, rout);
       }
-      G4VSolid *sHausingHexBase2; // inner, -2 mm???
-      {
-        const G4int nz = 2;
-        const G4int nss = 6;
-        G4double z[nz]   = {-30.5*mm, 30.5*mm};
-        G4double rin[nz] = {0.*mm, 0.*mm};
-        G4double rout[nz] = {48.*mm, 48.*mm};
-        sHausingHexBase2 = new G4Polyhedra("sHausingHexBase2", 30.*deg, 360.*deg,
-                                       nss, nz, z, rin, rout);
-      }
-      G4VSolid *sHausingHexBase = new G4SubtractionSolid("sHausingHexBase", sHausingHexBase1, sHausingHexBase2);
+//      G4VSolid *sHausingHexBase2; // inner, -2 mm???
+//      {
+//        const G4int nz = 2;
+//        const G4int nss = 6;
+//        G4double z[nz]   = {-30.5*mm, 30.5*mm};
+//        G4double rin[nz] = {0.*mm, 0.*mm};
+//        G4double rout[nz] = {48.*mm, 48.*mm};
+//        sHausingHexBase2 = new G4Polyhedra("sHausingHexBase2", 30.*deg, 360.*deg,
+//                                       nss, nz, z, rin, rout);
+//      }
+//      G4VSolid *sHausingHexBase = new G4SubtractionSolid("sHausingHexBase", sHausingHexBase1, sHausingHexBase2);
 
       // trd hausing
       G4VSolid *sHausingTrd =
@@ -644,8 +650,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       // hausing hex 
       G4RotationMatrix rmY90;
       rmY90.rotateY(90.*deg);
+
       G4VSolid *sHausingHex =
-         new G4UnionSolid("sHausingHex",sHausingHexBase,sHausingTrd,
+         //new G4UnionSolid("sHausingHex",sHausingHexBase,sHausingTrd,
+         new G4UnionSolid("sHausingHex",sHausingHexBase1,sHausingTrd,
                           G4Transform3D(rmY90,G4ThreeVector(30.*mm,0.,0.)));
       // hausing pre-amp.
       G4VSolid *sPreAmpHausing;
@@ -667,39 +675,60 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                                         nz, z, rin, rout);
       }
       G4VSolid *sHausing =
-         new G4UnionSolid("sHausing",sHausingHex,sPreAmpHausing,
-//         new G4UnionSolid("sHausing",sHausingHexBase,sPreAmpHausing,
+         new G4UnionSolid("sHausing",sHausingHex,sPreAmpHausing, // orig
+//         new G4UnionSolid("sHausing",sHausingHexBase1,sPreAmpHausing,
 //         new G4UnionSolid("sHausing",sHausingTrd,sPreAmpHausing,
                           G4Transform3D(rmY90,G4ThreeVector()));
    
       // vacuum
-      G4VSolid *sHeadVacuumBase;
+//      G4VSolid *sHeadVacuumBase;
+//      {
+//        const G4int nz = 10 ;
+//        G4double z[nz] = 
+//           { -31.5*mm, -26.5*mm, -26.5*mm, -21.5*mm, -21.5*mm,
+//             21.5*mm, 21.5*mm, 26.5*mm,26.5*mm,31.5*mm };
+//        G4double rin[nz] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. };
+//        G4double rout[nz] = 
+//           { 44.5*mm, 44.5*mm, 45.5*mm, 45.5*mm, 48.5*mm,
+//             48.5*mm, 45.5*mm, 45.5*mm, 44.5*mm, 44.5*mm };
+//        sHeadVacuumBase = new G4Polycone("sHeadVacuumBase",0.*deg, 360.*deg,
+//                                     nz, z, rin, rout);
+//      }
+//      G4VSolid *sHeadVacuumMid;
+//      {
+//        const G4int nz = 7;
+//        G4double z[nz] = { 0.*mm, 100.*mm, 150.*mm, 150.*mm, 345.*mm, 
+//                           345.*mm, 602.*mm};
+//        G4double rin[nz] = {0., 0., 0., 0., 0., 0., 0.,};
+//        G4double rout[nz] = { 17.*mm, 17.*mm, 46.25*mm, 17.*mm, 17.*mm,
+//                              106.*mm, 106.*mm};
+//        sHeadVacuumMid = new G4Polycone("sHeadVacuumMid",0.*deg, 360.*deg,
+//                                        nz, z, rin, rout);
+//      }
+//      G4VSolid *sHeadVacuum =
+//        new G4UnionSolid("sHeadVacuum",sHeadVacuumBase, sHeadVacuumMid, // orig
+//        //new G4UnionSolid("sHeadVacuum",sHeadVacuumBase, sHeadVacuumMid,
+//                         G4Transform3D(rmY90,G4ThreeVector()));
+      
+      
+      G4VSolid *sHeadVacuum; // same as sHauseingHexBase2 
       {
-        const G4int nz = 10 ;
-        G4double z[nz] = 
-           { -31.5*mm, -26.5*mm, -26.5*mm, -21.5*mm, -21.5*mm,
-             21.5*mm, 21.5*mm, 26.5*mm,26.5*mm,31.5*mm };
-        G4double rin[nz] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. };
-        G4double rout[nz] = 
-           { 44.5*mm, 44.5*mm, 45.5*mm, 45.5*mm, 48.5*mm,
-             48.5*mm, 45.5*mm, 45.5*mm, 44.5*mm, 44.5*mm };
-        sHeadVacuumBase = new G4Polycone("sHeadVacuumBase",0.*deg, 360.*deg,
-                                     nz, z, rin, rout);
+        const G4int nz = 2;
+        const G4int nss = 6;
+        G4double z[nz]   = {-30.5*mm, 30.5*mm};
+        G4double rin[nz] = {0.*mm, 0.*mm};
+        G4double rout[nz] = {48.*mm, 48.*mm};
+        sHeadVacuum = new G4Polyhedra("sHeadVacuum", 30.*deg, 360.*deg,
+                                       nss, nz, z, rin, rout);
       }
-      G4VSolid *sHeadVacuumMid;
-      {
-        const G4int nz = 7;
-        G4double z[nz] = { 0.*mm, 100.*mm, 150.*mm, 150.*mm, 345.*mm, 
-                           345.*mm, 602.*mm};
-        G4double rin[nz] = {0., 0., 0., 0., 0., 0., 0.,};
-        G4double rout[nz] = { 17.*mm, 17.*mm, 46.25*mm, 17.*mm, 17.*mm,
-                              106.*mm, 106.*mm};
-        sHeadVacuumMid = new G4Polycone("sHeadVacuumMid",0.*deg, 360.*deg,
-                                        nz, z, rin, rout);
-      }
-      G4VSolid *sHeadVacuum =
-        new G4UnionSolid("sHeadVacuum",sHeadVacuumBase, sHeadVacuumMid,
-                         G4Transform3D(rmY90,G4ThreeVector()));
+      
+      
+      
+      
+      
+      
+      
+      
       G4VSolid *sPreAmpVacuum;
       {
         const G4int nz = 10;
@@ -765,16 +794,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
          
       // logical volumes
       G4LogicalVolume *lHausing =
-//         new G4LogicalVolume(sHausing,Al,"lHausing",0,0,0);
-         new G4LogicalVolume(sHausingHexBase1,Al,"lHausing",0,0,0);
+         new G4LogicalVolume(sHausing,Al,"lHausing",0,0,0);
+         //new G4LogicalVolume(sHausingHexBase1,Al,"lHausing",0,0,0);
       
       G4VisAttributes *hausingVisAtt = new G4VisAttributes();
       hausingVisAtt->SetForceWireframe(true);
-      lHausing->SetVisAttributes(hausingVisAtt);
+      
+      
+//      lHausing->SetVisAttributes(hausingVisAtt);
 
-//      G4LogicalVolume *lHeadVacuum = 
-//         new G4LogicalVolume(sHeadVacuum,Vacuum,"lHeadVacuum",0,0,0);
-//      lHeadVacuum->SetVisAttributes(hausingVisAtt);
+      G4LogicalVolume *lHeadVacuum = 
+         new G4LogicalVolume(sHeadVacuum,Vacuum,"lHeadVacuum",0,0,0);
+      lHeadVacuum->SetVisAttributes(hausingVisAtt);
       G4LogicalVolume *lPreAmpVacuum =
          new G4LogicalVolume(sPreAmpVacuum,Vacuum,"lPreAmpVacuum",0,0,0);
       G4LogicalVolume *lInnerDewar =
@@ -792,7 +823,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       G4LogicalVolume *lGeCrystal =
          //new G4LogicalVolume(sGeCrystal,Ge,"lGeCrystal",0,0,0);
          new G4LogicalVolume(sGeCrystal,Vacuum,"lGeCrystal",0,0,0);
-      lGeCrystal->SetVisAttributes(hausingVisAtt);
+      //lGeCrystal->SetVisAttributes(hausingVisAtt);
       G4LogicalVolume *lGeCathode =
          new G4LogicalVolume(sGeCathode,fCarbon,"lGeCathode",0,0,0);
       //G4LogicalVolume *lInShield =
@@ -868,29 +899,29 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       //   lGeSensitive->SetSensitiveDetector(fGRAPESD);
    
       // visualize
-//      lDewarColor->SetVisAttributes(new G4VisAttributes(G4Colour(0.71,0.93,0.71)));
+      lDewarColor->SetVisAttributes(new G4VisAttributes(G4Colour(0.71,0.93,0.71)));
    
       // placements
-//      new G4PVPlacement(0,G4ThreeVector(),lLiquid,"Liquid",lInnerDewar,false,0, checkOverlaps);
-//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
-//                        //lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps); // orig
-//                        lInnerDewar,"InnerDewar",lHausing,false,0, checkOverlaps);
+      new G4PVPlacement(0,G4ThreeVector(),lLiquid,"Liquid",lInnerDewar,false,0, checkOverlaps);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
+                        //lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps); // orig
+                        lInnerDewar,"InnerDewar",lHausing,false,0, checkOverlaps);
       new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
-                        //lHeadVacuum,false,0); // orig
-                        lHausing,false,0,checkOverlaps);
-                        //logicWorld,false,0,checkOverlaps);
-//      new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
-//                        //lHeadVacuum,false,0, checkOverlaps); // orig
-//                        lHausing,false,0, checkOverlaps);
-//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
-//                        //lColdFinger,"ColdFinger",lHeadVacuum,false,0, checkOverlaps); // orig
-//                        lColdFinger,"ColdFinger",lHausing,false,0, checkOverlaps);
-////      new G4PVPlacement(0,G4ThreeVector(),lHeadVacuum,"HeadVacuum",
-////                        lHausing,false,0, checkOverlaps);
-//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
-//                        lPreAmpVacuum,"PreAmpVacuum",lHausing,false,0);
-//      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
-//                        lDewarColor,"DewarColor",lHausing,false,0, checkOverlaps);
+                      lHeadVacuum,false,0,checkOverlaps); // orig
+                      //lHausing,false,0,checkOverlaps);
+                      //logicWorld,false,0,checkOverlaps);
+      new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
+                        lHeadVacuum,false,0, checkOverlaps); // orig
+                        //lHausing,false,0, checkOverlaps);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
+                        //lColdFinger,"ColdFinger",lHeadVacuum,false,0, checkOverlaps); // orig
+                        lColdFinger,"ColdFinger",lHausing,false,0, checkOverlaps);
+      new G4PVPlacement(0,G4ThreeVector(),lHeadVacuum,"HeadVacuum",
+                        lHausing,false,0, checkOverlaps);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector()),
+                        lPreAmpVacuum,"PreAmpVacuum",lHausing,false,0);
+      new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
+                        lDewarColor,"DewarColor",lHausing,false,0, checkOverlaps);
       //   new G4PVPlacement(0,G4ThreeVector(0.,0.,-20.5*mm),lInShield,
       //                     "InShield",lHausing,false,0, checkOverlaps);
       ifstream fin;

@@ -315,7 +315,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     //}      
     
     //det = preStepTouchable->GetReplicaNumber(3);
-    det = preStepTouchable->GetReplicaNumber(1);
+    det = preStepTouchable->GetReplicaNumber(2);
     seg = preStepTouchable->GetReplicaNumber(0);
     if(seg>9){
       cry=1;
