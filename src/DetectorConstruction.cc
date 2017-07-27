@@ -137,6 +137,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   fCD2->AddElement(C, .333);
   fCD2->AddElement(D, .667);
 
+  G4Element* Ti = new G4Element("Titanium", "Ti", 22., 47.867*g/mole);
+  G4Material* fTiD2 = new G4Material("TiD2", 3.75*g/cm3, 2);
+  fTiD2->AddElement(Ti, .333);
+  fTiD2->AddElement(D, .667);
+
   printf("Building %s target\n", fDetInfo->GetTargetMaterial().c_str());
   
   if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
@@ -197,6 +202,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     fCsI->AddElement(I, .5);
     fCsI->AddElement(Cs, .5);
     
+    G4Material* fAl = nist->FindOrBuildMaterial("G4_Al");
 
     G4int noOfDet = fDetInfo->GetNoOfDetectors();
     
@@ -244,7 +250,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
           logical[d] = new G4LogicalVolume(box[d], fCsI, tmpName);
         }
 
-      } else if( strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0 ){
+      } else if( (strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0) ||
+                 (strcmp(fDetInfo->GetType(d).data(), "CsItube")==0) ||
+                 (strcmp(fDetInfo->GetType(d).data(), "Altube")==0) 
+               ){
 
     //    G4ThreeVector vCen(1.0, 0.0, 0.0); // vector through center of detector
         G4ThreeVector vRot(1.0, 0.0, 0.0); // rotation vector
@@ -273,7 +282,16 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         tube[d] = new G4Tubs(tmpName, size[d][0], size[d][1], size[d][2], size[d][3], size[d][4]);
         
         sprintf(tmpName, "logical%02d", d);
-        logical[d] = new G4LogicalVolume(tube[d], fSilicon, tmpName);
+        if(strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0){
+          logical[d] = new G4LogicalVolume(tube[d], fSilicon, tmpName);
+        }else if(strcmp(fDetInfo->GetType(d).data(), "CsItube")==0){
+          logical[d] = new G4LogicalVolume(tube[d], fCsI, tmpName);
+        }else if(strcmp(fDetInfo->GetType(d).data(), "Altube")==0){
+          logical[d] = new G4LogicalVolume(tube[d], fAl, tmpName);
+        }else{
+          printf("Error in detector construction. But this should not happen.\n");
+          abort();
+        }
 
       } else {
         printf("Error in detector construction: unknown type '%s' (id %d)\n", fDetInfo->GetType(d).data(), d);
@@ -313,31 +331,59 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
     if(fDetInfo->IncludeBeamPipe()){
       
-      const G4int beamPipeSegments=1;
-      //const G4int beamPipeSegments=3;
+      //const G4int beamPipeSegments=1;
+      const G4int beamPipeSegments=3;
       G4double sizeBeamPipe[beamPipeSegments][3]={{0.0}};
       G4double posBeamPipe[beamPipeSegments][3]={{0.0}};
       
-      sizeBeamPipe[0][0] = 150.0;
-      sizeBeamPipe[0][1] = 160.0;
-      sizeBeamPipe[0][2] = 600.0;
-      posBeamPipe[0][2] = -145.0;
-
-      //sizeBeamPipe[0][0] = 150.0;
-      //sizeBeamPipe[0][1] = 155.0;
-      //sizeBeamPipe[0][2] = 300.0;
+      //sizeBeamPipe[0][0] = 158.0;
+      //sizeBeamPipe[0][1] = 162.0;
+      //sizeBeamPipe[0][2] = 600.0;
       //posBeamPipe[0][2] = -145.0;
 
-      sizeBeamPipe[1][0] = 75.0;
+      
+      // option 1 files _34
+      //sizeBeamPipe[0][0] = 158.0;
+      sizeBeamPipe[0][0] = 156.0;
+      sizeBeamPipe[0][1] = 162.0;
+      sizeBeamPipe[0][2] = 310.0;
+      posBeamPipe[0][2] = -150.0;
+
+      sizeBeamPipe[1][0] = 49.0;
       sizeBeamPipe[1][1] = sizeBeamPipe[0][1];
       sizeBeamPipe[1][2] = 5.0;
       posBeamPipe[1][2] = 7.5;
       
       sizeBeamPipe[2][0] = sizeBeamPipe[1][0];
-      sizeBeamPipe[2][1] = 85.0;
+      sizeBeamPipe[2][1] = 51.0;
       sizeBeamPipe[2][2] = 300.0;
 
       posBeamPipe[2][2] = 160.0;
+      
+      //// option 2,3 with reduced pipe
+      //sizeBeamPipe[0][0] = 130.0;
+      //sizeBeamPipe[0][1] = 136.6;
+      //sizeBeamPipe[0][2] = 310.0;
+      //posBeamPipe[0][2] = -150.0;
+
+      //sizeBeamPipe[1][0] = 49.0;
+      //sizeBeamPipe[1][1] = sizeBeamPipe[0][1];
+      //sizeBeamPipe[1][2] = 5.0;
+      //posBeamPipe[1][2] = 7.5;
+      //
+      //sizeBeamPipe[2][0] = sizeBeamPipe[1][0];
+      //sizeBeamPipe[2][1] = 51.0;
+      //sizeBeamPipe[2][2] = 300.0;
+      //posBeamPipe[2][2] = 160.0;
+      
+      
+      //// option 2,3 with straight tube
+      //sizeBeamPipe[0][0] = 130.0;
+      //sizeBeamPipe[0][1] = 136.6;
+      //sizeBeamPipe[0][2] = 600.0;
+      //posBeamPipe[0][2] = -145.0;
+
+      
 
 
       G4Tubs* sBeamPipeTubs[beamPipeSegments];
@@ -906,10 +952,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       new G4PVPlacement(G4Transform3D(rmY90,G4ThreeVector(473.5*mm,0.,0.)),
                         //lInnerDewar,"InnerDewar",lHeadVacuum,false,0, checkOverlaps); // orig
                         lInnerDewar,"InnerDewar",lHausing,false,0, checkOverlaps);
-      new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
+    new G4PVPlacement(0,G4ThreeVector(),lGeCrystal,"GeCrystal",
                       lHeadVacuum,false,0,checkOverlaps); // orig
-                      //lHausing,false,0,checkOverlaps);
-                      //logicWorld,false,0,checkOverlaps);
+                    //lHausing,false,0,checkOverlaps);
+                    //logicWorld,false,0,checkOverlaps);
       new G4PVPlacement(0,G4ThreeVector(),lColdCase,"ColdCase",
                         lHeadVacuum,false,0, checkOverlaps); // orig
                         //lHausing,false,0, checkOverlaps);

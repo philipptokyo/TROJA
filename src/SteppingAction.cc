@@ -97,8 +97,11 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       sprintf(tmpName, "logical%02d", d);
       //printf("looking for %s, found %s\n", tmpName, volume->GetName().data());
       if(std::strcmp(volume->GetName(), tmpName)==0){
-        fFI = 1;
         detID2 = d;
+        
+        if(fDetInfo->IsPosDet(d)){
+          fFI = 1;
+        }
         
         // save FI for later cross checking
         fDetInfo->detData.fIX=pos1.getX();
