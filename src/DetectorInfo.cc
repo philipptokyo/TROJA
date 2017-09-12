@@ -34,6 +34,8 @@ DetectorInfo::DetectorInfo()
   fRandomizer = new TRandom3();
   fRandomizer->SetSeed(0);
 
+  fIncludeDali=false;
+  
   fIncludeGrape=false;
   fNumberOfGrapeDetectors=6;
   fIncludeBeamPipe=false;
@@ -458,6 +460,10 @@ void DetectorInfo::Parse(string filename)
       }
       printf("\n");
 
+    }
+    else if(strcmp(temp[0],"include_dali")==0){
+      fIncludeDali=true;
+      printf("Including %d DALI detectors\n", fNumberOfGrapeDetectors);
     }
     else if(strcmp(temp[0],"include_grape")==0){
       fIncludeGrape=true;

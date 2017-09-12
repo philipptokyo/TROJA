@@ -62,6 +62,7 @@
 #include "G4Trd.hh"
 #include "G4Polycone.hh"
 
+#include "Dali2.hh"
 
 
 
@@ -431,6 +432,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     }
 
 
+    if(fDetInfo->IncludeDali()){
+      Dali2* fDali2Array = new Dali2(nist, logicWorld);
+      fDali2Array->CreateArrayXYZPsiThetaPhi(); 
+    }
 
 
 
