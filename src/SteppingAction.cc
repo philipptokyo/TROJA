@@ -176,6 +176,74 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
   
   // ************************************************************************
+  // ****************************** DALI ************************************
+  // ************************************************************************
+  
+
+  if(fDetInfo->IncludeDali()){
+
+    string materialname = volume->GetName();
+    //size_t contains = materialname.find("lDali2");
+    size_t contains = materialname.find("lDali2Crystal");
+    
+    G4Track * theTrack = step->GetTrack();
+    Int_t trackVolume = theTrack->GetVolume()->GetCopyNo();
+
+    G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+    G4int pdgCode = thisDef->GetPDGEncoding();
+    //G4int parentID = step->GetTrack()->GetParentID();
+    
+    //edep = step->GetTotalEnergyDeposit()/MeV; 
+    
+    //if(trackVolume >=100100 && trackVolume < (100000+NUMBEROFDALI2CRYSTALS*100+2)){
+    if( (trackVolume >=100100) && (trackVolume < (100000+NUMBEROFDALI2CRYSTALS*100+2)) && (contains==0) && (edep>0.000) && (pdgCode!=2212)){
+      
+      //cout << "Dali:\nmaterialname " << materialname << ", contains " << contains << ", trackVolume " << trackVolume << ", parent id " << parentID << ", pdg code " << pdgCode << endl;
+      
+      if(trackVolume%100==0){
+        Int_t dummy = ((trackVolume-100000)/100)-1;
+      
+        //if(fDetector->fDali2Array->GetFIPointOption()==1){
+        Double_t newTime = theTrack->GetGlobalTime();
+        //Double_t oldTime = fDetector->fDali2Array->GetFITime(dummy);
+        Double_t oldTime = fDetInfo->detData.fDaliFITime[dummy];
+      
+        //cout << "dummy " << dummy << ", newTime " << newTime << ", oldTime " << oldTime << endl;
+      
+        //if(newTime<oldTime ||  fDetector->fDali2Array->GetCrystalFlag(dummy)==false) {
+        if(newTime<oldTime ||  fDetInfo->detData.fDaliCrystalFlag[dummy]==false) {
+          //fDetector->fDali2Array->SetFIX(dummy,(float)theTrack->GetPosition().x()/cm); 
+          //fDetector->fDali2Array->SetFIY(dummy,(float)theTrack->GetPosition().y()/cm);
+          //fDetector->fDali2Array->SetFIZ(dummy,(float)theTrack->GetPosition().z()/cm);
+          //fDetector->fDali2Array->SetFITime(dummy,newTime);
+          fDetInfo->detData.fDaliFIX[dummy] = (Float_t)theTrack->GetPosition().x()/cm; 
+          fDetInfo->detData.fDaliFIY[dummy] = (Float_t)theTrack->GetPosition().y()/cm;
+          fDetInfo->detData.fDaliFIZ[dummy] = (Float_t)theTrack->GetPosition().z()/cm;
+          fDetInfo->detData.fDaliFITime[dummy] = newTime;
+      
+          //cout << "FI xyz t: " << fDetInfo->detData.fDaliFIX[dummy] << ", " << fDetInfo->detData.fDaliFIY[dummy] << ", " << fDetInfo->detData.fDaliFIZ[dummy] << ", " << fDetInfo->detData.fDaliFITime[dummy] << endl;
+
+        }
+        //}  // first interaction point
+        
+        //fDetector->fDali2Array->SetCrystalFlagTrue(dummy);
+        //fDetector->fDali2Array->AddCrystalEnergy(dummy,edep);
+        if(fDetInfo->detData.fDaliCrystalFlag[dummy] == false){
+          fDetInfo->detData.fDaliCrystalFlag[dummy] = true;
+          fDetInfo->detData.fDaliCrystalMult += (Int_t)1;
+        }
+        if(TMath::IsNaN(fDetInfo->detData.fDaliCrystalEnergy[dummy])){
+          fDetInfo->detData.fDaliCrystalEnergy[dummy] = 0.0;
+        }
+        fDetInfo->detData.fDaliCrystalEnergy[dummy] += (Float_t)edep;
+      
+        //cout << "Dali mult " << fDetInfo->detData.fDaliCrystalMult << ", edep " << edep << ", crystal energy " << fDetInfo->detData.fDaliCrystalEnergy[dummy] << endl;
+
+      }
+    }
+  } // include Dali
+  
+  // ************************************************************************
   // ****************************** GRAPE ***********************************
   // ************************************************************************
   

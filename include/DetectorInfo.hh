@@ -8,6 +8,7 @@
 
 //#define maxDetectors 10
 #include "/home/philipp/sim/troja/include/DetectorGlobals.hh"
+#include "/home/philipp/sim/troja/include/DaliGlobals.hh"
 
 using namespace std;
 
@@ -74,6 +75,15 @@ typedef struct _dat
   //Int_t grapeDet;
   //Int_t grapeCrystal;
   //Int_t grapeSegment;
+
+  Bool_t   fDaliCrystalFlag[NUMBEROFDALI2CRYSTALS];
+  Float_t  fDaliCrystalEnergy[NUMBEROFDALI2CRYSTALS];
+  Int_t    fDaliCrystalMult;
+  Float_t  fDaliCrystalTime[NUMBEROFDALI2CRYSTALS];
+  Double_t fDaliFITime[NUMBEROFDALI2CRYSTALS];
+  Float_t  fDaliFIX[NUMBEROFDALI2CRYSTALS];
+  Float_t  fDaliFIY[NUMBEROFDALI2CRYSTALS];
+  Float_t  fDaliFIZ[NUMBEROFDALI2CRYSTALS];
 
   Double_t targetEnergyLoss; // for debugging only
 

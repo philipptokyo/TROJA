@@ -84,19 +84,42 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   //fOutTree->Branch("grapeCrystal", &(fDetInfo->detData.grapeCrystal), "grapeCrystal/I"); // ID of the detector with the first interaction point
   //fOutTree->Branch("grapeSegment", &(fDetInfo->detData.grapeSegment), "grapeSegment/I"); // ID of the detector with the first interaction point
 
-  fOutTree->Branch("grapeDetMul", &(fDetInfo->detData.grapeDetMul), "grapeDetMul/I"); // ID of the detector with the first interaction point
+  if(detInfo->IncludeGrape()){
+    fOutTree->Branch("grapeDetMul", &(fDetInfo->detData.grapeDetMul), "grapeDetMul/I"); // ID of the detector with the first interaction point
 
-  sprintf(tmpName, "grapeCryMul[%d]/I", grapeMaxDet);
-  fOutTree->Branch("grapeCryMul", (fDetInfo->detData.grapeCryMul), tmpName); // ID of the detector with the first interaction point
-  sprintf(tmpName, "grapeSegMul[%d][%d]/I", grapeMaxDet, grapeMaxCry);
-  fOutTree->Branch("grapeSegMul", (fDetInfo->detData.grapeSegMul), tmpName); // ID of the detector with the first interaction point
-  
-  sprintf(tmpName, "grapeDetEnergy[%d]/D", grapeMaxDet);
-  fOutTree->Branch("grapeDetEnergy", (fDetInfo->detData.grapeDetEnergy), tmpName); // ID of the detector with the first interaction point
-  sprintf(tmpName, "grapeCryEnergy[%d][%d]/D", grapeMaxDet, grapeMaxCry);
-  fOutTree->Branch("grapeCryEnergy", (fDetInfo->detData.grapeCryEnergy), tmpName); // ID of the detector with the first interaction point
-  sprintf(tmpName, "grapeSegEnergy[%d][%d][%d]/D", grapeMaxDet, grapeMaxCry, grapeMaxSeg);
-  fOutTree->Branch("grapeSegEnergy", (fDetInfo->detData.grapeSegEnergy), tmpName); // ID of the detector with the first interaction point
+    sprintf(tmpName, "grapeCryMul[%d]/I", grapeMaxDet);
+    fOutTree->Branch("grapeCryMul", (fDetInfo->detData.grapeCryMul), tmpName); // ID of the detector with the first interaction point
+    sprintf(tmpName, "grapeSegMul[%d][%d]/I", grapeMaxDet, grapeMaxCry);
+    fOutTree->Branch("grapeSegMul", (fDetInfo->detData.grapeSegMul), tmpName); // ID of the detector with the first interaction point
+    
+    sprintf(tmpName, "grapeDetEnergy[%d]/D", grapeMaxDet);
+    fOutTree->Branch("grapeDetEnergy", (fDetInfo->detData.grapeDetEnergy), tmpName); // ID of the detector with the first interaction point
+    sprintf(tmpName, "grapeCryEnergy[%d][%d]/D", grapeMaxDet, grapeMaxCry);
+    fOutTree->Branch("grapeCryEnergy", (fDetInfo->detData.grapeCryEnergy), tmpName); // ID of the detector with the first interaction point
+    sprintf(tmpName, "grapeSegEnergy[%d][%d][%d]/D", grapeMaxDet, grapeMaxCry, grapeMaxSeg);
+    fOutTree->Branch("grapeSegEnergy", (fDetInfo->detData.grapeSegEnergy), tmpName); // ID of the detector with the first interaction point
+  }
+
+  if(detInfo->IncludeDali()){
+
+    sprintf(tmpName, "DALI2Flag[%d]/B", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2Flag", (fDetInfo->detData.fDaliCrystalFlag), tmpName);
+    sprintf(tmpName, "DALI2EnergyNotCor[%d]/F", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2EnergyNotCor", (fDetInfo->detData.fDaliCrystalEnergy), tmpName);
+    sprintf(tmpName, "DALI2Mult/I");
+    fOutTree->Branch("DALI2Mult", (fDetInfo->detData.fDaliCrystalMult), tmpName);
+    sprintf(tmpName, "DALI2Time[%d]/F", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2Time", (fDetInfo->detData.fDaliCrystalTime), tmpName);
+    sprintf(tmpName, "DALI2FITime[%d]/D", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2FITime", (fDetInfo->detData.fDaliFITime), tmpName);
+    sprintf(tmpName, "DALI2FIX[%d]/F", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2FIX", (fDetInfo->detData.fDaliFIX), tmpName);
+    sprintf(tmpName, "DALI2FIY[%d]/F", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2FIY", (fDetInfo->detData.fDaliFIY), tmpName);
+    sprintf(tmpName, "DALI2FIZ[%d]/F", NUMBEROFDALI2CRYSTALS);
+    fOutTree->Branch("DALI2FIZ", (fDetInfo->detData.fDaliFIZ), tmpName);
+
+  }
 
   fOutTree->Branch("targetEnergyLoss", &(fDetInfo->detData.targetEnergyLoss), "targetEnergyLoss/D"); 
 
