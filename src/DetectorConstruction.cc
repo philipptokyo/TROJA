@@ -343,23 +343,41 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
       //posBeamPipe[0][2] = -145.0;
 
       
-      // option 1 files _34
-      //sizeBeamPipe[0][0] = 158.0;
-      sizeBeamPipe[0][0] = 156.0;
-      sizeBeamPipe[0][1] = 162.0;
-      sizeBeamPipe[0][2] = 310.0;
-      posBeamPipe[0][2] = -150.0;
+      // cross checked with technical drawing
+      sizeBeamPipe[0][0] = 156.25;
+      sizeBeamPipe[0][1] = 159.25;
+      sizeBeamPipe[0][2] = 338.0;
+      posBeamPipe[0][2] = -135.0;
 
-      sizeBeamPipe[1][0] = 49.0;
+      sizeBeamPipe[1][0] = 54.15;
       sizeBeamPipe[1][1] = sizeBeamPipe[0][1];
-      sizeBeamPipe[1][2] = 5.0;
-      posBeamPipe[1][2] = 7.5;
-      
-      sizeBeamPipe[2][0] = sizeBeamPipe[1][0];
-      sizeBeamPipe[2][1] = 51.0;
-      sizeBeamPipe[2][2] = 300.0;
+      sizeBeamPipe[1][2] = 7.0;
+      posBeamPipe[1][2] = 37.5;
 
-      posBeamPipe[2][2] = 160.0;
+      sizeBeamPipe[2][0] = sizeBeamPipe[1][0];
+      sizeBeamPipe[2][1] = 57.15;
+      sizeBeamPipe[2][2] = 126.0;
+
+      posBeamPipe[2][2] = 104.0;
+
+
+      //// option 1 files _34
+      ////sizeBeamPipe[0][0] = 158.0;
+      //sizeBeamPipe[0][0] = 156.0;
+      //sizeBeamPipe[0][1] = 162.0;
+      //sizeBeamPipe[0][2] = 310.0;
+      //posBeamPipe[0][2] = -150.0;
+
+      //sizeBeamPipe[1][0] = 49.0;
+      //sizeBeamPipe[1][1] = sizeBeamPipe[0][1];
+      //sizeBeamPipe[1][2] = 5.0;
+      //posBeamPipe[1][2] = 7.5;
+      //
+      //sizeBeamPipe[2][0] = sizeBeamPipe[1][0];
+      //sizeBeamPipe[2][1] = 51.0;
+      //sizeBeamPipe[2][2] = 300.0;
+
+      //posBeamPipe[2][2] = 160.0;
       
       //// option 2,3 with reduced pipe
       //sizeBeamPipe[0][0] = 130.0;
@@ -433,8 +451,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
     if(fDetInfo->IncludeDali()){
-      Dali2* fDali2Array = new Dali2(nist, logicWorld);
+      Dali2* fDali2Array = new Dali2(nist, logicWorld, fDetInfo);
       fDali2Array->CreateArrayXYZPsiThetaPhi(); 
+      fDali2Array->SetEnergyResolutionInd(1);
     }
 
 

@@ -41,6 +41,29 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
   char tmpName[50];
 
   fOutFile = new TFile(info->fOutFileNameTroja, "recreate");
+
+  fHeaderTree = new TTree("header","some detector globals, for instance");
+
+
+  sprintf(tmpName, "daliPosX[%d]/D", NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliPosX", (fDetInfo->daliHead.fDaliPosX), tmpName);
+  sprintf(tmpName, "daliPosY[%d]/D", NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliPosY", (fDetInfo->daliHead.fDaliPosY), tmpName);
+  sprintf(tmpName, "daliPosZ[%d]/D", NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliPosZ", (fDetInfo->daliHead.fDaliPosZ), tmpName);
+  sprintf(tmpName, "daliTheta[%d]/D", NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliTheta", (fDetInfo->daliHead.fDaliTheta), tmpName);
+  sprintf(tmpName, "daliPhi[%d]/D", NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliPhi", (fDetInfo->daliHead.fDaliPhi), tmpName);
+  sprintf(tmpName, "daliDistance[%d]/D", NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliDistance", (fDetInfo->daliHead.fDaliDistance), tmpName);
+  sprintf(tmpName, "daliTimeResolution[%d]/F",2);
+  fHeaderTree->Branch("daliTimeResolution", (fDetInfo->daliHead.fDaliTimeResolution), tmpName);
+  sprintf(tmpName, "daliEnergyResolutionInd[%d][%d]/F", 2, NUMBEROFDALI2CRYSTALS);
+  fHeaderTree->Branch("daliEnergyResolutionInd", (fDetInfo->daliHead.fDaliEnergyResolutionInd), tmpName);
+
+
+
   fOutTree = new TTree("troja", "Transfer at OEDO in Japan, Geant4 simulation file");
   
   fOutTree->Branch("eventNumber", &(fDetInfo->detData.eventNumber), "eventNumber/I");
@@ -102,12 +125,12 @@ RunAction::RunAction(InputInfo* info, DetectorInfo* detInfo)
 
   if(detInfo->IncludeDali()){
 
-    sprintf(tmpName, "DALI2Flag[%d]/B", NUMBEROFDALI2CRYSTALS);
+    sprintf(tmpName, "DALI2Flag[%d]/O", NUMBEROFDALI2CRYSTALS);
     fOutTree->Branch("DALI2Flag", (fDetInfo->detData.fDaliCrystalFlag), tmpName);
     sprintf(tmpName, "DALI2EnergyNotCor[%d]/F", NUMBEROFDALI2CRYSTALS);
     fOutTree->Branch("DALI2EnergyNotCor", (fDetInfo->detData.fDaliCrystalEnergy), tmpName);
     sprintf(tmpName, "DALI2Mult/I");
-    fOutTree->Branch("DALI2Mult", (fDetInfo->detData.fDaliCrystalMult), tmpName);
+    fOutTree->Branch("DALI2Mult", &(fDetInfo->detData.fDaliCrystalMult), tmpName);
     sprintf(tmpName, "DALI2Time[%d]/F", NUMBEROFDALI2CRYSTALS);
     fOutTree->Branch("DALI2Time", (fDetInfo->detData.fDaliCrystalTime), tmpName);
     sprintf(tmpName, "DALI2FITime[%d]/D", NUMBEROFDALI2CRYSTALS);
@@ -165,6 +188,9 @@ void RunAction::EndOfRunAction(const G4Run* aRun)
     = particleGun->GetParticleDefinition()->GetParticleName();                       
   G4double particleEnergy = particleGun->GetParticleEnergy();
   
+  fHeaderTree->Fill();
+  fHeaderTree->Write("header");
+
   fOutTree->Write("troja");   
   fOutFile->Close();
  

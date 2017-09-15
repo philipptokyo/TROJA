@@ -202,9 +202,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
   //  }
   //}
 
+
   outTree->Fill();
 
-
+  //ResetDali(detInfo);
 
 }  
 
@@ -216,3 +217,21 @@ void EventAction::Reset()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+//void EventAction::ResetDali(DetectorInfo* detInfo)
+//{
+//   for(Int_t d=0; d<NUMBEROFDALI2CRYSTALS; d++){
+//    detInfo->detData.fDaliCrystalFlag[d] = false;
+//    detInfo->detData.fDaliCrystalEnergy[d] = NAN;
+//    detInfo->detData.fDaliCrystalMult = 0;
+//    detInfo->detData.fDaliCrystalTime[d] = 0.0;
+//    detInfo->detData.fDaliFITime[d] = 0.0;
+//    detInfo->detData.fDaliFIX[d] = NAN;
+//    detInfo->detData.fDaliFIY[d] = NAN;
+//    detInfo->detData.fDaliFIZ[d] = NAN;
+//
+//  }
+//
+//}
+//
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -36,12 +36,14 @@
 #include "MaterialList.hh"
 #include "DaliGlobals.hh"
 
+#include "DetectorInfo.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 class Dali2  {
 public:
   
   //Dali2(MaterialList *ptMaterialList,G4LogicalVolume *ptWorld);
-  Dali2(G4NistManager *ptMaterialList,G4LogicalVolume *ptWorld);
+  Dali2(G4NistManager *ptMaterialList,G4LogicalVolume *ptWorld, DetectorInfo* di);
   ~Dali2();
 
   void   AddCrystalEnergy(int a,float b){fCrystalEnergy[a] = fCrystalEnergy[a] + b;}
@@ -80,6 +82,8 @@ public:
   void   SetTimeResolution(float a,float b){fTimeResolution[0] = a;fTimeResolution[1] = b;}
   void   SetZPosShift(float a){fZPosShift = a;}
 private:
+
+  DetectorInfo* fDetInfo;
 
   G4LogicalVolume*    lWorld;                    // Need a pointer to the logic world volume
   //MaterialList*       fMaterialList;             // Pointer to the material list
@@ -139,9 +143,9 @@ private:
   bool   fCrystalFlag[NUMBEROFDALI2CRYSTALS];
   float  fCrystalEnergy[NUMBEROFDALI2CRYSTALS];
   int    fCrystalMult;
-  float  fCrystalTime[NUMBEROFDALI2CRYSTALS];
-  float  fEnergyResolution[2];
-  float  fEnergyResolutionInd[2][NUMBEROFDALI2CRYSTALS];   // individuall resolution for every detector
+  Float_t  fCrystalTime[NUMBEROFDALI2CRYSTALS];
+  Float_t  fEnergyResolution[2];
+  Float_t  fEnergyResolutionInd[2][NUMBEROFDALI2CRYSTALS];   // individuall resolution for every detector
   int    fIndEnergyResOpt;
   int    fFIPointOption;
   double fFITime[NUMBEROFDALI2CRYSTALS];
@@ -150,12 +154,12 @@ private:
   float  fFIZ[NUMBEROFDALI2CRYSTALS];
   FILE*  fFileIn;
   FILE*  fFileOut;
-  double fPosX[NUMBEROFDALI2CRYSTALS];
-  double fPosY[NUMBEROFDALI2CRYSTALS];
-  double fPosZ[NUMBEROFDALI2CRYSTALS];
+  Double_t fPosX[NUMBEROFDALI2CRYSTALS];
+  Double_t fPosY[NUMBEROFDALI2CRYSTALS];
+  Double_t fPosZ[NUMBEROFDALI2CRYSTALS];
   char   fTempname[200];
-  int    fTypeOfEnergyResolution;
-  float  fTimeResolution[2];
+  Int_t    fTypeOfEnergyResolution;
+  Float_t  fTimeResolution[2];
   float  fZPosShift;
 };
 #endif

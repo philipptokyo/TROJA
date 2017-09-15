@@ -33,6 +33,7 @@ class RunAction : public G4UserRunAction
 
     TFile* GetOutFile() {return fOutFile;}
     TTree* GetOutTree() {return fOutTree;}
+    TTree* GetHeaderTree() {return fHeaderTree;}
 
     DetectorInfo* GetDetInfo() {return fDetInfo;} 
 
@@ -43,6 +44,7 @@ class RunAction : public G4UserRunAction
 
     TFile* fOutFile;
     TTree* fOutTree;
+    TTree* fHeaderTree;
 
 
 };

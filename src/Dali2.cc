@@ -4,9 +4,11 @@
 using namespace std;
 
 //Dali2::Dali2(MaterialList *ptMaterialList,G4LogicalVolume *ptWorld)   {
-Dali2::Dali2(G4NistManager *ptMaterialList,G4LogicalVolume *ptWorld)   {
+Dali2::Dali2(G4NistManager *ptMaterialList,G4LogicalVolume *ptWorld, DetectorInfo* di)   {
   
   printf("Entering Dali Constructor\n");
+
+  fDetInfo = di;
 
   fMaterialList = ptMaterialList;
   lWorld        = ptWorld;
@@ -246,6 +248,11 @@ void Dali2::CreateArrayXYZPsiThetaPhi()  {
     fPosX[dali2Det] = Pos.getX();
     fPosY[dali2Det] = Pos.getY();
     fPosZ[dali2Det] = Pos.getZ();
+
+    fDetInfo->daliHead.fDaliPosX[dali2Det] = Pos.getX();
+    fDetInfo->daliHead.fDaliPosY[dali2Det] = Pos.getY();
+    fDetInfo->daliHead.fDaliPosZ[dali2Det] = Pos.getZ();
+
     //-----------------------------------------
     //------------------------------------------------
     cout << id << " " << fPosX[dali2Det]/cm 
@@ -267,6 +274,10 @@ void Dali2::CreateArrayXYZPsiThetaPhi()  {
     if(abs(fPosY[dali2Det]/mm)<1.0 && fPosX[dali2Det]/mm>=0.0) phiPlaced = 0.0;
     if(abs(fPosY[dali2Det]/mm)<1.0 && fPosX[dali2Det]/mm<0.0)  phiPlaced = 180.0;
 
+    fDetInfo->daliHead.fDaliTheta[dali2Det] = (Double_t)thetaPlaced;
+    fDetInfo->daliHead.fDaliPhi[dali2Det] = (Double_t)phiPlaced;
+    fDetInfo->daliHead.fDaliDistance[dali2Det] = (Double_t)distance;
+
     fprintf(fFileOut,"%i %i %f %f %f \n", dali2Det, detType, thetaPlaced, phiPlaced, distance);
   }
   fclose(fFileIn);
@@ -279,7 +290,7 @@ void Dali2::SetEnergyResolutionInd(int a)  {
   if(fIndEnergyResOpt!=1) return;
   cout<<"Setting the Energy resolution."<<endl;
   //fFileIn  = fopen("./input/Dali2Resolution.txt","r");
-  fFileIn  = fopen("/home/philipp/sim/troja/Dai2Resolution.txt","r");
+  fFileIn  = fopen("/home/philipp/sim/troja/Dali2Resolution.txt","r");
   int detector;
   float FWHM = 1.;
   char resolution[100];
@@ -287,12 +298,18 @@ void Dali2::SetEnergyResolutionInd(int a)  {
   cout<<"Opened file."<<endl;
 //  fscanf(fFileIn,"%s %i",&resolution,&resolutionType); //Check if the given resolution is in SIGMA or FWHM
   fscanf(fFileIn,"%100s %i",&resolution[0],&resolutionType); //pschrock
+
+  //fDetInfo.fDaliTypeOfEnergyResolution = resolutionType;
+
   if(resolutionType==1) FWHM=2.35;
   for(int i=0;!feof(fFileIn)&&i<NUMBEROFDALI2CRYSTALS;i++)  {
     fscanf(fFileIn,"%i",&detector);
     fscanf(fFileIn,"%f %f",&fEnergyResolutionInd[0][detector-1],&fEnergyResolutionInd[1][detector-1]);
     fEnergyResolutionInd[0][detector-1] = fEnergyResolutionInd[0][detector-1]/FWHM;
     G4cout<<"Energy resolution detector "<<detector<<": "<<fEnergyResolutionInd[0][detector-1]<<" "<<fEnergyResolutionInd[1][detector-1]<<endl;
+
+    fDetInfo->daliHead.fDaliEnergyResolutionInd[0][detector-1] = (Float_t)fEnergyResolutionInd[0][detector-1];
+    fDetInfo->daliHead.fDaliEnergyResolutionInd[1][detector-1] = (Float_t)fEnergyResolutionInd[1][detector-1];
   }
   fclose(fFileIn);
 }
