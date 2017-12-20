@@ -101,6 +101,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         
         if(fDetInfo->IsPosDet(d)){
           fFI = 1;
+        }else{
+          continue;
         }
         
         // save FI for later cross checking
@@ -131,10 +133,10 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
         //printf("Found FI x = %f, y = %f, z = %f, stripx = %d, stripy = %d\n", fDetInfo->detData.fIX, fDetInfo->detData.fIY, fDetInfo->detData.fIZ, fDetInfo->detData.stripX[detID1], fDetInfo->detData.stripY[detID1]);
         
-        // to sum up energies in each detector, set them from NAN to 0.0
-        for(G4int dd=0; dd<fDetInfo->GetNoOfDetectors(); dd++){
-          fDetInfo->detData.energyNotSmeared[dd]=0.0; // was NAN 
-        }
+        //// to sum up energies in each detector, set them from NAN to 0.0
+        //for(G4int dd=0; dd<fDetInfo->GetNoOfDetectors(); dd++){
+        //  fDetInfo->detData.energyNotSmeared[dd]=0.0; // was NAN 
+        //}
 
         
         // leave the FI loop
@@ -160,10 +162,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     sprintf(tmpName, "logical%02d", d);
     //printf("looking for %s\n", tmpName);
     if(std::strcmp(volume->GetName(), tmpName)==0){
+      if(TMath::IsNaN(fDetInfo->detData.energyNotSmeared[d])){
+        fDetInfo->detData.energyNotSmeared[d] = 0.0;
+      }
       fDetInfo->detData.energyNotSmeared[d] += edep;
       fDetInfo->detData.haveHit[d] = 1;
       fDetInfo->detData.haveHitID[d] = d; // aux
-      //printf("EnergyDeposit in %s is %f\n", tmpName, edep);
+      //printf("EnergyDeposit in %s is %f\n", tmpName, fDetInfo->detData.energyNotSmeared[d]);
     }
 
   }

@@ -17,7 +17,7 @@
 
 #include "InputInfo.hh"
 
-#define maxGammas 2
+#define maxGammas maxNumberOfStates+1
 
 class G4ParticleGun;
 class G4Event;

@@ -106,7 +106,8 @@
 /vis/viewer/set/hiddenMarker true
 #/vis/viewer/set/viewpointThetaPhi 120 90
 #/vis/viewer/set/viewpointThetaPhi 50 140
-/vis/viewer/set/viewpointThetaPhi 80 140
+#/vis/viewer/set/viewpointThetaPhi 80 140
+/vis/viewer/set/viewpointThetaPhi 140 140
 #/vis/viewer/set/viewpointThetaPhi 120 140
 #/vis/viewer/set/viewpointThetaPhi 180 180
 #

@@ -146,9 +146,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   printf("Building %s target\n", fDetInfo->GetTargetMaterial().c_str());
   
   if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
-
     fTarget = fCD2;
-
+  }else if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "TiD2")==0 ){
+    fTarget = fTiD2;
   }else{
 
     //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 

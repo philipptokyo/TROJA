@@ -189,8 +189,8 @@ void Dali2::CreateArrayXYZPsiThetaPhi()  {
     int dali2Det = (id-100000)/100-1;
     z = z + fZPosShift; // Shift along beam axis because of target thickness.
  
-    //G4ThreeVector Pos(x*cm,y*cm,z*cm); //Position of the center
-    G4ThreeVector Pos(-x*cm,-y*cm,-z*cm); //Position of the center
+    G4ThreeVector Pos(x*cm,y*cm,z*cm); //Position of the center
+    //G4ThreeVector Pos(-x*cm,-y*cm,-z*cm); // pschrock: rotate dali2
 
     Rot3D.set(0, 0, 0);
     Rot3D.rotateX(psi*degree);
