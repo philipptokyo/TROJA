@@ -9,6 +9,7 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
+#include "InputInfo.hh"
 #include "DetectorInfo.hh"
 //#include "DetectorGlobals.hh"
 
@@ -20,7 +21,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
     DetectorConstruction();
-    DetectorConstruction(DetectorInfo* detInfo);
+    DetectorConstruction(InputInfo* info, DetectorInfo* detInfo);
     virtual ~DetectorConstruction();
 
   public:
@@ -30,6 +31,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     DetectorInfo* GetDetectorInfo() {return fDetInfo;}
 
   private:
+    InputInfo* fInfo;
     DetectorInfo* fDetInfo;
 };
 

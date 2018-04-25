@@ -98,7 +98,7 @@ printf("- G4RunManager* runManager = new G4RunManager()\n");
   //
   // Detector construction
 printf("- runManager->SetUserInitialization(new DetectorConstruction(detInfo))\n");
-  runManager->SetUserInitialization(new DetectorConstruction(detInfo));
+  runManager->SetUserInitialization(new DetectorConstruction(info, detInfo));
 
   // Physics list
   //  G4VModularPhysicsList* physicsList = new QGSP_BIC_EMY;

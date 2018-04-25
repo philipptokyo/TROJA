@@ -77,9 +77,10 @@ DetectorConstruction::DetectorConstruction()
   printf("WARNING: Empty detector information in DetectorConstruction.cc!!!\n");
 }
 
-DetectorConstruction::DetectorConstruction(DetectorInfo* detInfo)
+DetectorConstruction::DetectorConstruction(InputInfo* info, DetectorInfo* detInfo)
 : G4VUserDetectorConstruction()
 { 
+  fInfo = info;
   fDetInfo=detInfo;  
 }
 
@@ -135,19 +136,26 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4Element* C = new G4Element("Carbon", "C", 6., 12.01*g/mole);
   G4Element* D = new G4Element("Deuterium", "D", 1., 2.01*g/mole);
   G4Material* fCD2 = new G4Material("CD2", 0.88*g/cm3, 2);
-  fCD2->AddElement(C, .333);
-  fCD2->AddElement(D, .667);
+  //fCD2->AddElement(C, .333);
+  //fCD2->AddElement(D, .667);
+  fCD2->AddElement(C, 1);
+  fCD2->AddElement(D, 2);
 
   G4Element* Ti = new G4Element("Titanium", "Ti", 22., 47.867*g/mole);
   G4Material* fTiD2 = new G4Material("TiD2", 3.75*g/cm3, 2);
   fTiD2->AddElement(Ti, .333);
   fTiD2->AddElement(D, .667);
 
-  printf("Building %s target\n", fDetInfo->GetTargetMaterial().c_str());
+  //printf("Building %s target\n", fDetInfo->GetTargetMaterial().c_str());
+  printf("Building %s target\n", fInfo->GetTargetMaterial().c_str());
   
-  if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
+  //if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
+  //  fTarget = fCD2;
+  //}else if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "TiD2")==0 ){
+  //  fTarget = fTiD2;
+  if( strcmp(fInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
     fTarget = fCD2;
-  }else if( strcmp(fDetInfo->GetTargetMaterial().c_str(), "TiD2")==0 ){
+  }else if( strcmp(fInfo->GetTargetMaterial().c_str(), "TiD2")==0 ){
     fTarget = fTiD2;
   }else{
 
@@ -157,7 +165,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     //G4Material* fPE    = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
     //G4Material* fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
     
-    fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
+    //fTarget    = nist->FindOrBuildMaterial(fDetInfo->GetTargetMaterial().c_str());
+    fTarget    = nist->FindOrBuildMaterial(fInfo->GetTargetMaterial().c_str());
 
   }
   
@@ -166,13 +175,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //------------------- Target-----------------------------
   
   //G4ThreeVector fTargetPos(0,0,0);
-  G4ThreeVector fTargetPos(fDetInfo->GetTargetPosition(0), fDetInfo->GetTargetPosition(1), fDetInfo->GetTargetPosition(2));
+  //G4ThreeVector fTargetPos(fDetInfo->GetTargetPosition(0), fDetInfo->GetTargetPosition(1), fDetInfo->GetTargetPosition(2));
+  G4ThreeVector fTargetPos(fInfo->GetTargetPosition(0), fInfo->GetTargetPosition(1), fInfo->GetTargetPosition(2));
 
   //G4Box* solidTarget = new G4Box("tgt_box", 40*0.5*mm, 40*0.5*mm, 0.00100*0.5*mm);  //1um
   //G4Box* solidTarget = new G4Box("tgt_box", 40*0.5*mm, 40*0.5*mm, 0.00100*2.65*mm);  //5.3um
   //G4Box* solidTarget = new G4Box("tgt_box", 60*0.5*mm, 60*0.5*mm, 0.00100*2.65*mm);  //5.3um
   //G4Box* solidTarget = new G4Box("tgt_box", 60*0.5*mm, 60*0.5*mm, 0.00100*0.1*0.5*mm);  //0.1um
-  G4Box* solidTarget = new G4Box("tgt_box", fDetInfo->GetTargetSize(0)*0.5*mm, fDetInfo->GetTargetSize(1)*0.5*mm, fDetInfo->GetTargetSize(2)*0.5*mm); 
+  //G4Box* solidTarget = new G4Box("tgt_box", fDetInfo->GetTargetSize(0)*0.5*mm, fDetInfo->GetTargetSize(1)*0.5*mm, fDetInfo->GetTargetSize(2)*0.5*mm); 
+  G4Box* solidTarget = new G4Box("tgt_box", fInfo->GetTargetSize(0)*0.5*mm, fInfo->GetTargetSize(1)*0.5*mm, fInfo->GetTargetSize(2)*0.5*mm); 
 
   printf("Target material is %s\n", fTarget->GetName().c_str());
 

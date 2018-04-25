@@ -113,9 +113,12 @@ void PrimaryGeneratorAction::SetRootTreeInput(){
   fTree->SetBranchAddress("lightPhi", &fPhi);
   fTree->SetBranchAddress("lightEnergy", &fEnergy);
   fTree->SetBranchAddress("lightPdgId", &fPdgId);
-  fTree->SetBranchAddress("beamX", &fX0);
-  fTree->SetBranchAddress("beamY", &fY0);
-  fTree->SetBranchAddress("beamZ", &fZ0);
+  //fTree->SetBranchAddress("beamX", &fX0);
+  //fTree->SetBranchAddress("beamY", &fY0);
+  //fTree->SetBranchAddress("beamZ", &fZ0);
+  fTree->SetBranchAddress("vertex[0]", &fX0);
+  fTree->SetBranchAddress("vertex[1]", &fY0);
+  fTree->SetBranchAddress("vertex[2]", &fZ0);
   
   fTree->SetBranchAddress("gammaMul", &fGammaMul);
   fTree->SetBranchAddress("gammaTheta", fGammaTheta);
