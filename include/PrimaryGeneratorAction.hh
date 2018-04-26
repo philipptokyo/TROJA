@@ -65,6 +65,7 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     Double_t fTheta, fPhi, fEnergy;
     Int_t fEventNumber, fPdgId;
     Float_t fX0, fY0, fZ0;
+    Float_t vertex[3];
     //Double_t fX0, fY0, fZ0;
 
     Int_t fGammaMul;

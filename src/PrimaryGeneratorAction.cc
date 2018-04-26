@@ -116,9 +116,10 @@ void PrimaryGeneratorAction::SetRootTreeInput(){
   //fTree->SetBranchAddress("beamX", &fX0);
   //fTree->SetBranchAddress("beamY", &fY0);
   //fTree->SetBranchAddress("beamZ", &fZ0);
-  fTree->SetBranchAddress("vertex[0]", &fX0);
-  fTree->SetBranchAddress("vertex[1]", &fY0);
-  fTree->SetBranchAddress("vertex[2]", &fZ0);
+  //fTree->SetBranchAddress("vertex[0]", &fX0);
+  //fTree->SetBranchAddress("vertex[1]", &fY0);
+  //fTree->SetBranchAddress("vertex[2]", &fZ0);
+  fTree->SetBranchAddress("vertex", vertex);
   
   fTree->SetBranchAddress("gammaMul", &fGammaMul);
   fTree->SetBranchAddress("gammaTheta", fGammaTheta);
@@ -171,6 +172,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //direction.setTheta(fTheta);
   //direction.setPhi(fPhi);
   //printf("fTheta %f, vector theta %f, fPhi %f, vector phi %f\n", fTheta, direction.getTheta() ,fPhi, direction.getPhi());
+
+  fX0=vertex[0];
+  fY0=vertex[1];
+  fZ0=vertex[2];
 
   //G4ThreeVector position(0.0, 0.0, 0.0);
   G4ThreeVector position(fX0*mm, fY0*mm, fZ0*mm);
