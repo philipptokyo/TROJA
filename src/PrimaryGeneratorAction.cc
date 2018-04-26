@@ -113,10 +113,18 @@ void PrimaryGeneratorAction::SetRootTreeInput(){
   fTree->SetBranchAddress("lightPhi", &fPhi);
   fTree->SetBranchAddress("lightEnergy", &fEnergy);
   fTree->SetBranchAddress("lightPdgId", &fPdgId);
-  fTree->SetBranchAddress("beamX", &fX0);
-  fTree->SetBranchAddress("beamY", &fY0);
-  fTree->SetBranchAddress("beamZ", &fZ0);
-
+  //fTree->SetBranchAddress("beamX", &fX0);
+  //fTree->SetBranchAddress("beamY", &fY0);
+  //fTree->SetBranchAddress("beamZ", &fZ0);
+  //fTree->SetBranchAddress("vertex[0]", &fX0);
+  //fTree->SetBranchAddress("vertex[1]", &fY0);
+  //fTree->SetBranchAddress("vertex[2]", &fZ0);
+  fTree->SetBranchAddress("vertex", vertex);
+  
+  fTree->SetBranchAddress("gammaMul", &fGammaMul);
+  fTree->SetBranchAddress("gammaTheta", fGammaTheta);
+  fTree->SetBranchAddress("gammaPhi", fGammaPhi);
+  fTree->SetBranchAddress("gammaE", fGammaE);
 }
 
 
@@ -165,19 +173,44 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //direction.setPhi(fPhi);
   //printf("fTheta %f, vector theta %f, fPhi %f, vector phi %f\n", fTheta, direction.getTheta() ,fPhi, direction.getPhi());
 
+  fX0=vertex[0];
+  fY0=vertex[1];
+  fZ0=vertex[2];
+
   //G4ThreeVector position(0.0, 0.0, 0.0);
   G4ThreeVector position(fX0*mm, fY0*mm, fZ0*mm);
   //printf("%f %f %f\n", position.getX(), position.getY(), position.getZ());
 
 
-  if(fPdgId==1000010010){
-    fPdgId=2212; // proton
-  }
+  //if(fPdgId==1000010010){
+  //  fPdgId=2212; // proton
+  //}
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4int particleId=(G4int)fPdgId;
-  //particleId=1000010020; //deuteron
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleId);
+
+//for debugging
+//particleId=1000010010; //deuteron
+
+  //G4ParticleDefinition* particle = particleTable->FindParticle(particleId);
+  G4ParticleDefinition* particle;
+  G4String particleName;
+
+  if(particleId==1000010010){ //proton
+    particle = particleTable->FindParticle(particleName="proton");
+  }else if(particleId==1000010020){ //deuteron
+    particle = particleTable->FindParticle(particleName="deuteron");
+  }else if(particleId==1000010030){ //triton
+    particle = particleTable->FindParticle(particleName="triton");
+  }else if(particleId==1000020030){ //3He
+    particle = particleTable->FindParticle(particleName="He3");
+  }else if(particleId==1000020040){ //Alpha
+    particle = particleTable->FindParticle(particleName="alpha");
+  }else{
+    particle = particleTable->FindParticle(particleId);
+  }
+
+
   //printf("particle ID is %d\n", particleId);
   //printf("PDGMass %f, ParticleType %s, PDGEncoding %d, PDGCharge %f\n", particle->GetPDGMass(), particle->GetParticleType().c_str(), particle->GetPDGEncoding(), particle->GetPDGCharge());
 
@@ -193,8 +226,26 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   fParticleGun->SetParticlePosition(position);
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
+  //printf("Added a proton, id %d\n", particleId);
 
+  //printf("\n\nNew Event\n");
+  if(fGammaMul>0){
 
+    particle = particleTable->FindParticle(particleName="gamma");
+    fParticleGun->SetParticleDefinition(particle);
+    // position is the same
+
+    for(Int_t gg=0; gg<fGammaMul; gg++){
+
+      direction.setRThetaPhi(1.0, fGammaTheta[gg], fGammaPhi[gg]);
+      fParticleGun->SetParticleMomentumDirection(direction);
+      fParticleGun->SetParticleEnergy(fGammaE[gg]*MeV);
+
+      fParticleGun->GeneratePrimaryVertex(anEvent);
+      //printf("Added a gamma with %f MeV - ", fGammaE[gg]*MeV);
+
+    }
+  }
 
 
 

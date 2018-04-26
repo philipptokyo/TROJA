@@ -7,7 +7,10 @@
 
 //#include "globals.hh"
 
-#define maxDetectors 10
+#define maxDetectors 20
 
+#define grapeMaxDet 18
+#define grapeMaxCry 2
+#define grapeMaxSeg 9
 
 #endif

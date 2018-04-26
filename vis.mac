@@ -1,11 +1,11 @@
-# Macro file for the visualization setting in the initialization phase 
-# of the B1 example when running in interactive mode
+# Macro file for the visualization setting for troja simulations 
 #
 
 # Use these open statements to open selected visualization
 #
 # Use this open statement to create an OpenGL view:
-/vis/open OGL 800x800-0+0
+#/vis/open OGL 800x800-0+0
+/vis/open OGL 1024x768-0+0
 #
 # Use this open statement to create an OpenInventor view:
 #/vis/open OI
@@ -105,7 +105,11 @@
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker true
 #/vis/viewer/set/viewpointThetaPhi 120 90
-/vis/viewer/set/viewpointThetaPhi 50 140
+#/vis/viewer/set/viewpointThetaPhi 50 140
+#/vis/viewer/set/viewpointThetaPhi 80 140
+/vis/viewer/set/viewpointThetaPhi 140 140
+#/vis/viewer/set/viewpointThetaPhi 120 140
+#/vis/viewer/set/viewpointThetaPhi 180 180
 #
 # Re-establish auto refreshing and verbosity:
 /vis/viewer/set/autoRefresh true

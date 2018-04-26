@@ -6,6 +6,7 @@
 
 #include "RunAction.hh"
 #include "SteppingAction.hh"
+#include "DetectorInfo.hh"
 // use of stepping action to get and reset accumulated energy  
 
 #include "PrimaryGeneratorAction.hh"
@@ -18,6 +19,7 @@
 #include "DetectorGlobals.hh"
 
 #include "TMath.h"
+//#include "TRandom3.h"
 
 using namespace G4Root;
 
@@ -41,6 +43,11 @@ EventAction::EventAction()
   fPrintModulo(100000)
 { 
   fgInstance = this;
+
+  fRandomizer = new TRandom3();
+  fRandomizer->SetSeed(0);
+
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -99,10 +106,106 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
   RunAction *runact = (RunAction*)G4RunManager::GetRunManager()->GetUserRunAction(); 
   TTree* outTree = (TTree*)runact->GetOutTree();
+  
+  DetectorInfo* detInfo = runact->GetDetInfo();
+  for(G4int d=0; d<maxDetectors; d++){
+    detInfo->detData.energy[d] = detInfo->SmearEnergy(d, detInfo->detData.energyNotSmeared[d]);
+  }
+  
+
+
+
+
+
+  //Bool_t printRes=false;
+  //if(detInfo->detData.grapeDetMul>0){
+  //  printf("\nHave before cuts:\n");
+  //  for(Int_t d=0; d<1; d++){
+  //    printf("Det mul %d, energy %f, ", detInfo->detData.grapeDetMul, detInfo->detData.grapeDetEnergy[d]);  
+  //    printf("Cry mul %d:\n", detInfo->detData.grapeCryMul[d]);
+  //    for(Int_t c=0; c<2; c++){
+  //      printf("Cry energy %f, seg mul %d: \n", detInfo->detData.grapeCryEnergy[d][c], detInfo->detData.grapeSegMul[d][c]);
+  //      for(Int_t s=0; s<9; s++){
+  //        printf("seg %d en %f, ", s, detInfo->detData.grapeSegEnergy[d][c][s]);
+  //      }
+  //      printf("\n");
+  //    }
+  //  }
+  //  printRes=true;
+  //}
+
+  Double_t threshold[18][2][9]={{{0.0}}};
+
+//  Double_t th0[9]={0.084, 0.092, 0.090, 
+//                   0.091, 0.090, 0.092, 
+//                   0.092, 0.087, 0.092};
+//  Double_t th1[9]={0.064, 0.068, 0.063,
+//                   0.070, 0.062, 0.068,
+//                   0.069, 0.065, 0.066};
+//
+//  for(Int_t s=0; s<9; s++){
+//    threshold[0][0][s]=th0[s];
+//    threshold[0][1][s]=th1[s];
+//  }
+
+
+  for(Int_t d=0; d<18; d++){
+    if(detInfo->detData.grapeDetMul>0){
+      Double_t sumEnDet=0.0;
+      for(Int_t c=0; c<2; c++){
+        if(detInfo->detData.grapeCryMul[d]>0){
+          Double_t sumEnCry=0.0;
+          for(Int_t s=0; s<9; s++){
+            detInfo->detData.grapeSegEnergy[d][c][s] = fRandomizer->Gaus(detInfo->detData.grapeSegEnergy[d][c][s], 0.0); // no
+            //detInfo->detData.grapeSegEnergy[d][c][s] = fRandomizer->Gaus(detInfo->detData.grapeSegEnergy[d][c][s], 0.002); // 2 keV
+            if(detInfo->detData.grapeSegEnergy[d][c][s]>threshold[d][c][s]){ // apply threshold
+              sumEnCry+=detInfo->detData.grapeSegEnergy[d][c][s];
+            }else{
+              if(!TMath::IsNaN(detInfo->detData.grapeSegEnergy[d][c][s])){
+                detInfo->detData.grapeSegEnergy[d][c][s]=0.0;
+                detInfo->detData.grapeSegMul[d][c]--;
+              }
+            }
+          }
+          if(sumEnCry>0.0){
+            detInfo->detData.grapeCryEnergy[d][c]=sumEnCry;
+            sumEnDet+=sumEnCry;
+          }else{
+            if(!TMath::IsNaN(detInfo->detData.grapeCryEnergy[d][c])){
+              detInfo->detData.grapeCryMul[d]--;
+            }
+          }
+        }
+      }
+      if(sumEnDet>0.0){
+        detInfo->detData.grapeDetEnergy[d]=sumEnDet;
+      }else{
+        if(!TMath::IsNaN(detInfo->detData.grapeDetEnergy[d])){
+          detInfo->detData.grapeDetMul--;
+        }
+      }
+    }
+  }
+
+  //if(printRes){
+  //  printf("Have after cuts:\n");
+  //  for(Int_t d=0; d<1; d++){
+  //    printf("Det mul %d, energy %f, ", detInfo->detData.grapeDetMul, detInfo->detData.grapeDetEnergy[d]);  
+  //    printf("Cry mul %d:\n", detInfo->detData.grapeCryMul[d]);
+  //    for(Int_t c=0; c<2; c++){
+  //      printf("Cry energy %f, seg mul %d: \n", detInfo->detData.grapeCryEnergy[d][c], detInfo->detData.grapeSegMul[d][c]);
+  //      for(Int_t s=0; s<9; s++){
+  //        printf("seg %d en %f, ", s, detInfo->detData.grapeSegEnergy[d][c][s]);
+  //      }
+  //      printf("\n");
+  //    }
+  //  }
+  //}
+
 
   outTree->Fill();
 
-
+  //ResetDali(detInfo);
 
 }  
 
@@ -114,3 +217,21 @@ void EventAction::Reset()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+//void EventAction::ResetDali(DetectorInfo* detInfo)
+//{
+//   for(Int_t d=0; d<NUMBEROFDALI2CRYSTALS; d++){
+//    detInfo->detData.fDaliCrystalFlag[d] = false;
+//    detInfo->detData.fDaliCrystalEnergy[d] = NAN;
+//    detInfo->detData.fDaliCrystalMult = 0;
+//    detInfo->detData.fDaliCrystalTime[d] = 0.0;
+//    detInfo->detData.fDaliFITime[d] = 0.0;
+//    detInfo->detData.fDaliFIX[d] = NAN;
+//    detInfo->detData.fDaliFIY[d] = NAN;
+//    detInfo->detData.fDaliFIZ[d] = NAN;
+//
+//  }
+//
+//}
+//
+////....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

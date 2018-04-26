@@ -17,6 +17,7 @@
 
 #include "InputInfo.hh"
 
+#define maxGammas maxNumberOfStates+1
 
 class G4ParticleGun;
 class G4Event;
@@ -64,7 +65,11 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     Double_t fTheta, fPhi, fEnergy;
     Int_t fEventNumber, fPdgId;
     Float_t fX0, fY0, fZ0;
+    Float_t vertex[3];
     //Double_t fX0, fY0, fZ0;
+
+    Int_t fGammaMul;
+    Float_t fGammaE[maxGammas], fGammaTheta[maxGammas], fGammaPhi[maxGammas];
    
     G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
 };

@@ -14,7 +14,9 @@
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
 // #include "QGSP_BIC_EMY.hh" //geant4.9
-#include "FTFP_BERT.hh" //geant4.10
+//#include "FTFP_BERT.hh" //geant4.10
+//#include "G4EmStandardPhysics_option3.hh" //geant4.10
+#include "PhysicsList.hh" //geant4.10.0
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -34,6 +36,7 @@
 #include "LibPerso.h"
 #include "InputInfo.hh"
 
+//#include "MUST2Array.hh"
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -58,6 +61,7 @@ int main(int argc,char** argv)
     //return 0;
   }
 
+  //sprintf(inputFileName, "doAll/input.txt");
 
   // read input file
   InputInfo* info = new InputInfo();
@@ -65,7 +69,7 @@ int main(int argc,char** argv)
   info->parse(inputFileName);
   
   
-
+  printf("\nTroja: input file parsed.\nGetting detector geometry...\n\n");
 
 
   // contains detector information
@@ -75,29 +79,41 @@ int main(int argc,char** argv)
   detInfo->Parse(info->fInFileNameGeometry);  
 
 
-
+  printf("\nTroja: detector geometry file parsed.\nSetting up Geant stuff...\n\n");
 
 
 
 
   // Choose the Random engine
   //
+printf("- CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine)\n");
   CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
   
   // Construct the default run manager
   //
-  G4RunManager * runManager = new G4RunManager;
+printf("- G4RunManager* runManager = new G4RunManager()\n");
+  G4RunManager* runManager = new G4RunManager();
 
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new DetectorConstruction(detInfo));
+printf("- runManager->SetUserInitialization(new DetectorConstruction(detInfo))\n");
+  runManager->SetUserInitialization(new DetectorConstruction(info, detInfo));
 
   // Physics list
-//  G4VModularPhysicsList* physicsList = new QGSP_BIC_EMY;
-  G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  //physicsList->SetVerboseLevel(1);
-  physicsList->SetVerboseLevel(0);
+  //  G4VModularPhysicsList* physicsList = new QGSP_BIC_EMY;
+  //  G4VModularPhysicsList* physicsList = new FTFP_BERT;
+  //  G4VModularPhysicsList* physicsList = new PhysicsList();
+printf("- PhysicsList* physicsList = new PhysicsList()\n");
+  PhysicsList* physicsList = new PhysicsList();
+printf("- physicsList->AddPhysicsList(emstandard_opt4)\n");
+  physicsList->AddPhysicsList("emstandard_opt4"); // good for low energy ions
+  //physicsList->AddPhysicsList("emstandard_opt0");
+
+  //physicsList->SetCutForGamma(0.001*mm);
+
+  physicsList->SetVerboseLevel(2);
+  //physicsList->SetVerboseLevel(0);
   runManager->SetUserInitialization(physicsList);
     
   // Primary generator action
@@ -111,6 +127,7 @@ int main(int argc,char** argv)
   runManager->SetUserAction(new SteppingAction(detInfo));     
 
   // Event action
+printf("- runManager->SetUserAction(new EventAction())\n");
   runManager->SetUserAction(new EventAction());
 
   // Run action
@@ -118,6 +135,7 @@ int main(int argc,char** argv)
      
   // Initialize G4 kernel
   //
+printf("- runManager->Initialize()\n");
   runManager->Initialize();
   
 #ifdef G4VIS_USE
@@ -133,9 +151,9 @@ int main(int argc,char** argv)
 
   if (argc==2) {
     // batch mode
-//    G4String command = "/control/execute ";
-//    G4String fileName = argv[1];
-//    UImanager->ApplyCommand(command+fileName);
+    //    G4String command = "/control/execute ";
+    //    G4String fileName = argv[1];
+    //    UImanager->ApplyCommand(command+fileName);
 
     //G4cout << "Creating string " << G4endl;
     
@@ -159,17 +177,18 @@ int main(int argc,char** argv)
     
   }
   else {
+    argc=1;
     // interactive mode : define UI session
-#ifdef G4UI_USE
-    G4UIExecutive* ui = new G4UIExecutive(argc, argv);
-#ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute init_vis.mac"); 
-#else
-    UImanager->ApplyCommand("/control/execute init.mac"); 
-#endif
-    ui->SessionStart();
-    delete ui;
-#endif
+    #ifdef G4UI_USE
+      G4UIExecutive* ui = new G4UIExecutive(argc, argv);
+    #ifdef G4VIS_USE
+      UImanager->ApplyCommand("/control/execute init_vis.mac"); 
+    #else
+      UImanager->ApplyCommand("/control/execute init.mac"); 
+    #endif
+      ui->SessionStart();
+      delete ui;
+    #endif
   }
 
   // Job termination
@@ -177,9 +196,9 @@ int main(int argc,char** argv)
   // owned and deleted by the run manager, so they should not be deleted 
   // in the main() program !
   
-#ifdef G4VIS_USE
-  delete visManager;
-#endif
+  #ifdef G4VIS_USE
+    delete visManager;
+  #endif
   delete runManager;
   
   delete theApp;

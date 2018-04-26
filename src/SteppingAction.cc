@@ -13,6 +13,7 @@
 #include "G4Step.hh"
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 #include "TMath.h"
 #include <cmath>
@@ -73,52 +74,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   fDetInfo->detData.eventNumber = eID;
 
-  // ************************************************************************
-  // ************************* Silicon Spheres ******************************
-  // ************************************************************************
-  
-  // collect energy and track length step by step
-  // first Si
-    //printf("volume name is %s\n",volume->GetName().c_str());
-//  if (std::strcmp(volume->GetName(), "Shape1")==0 ){
-//    //printf("in volume 1\n");
-//    G4double edep = step->GetTotalEnergyDeposit();
-//    fEnergy1 += edep;
-//    //printf("fEnergy1 = %f\n", fEnergy1);
-//    
-//    // check if the particle just entered Shape1
-//    // if so, get the position of the first interaction point
-//    if (point1->GetStepStatus() == fGeomBoundary) {
-//      //printf("FI ");
-//      G4ThreeVector pos1 = point1->GetPosition();
-//      fX1=pos1.getX();
-//      fY1=pos1.getY();
-//      fZ1=pos1.getZ();
-//      //printf("x=%f y=%f z=%f\n", fX1, fY1, fZ1);
-//    }
-//  }
-//  
-//  
-//  if (std::strcmp(volume->GetName(), "Shape2")==0 ){
-//    //printf("in volume 2\n");
-//    if(TMath::IsNaN(fEnergy2)){
-//      fEnergy2 = 0.0;
-//    }
-//    G4double edep = step->GetTotalEnergyDeposit();
-//    fEnergy2 += edep;
-//    //printf("fEnergy2 = %f\n", fEnergy2);
-//    
-//  }
-  
-  
-  
-  
-  
   
   // ************************************************************************
   // *************************** Silicon SSD ********************************
   // ************************************************************************
-  
+
+
+
   // check if it is the first interaction point in a Silicon detector
   if ((point1->GetStepStatus() == fGeomBoundary) && !(fFI) ) {
 
@@ -135,13 +97,19 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       sprintf(tmpName, "logical%02d", d);
       //printf("looking for %s, found %s\n", tmpName, volume->GetName().data());
       if(std::strcmp(volume->GetName(), tmpName)==0){
-        fFI = 1;
         detID2 = d;
+        
+        if(fDetInfo->IsPosDet(d)){
+          fFI = 1;
+        }else{
+          continue;
+        }
         
         // save FI for later cross checking
         fDetInfo->detData.fIX=pos1.getX();
         fDetInfo->detData.fIY=pos1.getY();
         fDetInfo->detData.fIZ=pos1.getZ();
+        fDetInfo->detData.fITheta=pos1.getTheta();
         
         // cross check detector IDs
         if(detID1 != detID2){
@@ -159,13 +127,16 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                                    fDetInfo->detData.fIZ, 
                                    fDetInfo->detData.stripX[detID1], 
                                    fDetInfo->detData.stripY[detID1] );
+        
+        // CalHitPosition should be done in analysis
+        //fDetInfo->CalcHitPosition(detID1, fDetInfo->detData.stripX[detID1], fDetInfo->detData.stripY[detID1]);
 
         //printf("Found FI x = %f, y = %f, z = %f, stripx = %d, stripy = %d\n", fDetInfo->detData.fIX, fDetInfo->detData.fIY, fDetInfo->detData.fIZ, fDetInfo->detData.stripX[detID1], fDetInfo->detData.stripY[detID1]);
         
-        // to sum up energies in each detector, set them from NAN to 0.0
-        for(G4int dd=0; dd<fDetInfo->GetNoOfDetectors(); dd++){
-          fDetInfo->detData.energy[dd]=0.0; // was NAN 
-        }
+        //// to sum up energies in each detector, set them from NAN to 0.0
+        //for(G4int dd=0; dd<fDetInfo->GetNoOfDetectors(); dd++){
+        //  fDetInfo->detData.energyNotSmeared[dd]=0.0; // was NAN 
+        //}
 
         
         // leave the FI loop
@@ -180,25 +151,324 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
   // now, sum up the energies in each detector
 
-  G4double edep = step->GetTotalEnergyDeposit(); // HERE IS A PROBLEM!!!!!!!!!!!!!!! todo
+  G4double edep = step->GetTotalEnergyDeposit()/MeV; 
   
-  //printf("\nEvent %d\n", eID);
-  for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
-      char tmpName[50];
-      sprintf(tmpName, "logical%02d", d);
-      //printf("looking for %s\n", tmpName);
-      if(std::strcmp(volume->GetName(), tmpName)==0){
-        fDetInfo->detData.energy[d] += edep;
-        fDetInfo->detData.haveHit[d] = 1;
-        fDetInfo->detData.haveHitID[d] = d; // aux
-        //printf("EnergyDeposit in %s is %f\n", tmpName, edep);
-      }
+  //if(edep>0){
+  //  printf("\nEvent %d, edep %lf\n", eID, edep);
+  //}
 
+  char tmpName[50];
+  for(G4int d=0; d<fDetInfo->GetNoOfDetectors(); d++){
+    sprintf(tmpName, "logical%02d", d);
+    //printf("looking for %s\n", tmpName);
+    if(std::strcmp(volume->GetName(), tmpName)==0){
+      if(TMath::IsNaN(fDetInfo->detData.energyNotSmeared[d])){
+        fDetInfo->detData.energyNotSmeared[d] = 0.0;
+      }
+      fDetInfo->detData.energyNotSmeared[d] += edep;
+      fDetInfo->detData.haveHit[d] = 1;
+      fDetInfo->detData.haveHitID[d] = d; // aux
+      //printf("EnergyDeposit in %s is %f\n", tmpName, fDetInfo->detData.energyNotSmeared[d]);
+    }
+
+  }
+
+  if(std::strcmp(volume->GetName(), "target_log")==0){
+    fDetInfo->detData.targetEnergyLoss += edep;
   }
   
   
   
   
+  // ************************************************************************
+  // ****************************** DALI ************************************
+  // ************************************************************************
+  
+
+  if(fDetInfo->IncludeDali()){
+
+    string materialname = volume->GetName();
+    //size_t contains = materialname.find("lDali2");
+    size_t contains = materialname.find("lDali2Crystal");
+    
+    G4Track * theTrack = step->GetTrack();
+    Int_t trackVolume = theTrack->GetVolume()->GetCopyNo();
+
+    G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+    G4int pdgCode = thisDef->GetPDGEncoding();
+    //G4int parentID = step->GetTrack()->GetParentID();
+    
+    //edep = step->GetTotalEnergyDeposit()/MeV; 
+    
+    //if(trackVolume >=100100 && trackVolume < (100000+NUMBEROFDALI2CRYSTALS*100+2)){
+    if( (trackVolume >=100100) && (trackVolume < (100000+NUMBEROFDALI2CRYSTALS*100+2)) && (contains==0) && (edep>0.000) && (pdgCode!=2212)){
+      
+      //cout << "Dali:\nmaterialname " << materialname << ", contains " << contains << ", trackVolume " << trackVolume << ", parent id " << parentID << ", pdg code " << pdgCode << endl;
+      
+      if(trackVolume%100==0){
+        Int_t dummy = ((trackVolume-100000)/100)-1;
+      
+        //if(fDetector->fDali2Array->GetFIPointOption()==1){
+        Double_t newTime = theTrack->GetGlobalTime();
+        //Double_t oldTime = fDetector->fDali2Array->GetFITime(dummy);
+        Double_t oldTime = fDetInfo->detData.fDaliFITime[dummy];
+      
+        //cout << "dummy " << dummy << ", newTime " << newTime << ", oldTime " << oldTime << endl;
+      
+        //if(newTime<oldTime ||  fDetector->fDali2Array->GetCrystalFlag(dummy)==false) {
+        if(newTime<oldTime ||  fDetInfo->detData.fDaliCrystalFlag[dummy]==false) {
+          //fDetector->fDali2Array->SetFIX(dummy,(float)theTrack->GetPosition().x()/cm); 
+          //fDetector->fDali2Array->SetFIY(dummy,(float)theTrack->GetPosition().y()/cm);
+          //fDetector->fDali2Array->SetFIZ(dummy,(float)theTrack->GetPosition().z()/cm);
+          //fDetector->fDali2Array->SetFITime(dummy,newTime);
+          fDetInfo->detData.fDaliFIX[dummy] = (Float_t)theTrack->GetPosition().x()/cm; 
+          fDetInfo->detData.fDaliFIY[dummy] = (Float_t)theTrack->GetPosition().y()/cm;
+          fDetInfo->detData.fDaliFIZ[dummy] = (Float_t)theTrack->GetPosition().z()/cm;
+          fDetInfo->detData.fDaliFITime[dummy] = newTime;
+      
+          //cout << "FI xyz t: " << fDetInfo->detData.fDaliFIX[dummy] << ", " << fDetInfo->detData.fDaliFIY[dummy] << ", " << fDetInfo->detData.fDaliFIZ[dummy] << ", " << fDetInfo->detData.fDaliFITime[dummy] << endl;
+
+        }
+        //}  // first interaction point
+        
+        //fDetector->fDali2Array->SetCrystalFlagTrue(dummy);
+        //fDetector->fDali2Array->AddCrystalEnergy(dummy,edep);
+        if(fDetInfo->detData.fDaliCrystalFlag[dummy] == false){
+          fDetInfo->detData.fDaliCrystalFlag[dummy] = true;
+          fDetInfo->detData.fDaliCrystalMult += (Int_t)1;
+        }
+        if(TMath::IsNaN(fDetInfo->detData.fDaliCrystalEnergy[dummy])){
+          fDetInfo->detData.fDaliCrystalEnergy[dummy] = 0.0;
+        }
+        fDetInfo->detData.fDaliCrystalEnergy[dummy] += (Float_t)edep;
+      
+        //cout << "Dali mult " << fDetInfo->detData.fDaliCrystalMult << ", edep " << edep << ", crystal energy " << fDetInfo->detData.fDaliCrystalEnergy[dummy] << endl;
+
+      }
+    }
+  } // include Dali
+  
+  // ************************************************************************
+  // ****************************** GRAPE ***********************************
+  // ************************************************************************
+  
+
+  if(fDetInfo->IncludeGrape()){
+//  //if( (parentID==0 && pdgCode==22) || (fDetInfo->detData.grapeEnergy>0 && parentID>0 && pdgCode<=22) ){ // gammas and it's secondaries
+//    
+//    G4Track * theTrack = step->GetTrack();
+//    int trackVolume = theTrack->GetVolume()->GetCopyNo();
+//
+//    //if(trackVolume>0) {
+//    //  printf("trackVolume %d\n", trackVolume);
+//    //}
+//    
+//    //if(trackVolume >=200100 && trackVolume <= 202000)
+//    if(trackVolume >=200100 && trackVolume <= 202000 && edep>0.000)
+//        {
+//          //if(TMath::IsNaN(fDetInfo->detData.grapeEnergy)){
+//          //  fDetInfo->detData.grapeEnergy=0.0;
+//          //}
+//          
+//          //the copy number is 2xxxyz, with xxx=detector number(0-17),y=crystal(0-1),z=segment(0-8)
+//          // for all other material belonging to the detector, y>=20 
+//          // reminder of the variables:
+//          // grapeCrystalFlag[20][2][20];
+//          //  grapeCrystalEnergyGamma[20][2][20];
+//          if(trackVolume%100<20)
+//          {
+//            //G4cout <<"TrackVolume: "<<trackVolume<<G4endl;
+//            int seg = trackVolume%10;
+//            int cry = ((trackVolume-seg)/10)%10;
+//            int det = (trackVolume-10*cry-seg-200000)/100 -1;
+//            //G4cout <<"det: "<<det<<G4endl;
+//            //G4cout <<"cry: "<<cry<<G4endl;
+//    //        fDetector->fGrapeArray->SetCrystalFlagTrue(det,cry,0);  // The entire crystal
+//    //        fDetector->fGrapeArray->AddCrystalEnergy(det,cry,0,edep);
+//    //
+//    //        fDetector->fGrapeArray->SetCrystalFlagTrue(det,cry,seg+1);  // The individual segments
+//    //        fDetector->fGrapeArray->AddCrystalEnergy(det,cry,seg+1,edep);
+//
+//            //printf("Grape: seg %d, cry %d, det %d, energy dep %f\n", seg, cry, det, edep);
+//
+//            ////fDetInfo->detData.grapeEnergy += edep;
+//            //if(fDetInfo->detData.grapeDet==-1){
+//            //  fDetInfo->detData.grapeDet=det;
+//            //  fDetInfo->detData.grapeCrystal=cry;
+//            //  fDetInfo->detData.grapeSegment=seg;
+//            //  fDetInfo->detData.grapeEnergy += edep;
+//            //}else if(fDetInfo->detData.grapeDet==det){
+//            //  fDetInfo->detData.grapeEnergy += edep;
+//            //}
+//
+//            if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
+//              fDetInfo->detData.grapeDetEnergy[det]=0.0;
+//              fDetInfo->detData.grapeDetMul++;
+//            }
+//            if(TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){
+//              fDetInfo->detData.grapeCryEnergy[det][cry]=0.0;
+//              fDetInfo->detData.grapeCryMul[det]++;
+//            }
+//            if(TMath::IsNaN(fDetInfo->detData.grapeSegEnergy[det][cry][seg])){
+//              fDetInfo->detData.grapeSegEnergy[det][cry][seg]=0.0;
+//              fDetInfo->detData.grapeSegMul[det][cry]++;
+//            }
+//
+//            fDetInfo->detData.grapeDetEnergy[det] += edep;
+//            fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
+//            fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
+//
+//            //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+//            //G4int pdgCode = thisDef->GetPDGEncoding();
+//            //G4int parentID = step->GetTrack()->GetParentID();
+//            //printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
+//            //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+//            //printf("egam det %f \n", fDetInfo->detData.grapeDetEnergy[0]);
+//            //printf("mul det %d, cry %d\n", fDetInfo->detData.grapeDetMul, fDetInfo->detData.grapeCryMul[0]);
+//    
+//          }
+//        }
+
+    // checking energy deposit
+    //G4double energyDep   = step->GetTotalEnergyDeposit();
+    //G4double deltaEnergy = step->GetDeltaEnergy();
+    //G4double stepl       = step->GetStepLength(); 
+ 
+    // If delta-energy is equal to zero, skip this process.
+    // The events where energy deposit is zero are reserved 
+    // becase in the compton scattering event the energy deposit is zero 
+    // but the momentum of gamma ray is changed.
+    //   if (deltaEnergy == 0.) return false;
+    //   if (energyDep/keV == 0.) return false;
+ 
+    // using post step information
+    G4StepPoint        *preStepPoint  = step->GetPreStepPoint();
+    G4StepPoint        *postStepPoint = step->GetPostStepPoint();
+    //G4VPhysicalVolume  *preStepVolume;
+    //G4VPhysicalVolume  *postStepVolume;
+ 
+    G4TouchableHistory *preStepTouchable;
+    G4TouchableHistory *postStepTouchable;
+    //G4VProcess         *preStepProcess;
+    //G4VProcess         *postStepProcess;
+    G4ThreeVector globalPostStepPosition,globalPreStepPosition;
+    G4ThreeVector localPostStepPosition, localPreStepPosition;
+    G4ThreeVector globalPosition, localPosition;
+    G4int seg;
+    G4int cry;
+    G4int det;
+    //G4int id;
+    //G4double mass = preStepPoint->GetMass();
+ 
+    // pre step information 
+    //preStepProcess = (G4VProcess*) preStepPoint->GetProcessDefinedStep();
+    preStepTouchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
+    //preStepVolume = preStepTouchable->GetVolume();
+    globalPreStepPosition = preStepPoint->GetPosition();
+    localPreStepPosition  = 
+      preStepTouchable->GetHistory()
+      ->GetTopTransform().TransformPoint(globalPreStepPosition);
+    
+    // post step information 
+    //postStepProcess = (G4VProcess*) postStepPoint->GetProcessDefinedStep();
+    postStepTouchable = (G4TouchableHistory*)(postStepPoint->GetTouchable());
+    //postStepVolume = postStepTouchable->GetVolume();
+    globalPostStepPosition = postStepPoint->GetPosition();
+    localPostStepPosition  = 
+      postStepTouchable->GetHistory()
+      ->GetTopTransform().TransformPoint(globalPostStepPosition);
+ 
+    //if(preStepProcess &&
+    //    (preStepProcess->GetProcessName() == G4String("LowEnCompton") ||
+    //     preStepProcess->GetProcessName() == G4String("LowEnPhotoElec") ||
+    //     preStepProcess->GetProcessName() == G4String("LowEnConversion") ||
+    //     preStepProcess->GetProcessName() == G4String("LowEnBrem"))) {
+    //  globalPosition = globalPreStepPosition;
+    //  localPosition  = localPreStepPosition;
+    //}else{
+    //  globalPosition = (globalPreStepPosition + globalPostStepPosition)/2.;
+    //  localPosition  = (localPreStepPosition + localPostStepPosition)/2.;
+    //}      
+    
+    //det = preStepTouchable->GetReplicaNumber(3);
+    det = preStepTouchable->GetReplicaNumber(2);
+    seg = preStepTouchable->GetReplicaNumber(0);
+    if(seg>9){
+      cry=1;
+      seg-=11;
+    }else{
+      cry=0;
+      seg-=1; // start counting from 0
+    }
+    //id = segmentID + detectorID * 20;
+     
+    string materialname = volume->GetName();
+    //if(materialname=="World") cout << endl;
+    //cout << materialname << endl;
+    size_t contains = materialname.find("lSeg");
+    
+    if( ((Int_t)contains > -1) && (edep>0.000)){
+    //if( ((Int_t)contains > -1) && (edep>0.15)){ // step limit 
+      
+      //printf("\npreStepTouchable->GetReplicaNumber %d %d %d %d\n", preStepTouchable->GetReplicaNumber(0), preStepTouchable->GetReplicaNumber(1), preStepTouchable->GetReplicaNumber(2), preStepTouchable->GetReplicaNumber(3));
+      //printf("track in volume %s, edep, %f, det %d, cry %d, seg %d\n", volume->GetName().c_str(), edep, det, cry, seg);
+ 
+            
+      G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+      G4int pdgCode = thisDef->GetPDGEncoding();
+      G4int parentID = step->GetTrack()->GetParentID();
+      
+      Bool_t newCrystal=false;
+      if(fDetInfo->detData.grapeCryMul[det]>0 && TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){newCrystal=true;}
+      
+      //if( !( (newCrystal && parentID>0) && (TMath::Abs(pdgCode)==11) ) ){ // exclude e- going from one crystal to the other
+      if( !( (newCrystal && parentID==1) && (TMath::Abs(pdgCode)==11) ) ){ // exclude e- going from one crystal to the other
+      
+        if(TMath::IsNaN(fDetInfo->detData.grapeDetEnergy[det])){
+          fDetInfo->detData.grapeDetEnergy[det]=0.0;
+          fDetInfo->detData.grapeDetMul++;
+        }
+        if(TMath::IsNaN(fDetInfo->detData.grapeCryEnergy[det][cry])){
+          fDetInfo->detData.grapeCryEnergy[det][cry]=0.0;
+          fDetInfo->detData.grapeCryMul[det]++;
+        }
+        if(TMath::IsNaN(fDetInfo->detData.grapeSegEnergy[det][cry][seg])){
+          fDetInfo->detData.grapeSegEnergy[det][cry][seg]=0.0;
+          fDetInfo->detData.grapeSegMul[det][cry]++;
+        }
+        
+        //fDetInfo->detData.grapeDetEnergy[det] += edep;
+        //fDetInfo->detData.grapeCryEnergy[det][cry] += edep;
+        fDetInfo->detData.grapeSegEnergy[det][cry][seg] += edep;
+
+        //if(fDetInfo->detData.grapeSegEnergy[det][cry][seg]>0.1){
+        //  for(Int_t c=0; c<2; c++){
+        //  for(Int_t s=0; s<9; s++){
+        //    
+
+        //  }
+        //  }
+        //}
+        
+        //G4ParticleDefinition* thisDef = step->GetTrack()->GetDefinition(); 
+        //G4int pdgCode = thisDef->GetPDGEncoding();
+        //G4int parentID = step->GetTrack()->GetParentID();
+        //
+        ////if(fDetInfo->detData.grapeDetEnergy[0]>1.0 && fDetInfo->detData.grapeCryMul[det]>1) {
+        //  printf("event %d: parent id is %d, pdg code is %d\n", eID, parentID, pdgCode);
+        //  //printf("Grape: seg %d, cry %d, det %d, energy %f\n", seg, cry, det, edep);
+        //  printf("egam det %f \n", fDetInfo->detData.grapeDetEnergy[0]);
+        //  printf("mul det %d, cry %d\n", fDetInfo->detData.grapeDetMul, fDetInfo->detData.grapeCryMul[0]);
+        ////}
+      
+      
+      }
+
+
+
+    }
+
+  } // IncludeGrape
   
      
 }
