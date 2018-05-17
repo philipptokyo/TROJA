@@ -176,6 +176,8 @@ void Dali2::CreateArrayXYZPsiThetaPhi()  {
     G4cout<<"Read detector "<<i+1<<": "<<x<<" "<<y<<" "<<z<<" "<<psi<<" "<<theta<<" "<<phi<<" "<<rotSign<<" "<<detType<<endl;
     
     
+    // skip one side of DALI for visibility of inner parts
+    //if(x<0) continue;
 
     //The first digit is for the array type, digits 2-4 are used for the detector number
     //The last two digits are for the different physical materials of one detector

@@ -133,18 +133,25 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   
   G4Material* fTarget;
     
+  G4Element* Ti = new G4Element("Titanium", "Ti", 22., 47.867*g/mole);
   G4Element* C = new G4Element("Carbon", "C", 6., 12.01*g/mole);
-  G4Element* D = new G4Element("Deuterium", "D", 1., 2.01*g/mole);
+  G4Element* D = new G4Element("Deuterium", "D", 1., 2.014*g/mole);
+  G4Element* T = new G4Element("Tritium", "T", 1., 3.016*g/mole); 
+  
   G4Material* fCD2 = new G4Material("CD2", 0.88*g/cm3, 2);
   //fCD2->AddElement(C, .333);
   //fCD2->AddElement(D, .667);
   fCD2->AddElement(C, 1);
   fCD2->AddElement(D, 2);
 
-  G4Element* Ti = new G4Element("Titanium", "Ti", 22., 47.867*g/mole);
-  G4Material* fTiD2 = new G4Material("TiD2", 3.75*g/cm3, 2);
-  fTiD2->AddElement(Ti, .333);
-  fTiD2->AddElement(D, .667);
+  //G4Material* fTiD2 = new G4Material("TiD2", 3.75*g/cm3, 2);
+  G4Material* fTiD2 = new G4Material("TiD2", 4.5*g/cm3, 2);
+  fTiD2->AddElement(Ti, 1);
+  fTiD2->AddElement(D, 2);
+
+  G4Material* fTiT2 = new G4Material("TiT2", 4.5*g/cm3, 2); // todo: check density
+  fTiT2->AddElement(Ti, 1);
+  fTiT2->AddElement(T, 2);
 
   //printf("Building %s target\n", fDetInfo->GetTargetMaterial().c_str());
   printf("Building %s target\n", fInfo->GetTargetMaterial().c_str());
@@ -155,8 +162,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //  fTarget = fTiD2;
   if( strcmp(fInfo->GetTargetMaterial().c_str(), "CD2")==0 ){
     fTarget = fCD2;
-  }else if( strcmp(fInfo->GetTargetMaterial().c_str(), "TiD2")==0 ){
+  //}else if( strcmp(fInfo->GetTargetMaterial().c_str(), "TiD2")==0 ){
+  }else if( strcmp(fInfo->GetTargetMaterial().c_str(), "2DTI")==0 ){
     fTarget = fTiD2;
+  //}else if( strcmp(fInfo->GetTargetMaterial().c_str(), "TiT2")==0 ){
+  }else if( strcmp(fInfo->GetTargetMaterial().c_str(), "2TTI")==0 ){
+    fTarget = fTiT2;
   }else{
 
     //G4Material* fLead    = nist->FindOrBuildMaterial("G4_Pb"); 
@@ -224,6 +235,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4Box* box[maxDetectors];
     G4Tubs* tube[maxDetectors];
     G4LogicalVolume* logical[maxDetectors];
+
+    //G4VisAttributes* visAttBlue = new G4VisAttributes(G4Colour(0.5,0.5,1.0)); //blue
+    G4VisAttributes* visAttBlue = new G4VisAttributes(G4Colour(0.4,0.1,1.0)); //blue
+    G4VisAttributes* visAttRed = new G4VisAttributes(G4Colour(1.0,0.3,0.3)); //red
+    G4VisAttributes* visAttGray = new G4VisAttributes(G4Colour(1.0,1.0,1.0)); //gray
+    //G4VisAttributes* visAttYellow = new G4VisAttributes(G4Colour(1.0,1.0,.0)); //yellow
+    G4VisAttributes* visAttYellow = new G4VisAttributes(G4Colour(0.5,0.5,.1)); //yellow
+
     
     
     for(G4int d=0; d<noOfDet; d++){
@@ -258,8 +277,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         sprintf(tmpName, "logical%02d", d);
         if((strcmp(fDetInfo->GetType(d).data(), "DSSDbox")==0)){
           logical[d] = new G4LogicalVolume(box[d], fSilicon, tmpName);
+          logical[d]->SetVisAttributes(visAttBlue);
         }else if(strcmp(fDetInfo->GetType(d).data(), "CsIbox")==0){ // this if is redundant, ne
           logical[d] = new G4LogicalVolume(box[d], fCsI, tmpName);
+          logical[d]->SetVisAttributes(visAttYellow);
         }
 
       } else if( (strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0) ||
@@ -296,8 +317,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
         sprintf(tmpName, "logical%02d", d);
         if(strcmp(fDetInfo->GetType(d).data(), "DSSDtube")==0){
           logical[d] = new G4LogicalVolume(tube[d], fSilicon, tmpName);
+          logical[d]->SetVisAttributes(visAttBlue);
         }else if(strcmp(fDetInfo->GetType(d).data(), "CsItube")==0){
           logical[d] = new G4LogicalVolume(tube[d], fCsI, tmpName);
+          logical[d]->SetVisAttributes(visAttYellow);
         }else if(strcmp(fDetInfo->GetType(d).data(), "Altube")==0){
           logical[d] = new G4LogicalVolume(tube[d], fAl, tmpName);
         }else{

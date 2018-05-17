@@ -99,6 +99,9 @@
 ## Attach text to one corner of Shape2, with a small, fixed offset
 #/vis/scene/add/text 6 7 10 cm 18 4 4 Shape2
 #
+/vis/viewer/set/background white
+/vis/viewer/set/hiddenEdge 1
+#
 # To get nice view
 /vis/geometry/set/visibility World 0 false
 #/vis/geometry/set/visibility Envelope 0 false
@@ -107,9 +110,8 @@
 #/vis/viewer/set/viewpointThetaPhi 120 90
 #/vis/viewer/set/viewpointThetaPhi 50 140
 #/vis/viewer/set/viewpointThetaPhi 80 140
-/vis/viewer/set/viewpointThetaPhi 140 140
-#/vis/viewer/set/viewpointThetaPhi 120 140
-#/vis/viewer/set/viewpointThetaPhi 180 180
+#/vis/viewer/set/viewpointThetaPhi 140 140
+/vis/viewer/set/viewpointThetaPhi 50 150
 #
 # Re-establish auto refreshing and verbosity:
 /vis/viewer/set/autoRefresh true
